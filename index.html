@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>The Black Cat's Midnight Picnic</title>
     
     <!-- React & ReactDOM -->
@@ -28,7 +28,28 @@
             background-color: #020617; /* Slate 950 */
             color: #e2e8f0; /* Slate 200 */
             overscroll-behavior: none; /* Prevent pull-to-refresh on mobile */
+            margin: 0;
+            padding: 0;
+            height: 100vh; /* Fallback */
+            height: 100dvh;
         }
+        #root {
+            height: 100%;
+        }
+        /* Mobile safe area padding for notches/home bars */
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        /* Dynamic Height Classes */
+        .h-dvh {
+            height: 100vh;
+            height: 100dvh;
+        }
+        .content-height {
+            height: calc(100vh - 80px);
+            height: calc(100dvh - 80px);
+        }
+        
         @keyframes twinkle {
             0%, 100% { opacity: 0.2; transform: scale(0.8); }
             50% { opacity: 1; transform: scale(1.2); }
@@ -760,80 +781,82 @@
                     </div>
 
                     {/* Flexible Game Viewport */}
-                    <div className="relative w-full max-w-md bg-emerald-900 rounded-xl border-4 border-slate-700 overflow-hidden shadow-2xl flex-shrink-1 aspect-square max-h-[50vh]">
-                        {/* Map Grid */}
-                        {gameState === 'roaming' && (
-                            <div className="absolute inset-0 grid" style={{ 
-                                gridTemplateColumns: `repeat(${MAP_COLS}, 1fr)`, 
-                                gridTemplateRows: `repeat(${MAP_ROWS}, 1fr)` 
-                            }}>
-                                {mapGrid.map((cell, i) => (
-                                    <div key={i} className={`border-[0.5px] border-white/5 relative flex items-center justify-center ${cell.isObstacle ? 'bg-slate-800/50' : 'bg-green-800/40'}`}>
-                                        {cell.decoration && <span style={{fontSize: 'clamp(8px, 1.5vw, 16px)'}} className="opacity-70">{cell.decoration}</span>}
-                                    </div>
-                                ))}
+                    <div className="flex-1 w-full min-h-0 flex items-center justify-center">
+                        <div className="aspect-square max-h-full max-w-full bg-emerald-900 rounded-xl border-4 border-slate-700 overflow-hidden shadow-2xl relative">
+                            {/* Map Grid */}
+                            {gameState === 'roaming' && (
+                                <div className="absolute inset-0 grid" style={{ 
+                                    gridTemplateColumns: `repeat(${MAP_COLS}, 1fr)`, 
+                                    gridTemplateRows: `repeat(${MAP_ROWS}, 1fr)` 
+                                }}>
+                                    {mapGrid.map((cell, i) => (
+                                        <div key={i} className={`border-[0.5px] border-white/5 relative flex items-center justify-center ${cell.isObstacle ? 'bg-slate-800/50' : 'bg-green-800/40'}`}>
+                                            {cell.decoration && <span style={{fontSize: 'clamp(8px, 1.5vw, 16px)'}} className="opacity-70">{cell.decoration}</span>}
+                                        </div>
+                                    ))}
 
-                                {entities.map(e => (
-                                    <div key={e.id} className="absolute flex items-center justify-center transition-all duration-300 transform hover:scale-110 z-10"
+                                    {entities.map(e => (
+                                        <div key={e.id} className="absolute flex items-center justify-center transition-all duration-300 transform hover:scale-110 z-10"
+                                             style={{ 
+                                                 width: `${100/MAP_COLS}%`, height: `${100/MAP_ROWS}%`,
+                                                 left: `${(e.x/MAP_COLS)*100}%`, top: `${(e.y/MAP_ROWS)*100}%`,
+                                                 fontSize: 'clamp(12px, 2.5vw, 24px)'
+                                             }}>
+                                            {e.content}
+                                        </div>
+                                    ))}
+
+                                    <div className="absolute flex items-center justify-center transition-all duration-200 z-20"
                                          style={{ 
                                              width: `${100/MAP_COLS}%`, height: `${100/MAP_ROWS}%`,
-                                             left: `${(e.x/MAP_COLS)*100}%`, top: `${(e.y/MAP_ROWS)*100}%`,
-                                             fontSize: 'clamp(12px, 2.5vw, 24px)'
+                                             left: `${(player.x/MAP_COLS)*100}%`, top: `${(player.y/MAP_ROWS)*100}%`,
+                                             fontSize: 'clamp(14px, 3vw, 28px)'
                                          }}>
-                                        {e.content}
-                                    </div>
-                                ))}
-
-                                <div className="absolute flex items-center justify-center transition-all duration-200 z-20"
-                                     style={{ 
-                                         width: `${100/MAP_COLS}%`, height: `${100/MAP_ROWS}%`,
-                                         left: `${(player.x/MAP_COLS)*100}%`, top: `${(player.y/MAP_ROWS)*100}%`,
-                                         fontSize: 'clamp(14px, 3vw, 28px)'
-                                     }}>
-                                    🐈‍⬛
-                                </div>
-                            </div>
-                        )}
-
-                        {gameState === 'battle' && battleState && (
-                            <div className="absolute inset-0 bg-slate-900/95 flex flex-col items-center justify-center p-4 animate-in fade-in z-30">
-                                <h3 className="text-xl font-bold text-red-400 mb-4 animate-pulse">BATTLE!</h3>
-                                
-                                <div className="flex justify-around w-full mb-4">
-                                    <div className="text-center">
-                                        <div className="text-3xl mb-1">🐈‍⬛</div>
-                                        <div className="text-xs font-bold text-green-400">{player.hp} HP</div>
-                                    </div>
-                                    <div className="text-center">
-                                        <div className="text-3xl mb-1 animate-bounce">{battleState.enemy.content}</div>
-                                        <div className="text-xs font-bold text-red-400">{battleState.enemy.hp} HP</div>
+                                        🐈‍⬛
                                     </div>
                                 </div>
+                            )}
 
-                                <div className="w-full bg-black/50 p-2 rounded mb-4 h-20 overflow-y-auto text-[10px] font-mono text-slate-300 border border-slate-700">
-                                    {battleState.log.map((l, i) => <div key={i}>{l}</div>)}
+                            {gameState === 'battle' && battleState && (
+                                <div className="absolute inset-0 bg-slate-900/95 flex flex-col items-center justify-center p-4 animate-in fade-in z-30">
+                                    <h3 className="text-xl font-bold text-red-400 mb-4 animate-pulse">BATTLE!</h3>
+                                    
+                                    <div className="flex justify-around w-full mb-4">
+                                        <div className="text-center">
+                                            <div className="text-3xl mb-1">🐈‍⬛</div>
+                                            <div className="text-xs font-bold text-green-400">{player.hp} HP</div>
+                                        </div>
+                                        <div className="text-center">
+                                            <div className="text-3xl mb-1 animate-bounce">{battleState.enemy.content}</div>
+                                            <div className="text-xs font-bold text-red-400">{battleState.enemy.hp} HP</div>
+                                        </div>
+                                    </div>
+
+                                    <div className="w-full bg-black/50 p-2 rounded mb-4 h-20 overflow-y-auto text-[10px] font-mono text-slate-300 border border-slate-700">
+                                        {battleState.log.map((l, i) => <div key={i}>{l}</div>)}
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-2 w-full text-xs">
+                                        <button onClick={() => battleAction('attack')} className="p-2 bg-red-600 rounded font-bold hover:bg-red-500 flex items-center justify-center gap-1"><Sword size={12} /> Scratch</button>
+                                        <button onClick={() => battleAction('hiss')} className="p-2 bg-orange-600 rounded font-bold hover:bg-orange-500 flex items-center justify-center gap-1"><Zap size={12}/> Hiss</button>
+                                        <button onClick={() => battleAction('heal')} className="p-2 bg-green-600 rounded font-bold hover:bg-green-500 col-span-2 flex items-center justify-center gap-1"><Heart size={12} /> Purr</button>
+                                    </div>
                                 </div>
+                            )}
 
-                                <div className="grid grid-cols-2 gap-2 w-full text-xs">
-                                    <button onClick={() => battleAction('attack')} className="p-2 bg-red-600 rounded font-bold hover:bg-red-500 flex items-center justify-center gap-1"><Sword size={12} /> Scratch</button>
-                                    <button onClick={() => battleAction('hiss')} className="p-2 bg-orange-600 rounded font-bold hover:bg-orange-500 flex items-center justify-center gap-1"><Zap size={12}/> Hiss</button>
-                                    <button onClick={() => battleAction('heal')} className="p-2 bg-green-600 rounded font-bold hover:bg-green-500 col-span-2 flex items-center justify-center gap-1"><Heart size={12} /> Purr</button>
+                            {gameState === 'victory' && (
+                                <div className="absolute inset-0 bg-pink-900/90 flex flex-col items-center justify-center p-6 text-center animate-in zoom-in z-40">
+                                    <Trophy size={48} className="text-yellow-400 mb-2" />
+                                    <h2 className="text-2xl font-bold text-white mb-2">Adventure Complete!</h2>
+                                    <p className="text-pink-200 text-sm mb-4">You've cleared all challenges.</p>
                                 </div>
-                            </div>
-                        )}
-
-                        {gameState === 'victory' && (
-                            <div className="absolute inset-0 bg-pink-900/90 flex flex-col items-center justify-center p-6 text-center animate-in zoom-in z-40">
-                                <Trophy size={48} className="text-yellow-400 mb-2" />
-                                <h2 className="text-2xl font-bold text-white mb-2">Adventure Complete!</h2>
-                                <p className="text-pink-200 text-sm mb-4">You've cleared all challenges.</p>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
 
                     {/* Compact Controls */}
                     {gameState === 'roaming' && (
-                        <div className="mt-2 w-full max-w-md flex flex-col items-center gap-2">
+                        <div className="shrink-0 mt-2 w-full flex flex-col items-center gap-2">
                              <div className="text-pink-300 font-mono text-xs h-4 overflow-hidden w-full text-center">
                                 {message}
                             </div>
