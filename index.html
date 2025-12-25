@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Black Cat's Midnight Picnic</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        /* Custom scrollbar hiding */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        body {
+            background-color: #020617; /* Slate 950 */
+            color: #e2e8f0; /* Slate 200 */
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        .star {
+            animation: twinkle 3s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+        
+        // --- ICONS (Inline SVGs to fix display issues) ---
+        const IconBase = ({ children, size = 24, className = "", fill = "none" }) => (
+            <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width={size} 
+                height={size} 
+                viewBox="0 0 24 24" 
+                fill={fill} 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                className={className}
+            >
+                {children}
+            </svg>
+        );
+
+        const Heart = (props) => (
+            <IconBase {...props}>
+                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+            </IconBase>
+        );
+        const Music = (props) => (
+            <IconBase {...props}>
+                <path d="M9 18V5l12-2v13" />
+                <circle cx="6" cy="18" r="3" />
+                <circle cx="18" cy="16" r="3" />
+            </IconBase>
+        );
+        const Star = (props) => (
+            <IconBase {...props}>
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+            </IconBase>
+        );
+        const Tent = (props) => (
+            <IconBase {...props}>
+                <path d="M3.5 21 14 3" />
+                <path d="M20.5 21 10 3" />
+                <path d="M15.5 21 12 15l-3.5 6" />
+                <path d="M2 21h20" />
+            </IconBase>
+        );
+        
+        // REPLACED: Updated Cat Icon to use the actual Black Cat Emoji
+        // We use a foreignObject or text tag inside SVG if we want to keep IconBase, 
+        // OR we just return a span if we want the raw emoji.
+        // For the navigation bar consistency, let's wrap the emoji in a way that respects size props.
+        const Cat = ({ size = 24, className = "" }) => (
+            <div 
+                className={`flex items-center justify-center ${className}`} 
+                style={{ 
+                    width: size, 
+                    height: size, 
+                    fontSize: size * 0.8, // Scale emoji slightly smaller than container
+                    lineHeight: 1
+                }}
+            >
+                🐈‍⬛
+            </div>
+        );
+
+        const Coffee = (props) => (
+            <IconBase {...props}>
+                <path d="M10 2v2" />
+                <path d="M14 2v2" />
+                <path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1" />
+                <path d="M6 2v2" />
+            </IconBase>
+        );
+        const X = (props) => (
+            <IconBase {...props}>
+                <path d="M18 6 6 18" />
+                <path d="m6 6 12 12" />
+            </IconBase>
+        );
+        const Play = (props) => (
+            <IconBase {...props}>
+                <polygon points="5 3 19 12 5 21 5 3" />
+            </IconBase>
+        );
+        const Zap = (props) => (
+            <IconBase {...props}>
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+            </IconBase>
+        );
+        const Timer = (props) => (
+            <IconBase {...props}>
+                <line x1="10" x2="14" y1="2" y2="2" />
+                <line x1="12" x2="15" y1="14" y2="11" />
+                <circle cx="12" cy="14" r="8" />
+            </IconBase>
+        );
+        const Trophy = (props) => (
+            <IconBase {...props}>
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                <path d="M4 22h16" />
+                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+            </IconBase>
+        );
+        const RefreshCw = (props) => (
+            <IconBase {...props}>
+                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                <path d="M21 3v5h-5" />
+                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+                <path d="M8 16H3v5" />
+            </IconBase>
+        );
+
+        // --- ASSETS & CONFIG ---
+        const GAME_ITEMS = [
+            { type: 'good', emoji: '🍔', value: 10, label: 'Burger' },
+            { type: 'good', emoji: '🍗', value: 10, label: 'Chicken Leg' },
+            { type: 'good', emoji: '🪼', value: 10, label: 'Jellyfish' },
+            { type: 'bonus', emoji: '🧋', value: 50, label: 'Bubble Tea' },
+            { type: 'good', emoji: '🍪', value: 5, label: 'Soft Cookie' },
+            { type: 'good', emoji: '👅', value: 10, label: 'Tongue' },
+            { type: 'good', emoji: '🧎', value: 10, label: 'Kneeling' },
+            { type: 'good', emoji: '🍑', value: 10, label: 'Nectarine' },
+            { type: 'good', emoji: '🍆', value: 10, label: 'Eggplant' },
+            { type: 'good', emoji: '🧄', value: 10, label: 'Garlic' },
+            { type: 'good', emoji: '⛺', value: 10, label: 'Tent' },
+            
+            { type: 'bad', emoji: '🥀', value: -10, label: 'Wilted Flower' },
+            { type: 'bad', emoji: '🦑', value: -15, label: 'Calamari' },
+            { type: 'bad', emoji: '⛈️', value: -20, label: 'Bad Weather' },
+            { type: 'bad', emoji: '🦠', value: -15, label: 'Germ' },
+            { type: 'bad', emoji: '♂️', value: -20, label: 'Men' },
+        ];
+
+        const LEVEL_CONFIG = [
+            { level: 1, target: 50, time: 30, speed: 4, spawnRate: 0.03, title: "Warm Up" },
+            { level: 2, target: 100, time: 30, speed: 5, spawnRate: 0.04, title: "Getting Hungry" },
+            { level: 3, target: 150, time: 35, speed: 6, spawnRate: 0.05, title: "Midnight Snack" },
+            { level: 4, target: 200, time: 40, speed: 7, spawnRate: 0.06, title: "Fast Food" },
+            { level: 5, target: 250, time: 45, speed: 8, spawnRate: 0.08, title: "The Fiercest Hunt" },
+        ];
+
+        const MUSIC_POOL = [
+            "2TjdnqlpwOjhijHCwHCP2d", // Great Gig in the Sky
+            "4W3tM5eY5a7Xy2h8W2Lz2a", // Time
+            "4g2c7NoTWAOSYDy44l9nhs", // Money
+            "6pnwfWyaWjQiHCKTiZLItr", // Shine On You Crazy Diamond
+            "6mFqo63z1jD5U7aF7X4x6Z", // Wish You Were Here
+            "2ctvdKmETyOzPb2GiJJT53", // Breathe
+            "05uGBKRCuePsf43Hfm0JwX", // Brain Damage
+            "1tpcE1Ujav8q4fJgJMW4kb", // Fotia Sto Limani
+            "00hbwu3tPnbiH5MNjzF14N", // Oso Mikraino
+            "3rBCyn5i76CRYE5theSiB5", // Den Ksero
+            "7jhyoVX7uqGLLnoEvSSSnY", // O Erotas
+            "1cQ4zuzVnux91bI1tJR1G7", // Mehri Ta Haramata
+            "70LpDqsreV4MtlQzyyV87G", // San Ihthis
+            "5Od7Y3ihqhynfNBL10GS1V", // To Forema
+            "42wkMrkIqX4pYIGnTW70kG", // To Sima
+            "6ucNZBkwkPmw8OHiv5L7P4", // Pygolampides
+            "7Gi8jg3h2Ac0gMetpQUXmh", // To Koperti
+            "0H2zA6m04MUsu4mX2KecNr", // Fall Down
+            "6XHikJpK06NoXaFwkH4tPL", // I Spend Too Much Time in My Room
+            "2HcMkGeghyXdJRT1g85u0t", // To Ease You
+            "6R2YSITVeRTFwDczaxSnQS", // Hard To See
+            "4zGub7d71FopcEXaLKqxcU", // Tom's Place
+            "1ixXNc8iCkRniJhICf9xpy", // Turning Over a New Leaf
+            "4l38jp3bDPcI5avo9ov482", // Seabird
+            "3WSaGTmm67vd3stVi0Zu9D"  // Undercurrent
+        ];
+
+        // --- COMPONENTS ---
+
+        const StarBackground = () => {
+            const [stars, setStars] = useState([]);
+            useEffect(() => {
+                const s = [];
+                for(let i=0; i<50; i++) {
+                    s.push({
+                        top: Math.random() * 100,
+                        left: Math.random() * 100,
+                        size: Math.random() * 3,
+                        delay: Math.random() * 2,
+                        duration: Math.random() * 3 + 2
+                    });
+                }
+                setStars(s);
+            }, []);
+
+            return (
+                <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+                    {stars.map((s, i) => (
+                        <div
+                            key={i}
+                            className="absolute bg-white rounded-full opacity-70 star"
+                            style={{
+                                top: `${s.top}%`,
+                                left: `${s.left}%`,
+                                width: `${s.size}px`,
+                                height: `${s.size}px`,
+                                animationDuration: `${s.duration}s`,
+                                animationDelay: `${s.delay}s`
+                            }}
+                        />
+                    ))}
+                </div>
+            );
+        };
+
+        const PicnicGame = ({ onGameOver }) => {
+            const [gameState, setGameState] = useState('start');
+            const [currentLevelIdx, setCurrentLevelIdx] = useState(0);
+            const [score, setScore] = useState(0);
+            const [timeLeft, setTimeLeft] = useState(0);
+
+            const itemsRef = useRef([]);
+            const floatingTextsRef = useRef([]);
+            const playerPosRef = useRef(50);
+            const scoreRef = useRef(0);
+            const playerDomRef = useRef(null);
+            const requestRef = useRef();
+            const lastTimeRef = useRef(0);
+            
+            const [items, setItems] = useState([]);
+            const [floatingTexts, setFloatingTexts] = useState([]);
+            const [playerPos, setPlayerPos] = useState(50); 
+            
+            const currentLevelConfig = LEVEL_CONFIG[currentLevelIdx];
+
+            const resetLevel = () => {
+                itemsRef.current = [];
+                floatingTextsRef.current = [];
+                scoreRef.current = 0;
+                setScore(0);
+                setItems([]);
+                setFloatingTexts([]);
+                setTimeLeft(currentLevelConfig.time);
+                setGameState('playing');
+                lastTimeRef.current = Date.now();
+            };
+
+            const spawnItem = (spawnRate) => {
+                if (Math.random() > spawnRate) return;
+                const randomItem = GAME_ITEMS[Math.floor(Math.random() * GAME_ITEMS.length)];
+                const newItem = {
+                    id: Date.now() + Math.random(),
+                    x: Math.random() * (window.innerWidth - 50),
+                    y: -60,
+                    width: 40,
+                    height: 40,
+                    ...randomItem
+                };
+                itemsRef.current.push(newItem);
+            };
+
+            const handleInput = (clientX) => {
+                const width = window.innerWidth;
+                const pos = (clientX / width) * 100;
+                const clampedPos = Math.min(Math.max(pos, 5), 95);
+                playerPosRef.current = clampedPos;
+                setPlayerPos(clampedPos);
+            };
+
+            useEffect(() => {
+                if (gameState !== 'playing') return;
+
+                const gameLoop = () => {
+                    const now = Date.now();
+                    const dt = now - lastTimeRef.current;
+                    
+                    if (dt >= 1000) {
+                        setTimeLeft(prev => {
+                            const newTime = prev - 1;
+                            if (newTime <= 0) return 0;
+                            return newTime;
+                        });
+                        lastTimeRef.current = now;
+                    }
+
+                    if (scoreRef.current >= currentLevelConfig.target) {
+                        setGameState(currentLevelIdx === LEVEL_CONFIG.length - 1 ? 'victory' : 'level_complete');
+                        cancelAnimationFrame(requestRef.current);
+                        return;
+                    }
+
+                    const currentItems = itemsRef.current;
+                    const currentFloatingTexts = floatingTextsRef.current;
+                    const nextItems = [];
+                    const nextFloatingTexts = [];
+                    let scoreDelta = 0;
+
+                    let playerRect = { x: 0, y: 0, width: 0, height: 0 };
+                    if (playerDomRef.current) {
+                        const rect = playerDomRef.current.getBoundingClientRect();
+                        playerRect = {
+                            x: rect.x + 10,
+                            y: rect.y + 10,
+                            width: rect.width - 20,
+                            height: rect.height - 20
+                        };
+                    }
+
+                    currentFloatingTexts.forEach(ft => {
+                        ft.y -= 2;
+                        ft.life -= 1;
+                        if (ft.life > 0) nextFloatingTexts.push(ft);
+                    });
+
+                    currentItems.forEach(item => {
+                        item.y += currentLevelConfig.speed;
+                        const itemRect = { x: item.x, y: item.y, width: 30, height: 30 };
+                        const isColliding = 
+                            itemRect.x < playerRect.x + playerRect.width &&
+                            itemRect.x + itemRect.width > playerRect.x &&
+                            itemRect.y < playerRect.y + playerRect.height &&
+                            itemRect.y + itemRect.height > playerRect.y;
+
+                        if (isColliding) {
+                            scoreDelta += item.value;
+                            nextFloatingTexts.push({
+                                id: Date.now() + Math.random(),
+                                x: item.x,
+                                y: item.y,
+                                text: item.value > 0 ? `+${item.value}` : `${item.value}`,
+                                color: item.value > 0 ? 'text-green-400' : 'text-red-400',
+                                life: 40
+                            });
+                        } else if (item.y < window.innerHeight) {
+                            nextItems.push(item);
+                        }
+                    });
+
+                    itemsRef.current = nextItems;
+                    floatingTextsRef.current = nextFloatingTexts;
+                    
+                    setItems([...nextItems]); 
+                    setFloatingTexts([...nextFloatingTexts]);
+
+                    if (scoreDelta !== 0) {
+                        scoreRef.current += scoreDelta;
+                        setScore(scoreRef.current);
+                    }
+
+                    spawnItem(currentLevelConfig.spawnRate);
+                    requestRef.current = requestAnimationFrame(gameLoop);
+                };
+
+                lastTimeRef.current = Date.now();
+                requestRef.current = requestAnimationFrame(gameLoop);
+                return () => cancelAnimationFrame(requestRef.current);
+            }, [gameState, currentLevelConfig]);
+
+            useEffect(() => {
+                if (gameState === 'playing' && timeLeft === 0) {
+                    setGameState('failed');
+                }
+            }, [timeLeft, gameState]);
+
+            const renderOverlay = () => {
+                if (gameState === 'playing') return null;
+
+                let title = "";
+                let message = "";
+                let buttonText = "";
+                let onButtonClick = null;
+                let extraContent = null;
+
+                switch (gameState) {
+                    case 'start':
+                        title = "Midnight Picnic Challenge";
+                        message = "Are you ready to feed the Black Kitten (you)?";
+                        buttonText = "Start Level 1";
+                        onButtonClick = resetLevel;
+                        extraContent = (
+                            <div className="mt-4 text-sm text-pink-300 bg-black/40 p-3 rounded">
+                                <div>Level 1 Goal:</div>
+                                <div className="font-bold text-white text-lg">{LEVEL_CONFIG[0].target} points in {LEVEL_CONFIG[0].time}s</div>
+                            </div>
+                        );
+                        break;
+                    case 'level_complete':
+                        title = "Delicious!";
+                        message = `Level ${currentLevelIdx + 1} Complete!`;
+                        buttonText = `Start Level ${currentLevelIdx + 2}`;
+                        onButtonClick = () => {
+                            if (currentLevelIdx < LEVEL_CONFIG.length - 1) {
+                                setCurrentLevelIdx(prev => prev + 1);
+                                setTimeout(() => {
+                                    const nextLvl = LEVEL_CONFIG[currentLevelIdx + 1];
+                                    itemsRef.current = [];
+                                    scoreRef.current = 0;
+                                    setScore(0);
+                                    setTimeLeft(nextLvl.time);
+                                    setGameState('playing');
+                                    lastTimeRef.current = Date.now();
+                                }, 50);
+                            }
+                        };
+                        break;
+                    case 'failed':
+                        title = "Oh no! Too Slow!";
+                        message = `You didn't eat enough. The kitten is still hungry.`;
+                        buttonText = "Try Level Again";
+                        onButtonClick = resetLevel;
+                        break;
+                    case 'victory':
+                        return (
+                            <div className="absolute inset-0 flex items-center justify-center z-50 bg-black/90 backdrop-blur-md animate-in fade-in duration-1000">
+                                <div className="max-w-md w-full p-8 border-4 border-pink-500 rounded-3xl bg-slate-900 text-center relative overflow-hidden">
+                                    <div className="absolute top-0 left-0 w-full h-full bg-pink-500/10 animate-pulse"></div>
+                                    <div className="w-24 h-24 mx-auto bg-gradient-to-br from-pink-400 to-purple-600 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(236,72,153,0.8)]">
+                                        <Cat size={48} className="text-white" />
+                                    </div>
+                                    <h2 className="text-4xl font-serif text-transparent bg-clip-text bg-gradient-to-r from-pink-300 via-purple-300 to-white mb-6 font-bold">
+                                        Congratulations!
+                                    </h2>
+                                    <div className="bg-white/5 p-6 rounded-xl border border-pink-500/30 backdrop-blur-sm mb-8 transform hover:scale-105 transition-transform">
+                                        <Heart className="w-8 h-8 text-red-500 mx-auto mb-4 animate-bounce" fill="currentColor" />
+                                        <p className="text-xl text-pink-100 font-serif italic leading-relaxed">
+                                            "You're the fiercest black cat."
+                                        </p>
+                                    </div>
+                                    <button 
+                                        onClick={() => { setCurrentLevelIdx(0); setGameState('start'); }}
+                                        className="text-slate-400 hover:text-white text-sm underline"
+                                    >
+                                        Play Again
+                                    </button>
+                                </div>
+                            </div>
+                        );
+                    default:
+                        return null;
+                }
+
+                return (
+                    <div className="absolute inset-0 flex items-center justify-center z-30 bg-black/80 backdrop-blur-sm animate-in zoom-in-95 duration-300">
+                        <div className="text-center p-8 border-2 border-pink-500 rounded-2xl bg-slate-900 shadow-[0_0_20px_rgba(236,72,153,0.5)] max-w-sm w-full mx-4">
+                            <h2 className="text-3xl font-bold text-pink-400 mb-2">{title}</h2>
+                            <p className="text-slate-300 mb-6">{message}</p>
+                            {extraContent}
+                            <div className="flex justify-center gap-4 mb-6 text-2xl">
+                                <span>🍑</span><span>🍪</span><span>🧋</span>
+                            </div>
+                            <button 
+                                onClick={onButtonClick}
+                                className="w-full px-8 py-3 bg-pink-600 hover:bg-pink-500 text-white rounded-full font-bold transition-all transform hover:scale-105 shadow-lg shadow-pink-500/30"
+                            >
+                                {buttonText}
+                            </button>
+                        </div>
+                    </div>
+                );
+            };
+
+            return (
+                <div 
+                    className="relative w-full h-full touch-none overflow-hidden cursor-none"
+                    onTouchMove={(e) => handleInput(e.touches[0].clientX)}
+                    onMouseMove={(e) => handleInput(e.clientX)}
+                >
+                    <div className="absolute top-4 left-4 right-4 z-20 flex justify-between items-start pointer-events-none">
+                        <div className="flex flex-col gap-2">
+                            <div className="text-yellow-300 font-mono text-sm font-bold bg-black/60 p-2 rounded border border-yellow-500/30 flex items-center gap-2 w-fit">
+                                <Zap size={14} /> LEVEL {currentLevelIdx + 1}
+                            </div>
+                            <div className="text-pink-300 font-mono text-lg font-bold bg-black/60 p-2 rounded border border-pink-500/30 flex items-center gap-2 w-fit">
+                                <Trophy size={16} /> 
+                                <span>{score} / {currentLevelConfig.target}</span>
+                            </div>
+                        </div>
+                        <div className={`font-mono text-2xl font-bold bg-black/60 p-3 rounded-xl border flex items-center gap-2 ${timeLeft < 10 ? 'text-red-500 border-red-500 animate-pulse' : 'text-white border-slate-500'}`}>
+                            <Timer size={24} /> {timeLeft}s
+                        </div>
+                    </div>
+
+                    {renderOverlay()}
+
+                    {items.map(item => (
+                        <div 
+                            key={item.id}
+                            className="absolute text-4xl pointer-events-none"
+                            style={{ left: item.x, top: item.y }}
+                        >
+                            {item.emoji}
+                        </div>
+                    ))}
+
+                    {floatingTexts.map(ft => (
+                        <div 
+                            key={ft.id}
+                            className={`absolute text-2xl font-black pointer-events-none ${ft.color} drop-shadow-md`}
+                            style={{ 
+                                left: ft.x, 
+                                top: ft.y,
+                                opacity: ft.life / 40,
+                                transform: `translateY(-${(40 - ft.life)}px)`
+                            }}
+                        >
+                            {ft.text}
+                        </div>
+                    ))}
+
+                    <div 
+                        ref={playerDomRef}
+                        className="absolute bottom-24 text-6xl transform -translate-x-1/2 transition-transform duration-75 pointer-events-none drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]"
+                        style={{ left: `${playerPos}%` }}
+                    >
+                        🐈‍⬛
+                    </div>
+
+                    <div className="absolute bottom-0 w-full h-24 bg-gradient-to-t from-slate-900 to-transparent flex justify-around items-end pb-4 opacity-50 pointer-events-none">
+                        <Tent className="text-slate-600 w-12 h-12" />
+                        <div className="text-slate-600">🔥</div>
+                        <Tent className="text-slate-600 w-12 h-12" />
+                    </div>
+                </div>
+            );
+        };
+
+        const ConstellationIllustration = ({ title, icon, data }) => {
+            const hasRealData = !!data;
+            const seed = title.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+            const random = (offset = 0) => {
+                const x = Math.sin(seed + offset) * 10000;
+                return x - Math.floor(x);
+            };
+
+            let stars = [];
+            let lines = [];
+
+            if (hasRealData) {
+                stars = data.stars;
+                lines = data.lines;
+            } else {
+                const starCount = 5 + Math.floor(random(1) * 5);
+                for(let i=0; i<starCount; i++) {
+                    stars.push({
+                        x: 15 + random(i * 2) * 70,
+                        y: 15 + random(i * 2 + 1) * 70,
+                        size: 2 + random(i * 3) * 2
+                    });
+                }
+                const sortedStars = [...stars].sort((a,b) => a.x - b.x);
+                for(let i=0; i<sortedStars.length-1; i++) {
+                    lines.push({ x1: sortedStars[i].x, y1: sortedStars[i].y, x2: sortedStars[i+1].x, y2: sortedStars[i+1].y });
+                }
+                stars = sortedStars;
+            }
+
+            return (
+                <div className="w-full h-64 bg-slate-950 rounded-2xl relative overflow-hidden mb-6 border-2 border-slate-700 shadow-inner group">
+                    <div className="absolute inset-0 opacity-40 transition-opacity duration-1000" 
+                            style={{
+                                background: `radial-gradient(circle at ${random(10)*100}% ${random(11)*100}%, rgba(147, 51, 234, 0.3), transparent 60%),
+                                            radial-gradient(circle at ${random(12)*100}% ${random(13)*100}%, rgba(236, 72, 153, 0.2), transparent 50%)`
+                            }}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none select-none grayscale contrast-150 transform scale-150 group-hover:scale-125 transition-transform duration-1000">
+                        <span className="text-9xl filter blur-sm">{icon}</span>
+                    </div>
+                    <svg className="w-full h-full absolute inset-0 p-4 pointer-events-none">
+                        {lines.map((line, i) => (
+                            <line 
+                                key={i}
+                                x1={`${line.x1}%`} y1={`${line.y1}%`}
+                                x2={`${line.x2}%`} y2={`${line.y2}%`}
+                                stroke="rgba(255,255,255,0.4)"
+                                strokeWidth="1.5"
+                                strokeDasharray="5,5"
+                                className="animate-pulse"
+                                style={{ animationDuration: '3s' }}
+                            />
+                        ))}
+                        {stars.map((s, i) => (
+                            <circle 
+                                key={i} 
+                                cx={`${s.x}%`} 
+                                cy={`${s.y}%`} 
+                                r={s.size || (3 + random(i)*2)} 
+                                fill="white" 
+                                className="drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]"
+                            >
+                                <animate attributeName="opacity" values="0.5;1;0.5" dur={`${2 + random(i)}s`} repeatCount="indefinite" />
+                            </circle>
+                        ))}
+                    </svg>
+                    <div className="absolute bottom-2 right-4 text-xs text-slate-500 font-mono opacity-50">
+                        {hasRealData ? "ASTRONOMICAL DATA" : `ARTISTIC REP. FIG. ${seed % 100}`}
+                    </div>
+                </div>
+            )
+        }
+
+        const ConstellationGallery = () => {
+            const [activeConstellation, setActiveConstellation] = useState(null);
+            const [currentTracks, setCurrentTracks] = useState([]);
+            const [currentConstellations, setCurrentConstellations] = useState([]);
+
+            const allConstellations = [
+                { 
+                    id: 1, icon: '🏹', title: 'Orion', 
+                    text: 'The Hunter. Famous for his belt of three stars. Battling Taurus in the winter sky.',
+                    data: {
+                        stars: [{x: 25, y: 20, size: 4}, {x: 75, y: 25, size: 4}, {x: 45, y: 50, size: 3}, {x: 50, y: 50, size: 3}, {x: 55, y: 50, size: 3}, {x: 30, y: 80, size: 4}, {x: 70, y: 85, size: 5}],
+                        lines: [{x1: 25, y1: 20, x2: 45, y2: 50}, {x1: 75, y1: 25, x2: 55, y2: 50}, {x1: 45, y1: 50, x2: 50, y2: 50}, {x1: 50, y1: 50, x2: 55, y2: 50}, {x1: 45, y1: 50, x2: 30, y2: 80}, {x1: 55, y1: 50, x2: 70, y2: 85}]
+                    }
+                },
+                { 
+                    id: 2, icon: '🐻', title: 'Ursa Major', 
+                    text: 'The Great Bear (Big Dipper). Use the pointer stars to find the North Star.',
+                    data: {
+                        stars: [{x: 10, y: 30, size: 3}, {x: 25, y: 25, size: 3}, {x: 35, y: 35, size: 3}, {x: 50, y: 45, size: 3}, {x: 75, y: 45, size: 3}, {x: 75, y: 70, size: 3}, {x: 50, y: 70, size: 3}],
+                        lines: [{x1: 10, y1: 30, x2: 25, y2: 25}, {x1: 25, y1: 25, x2: 35, y2: 35}, {x1: 35, y1: 35, x2: 50, y2: 45}, {x1: 50, y1: 45, x2: 75, y2: 45}, {x1: 75, y1: 45, x2: 75, y2: 70}, {x1: 75, y1: 70, x2: 50, y2: 70}, {x1: 50, y1: 70, x2: 50, y2: 45}]
+                    }
+                },
+                { 
+                    id: 3, icon: '👑', title: 'Cassiopeia', 
+                    text: 'The Queen. A distinctive "W" or "M" shape high in the northern sky.',
+                    data: {
+                        stars: [{x: 15, y: 30, size: 3}, {x: 35, y: 60, size: 3}, {x: 50, y: 40, size: 4}, {x: 65, y: 60, size: 3}, {x: 85, y: 30, size: 3}],
+                        lines: [{x1: 15, y1: 30, x2: 35, y2: 60}, {x1: 35, y1: 60, x2: 50, y2: 40}, {x1: 50, y1: 40, x2: 65, y2: 60}, {x1: 65, y1: 60, x2: 85, y2: 30}]
+                    }
+                },
+                { 
+                    id: 4, icon: '🐕', title: 'Canis Major', 
+                    text: 'The Great Dog. Faithful companion to Orion. Home to Sirius, the brightest star.',
+                    data: {
+                        stars: [{x: 45, y: 30, size: 5}, {x: 55, y: 32, size: 3}, {x: 65, y: 55, size: 4}, {x: 60, y: 70, size: 3}, {x: 30, y: 60, size: 3}],
+                        lines: [{x1: 45, y1: 30, x2: 65, y2: 55}, {x1: 45, y1: 30, x2: 55, y2: 32}, {x1: 65, y1: 55, x2: 60, y2: 70}, {x1: 65, y1: 55, x2: 30, y2: 60}]
+                    }
+                },
+                { 
+                    id: 5, icon: '🦁', title: 'Leo', 
+                    text: 'The Lion. Look for the backward question mark (the Sickle) representing his head.',
+                    data: {
+                        stars: [{x: 70, y: 30, size: 3}, {x: 80, y: 20, size: 3}, {x: 85, y: 40, size: 3}, {x: 70, y: 55, size: 4}, {x: 30, y: 60, size: 3}, {x: 40, y: 70, size: 3}],
+                        lines: [{x1: 70, y1: 30, x2: 80, y2: 20}, {x1: 80, y1: 20, x2: 85, y2: 40}, {x1: 85, y1: 40, x2: 70, y2: 55}, {x1: 70, y1: 55, x2: 40, y2: 70}, {x1: 40, y1: 70, x2: 30, y2: 60}]
+                    }
+                },
+                { 
+                    id: 6, icon: '🦂', title: 'Scorpius', 
+                    text: 'The Scorpion. A large "J" shape in the southern summer sky. Antares is its beating heart.',
+                    data: {
+                        stars: [{x: 80, y: 20, size: 3}, {x: 75, y: 25, size: 3}, {x: 70, y: 35, size: 4}, {x: 60, y: 50, size: 3}, {x: 50, y: 65, size: 3}, {x: 40, y: 80, size: 3}, {x: 25, y: 70, size: 3}, {x: 20, y: 60, size: 3}],
+                        lines: [{x1: 80, y1: 20, x2: 75, y2: 25}, {x1: 75, y1: 25, x2: 70, y2: 35}, {x1: 70, y1: 35, x2: 60, y2: 50}, {x1: 60, y1: 50, x2: 50, y2: 65}, {x1: 50, y1: 65, x2: 40, y2: 80}, {x1: 40, y1: 80, x2: 25, y2: 70}, {x1: 25, y1: 70, x2: 20, y2: 60}]
+                    }
+                },
+                { 
+                    id: 7, icon: '🦢', title: 'Cygnus', 
+                    text: 'The Swan (Northern Cross). Flying down the Milky Way.',
+                    data: {
+                        stars: [{x: 50, y: 20, size: 4}, {x: 50, y: 50, size: 3}, {x: 50, y: 80, size: 3}, {x: 20, y: 40, size: 3}, {x: 80, y: 40, size: 3}],
+                        lines: [{x1: 50, y1: 20, x2: 50, y2: 80}, {x1: 20, y1: 40, x2: 80, y2: 40}]
+                    }
+                },
+                { 
+                    id: 8, icon: '🎵', title: 'Lyra', 
+                    text: 'The Lyre. Small but distinct. Home to Vega, one of the brightest summer stars.',
+                    data: {
+                        stars: [{x: 50, y: 20, size: 5}, {x: 40, y: 40, size: 3}, {x: 60, y: 40, size: 3}, {x: 45, y: 60, size: 3}, {x: 55, y: 60, size: 3}],
+                        lines: [{x1: 50, y1: 20, x2: 40, y2: 40}, {x1: 50, y1: 20, x2: 60, y2: 40}, {x1: 40, y1: 40, x2: 60, y2: 40}, {x1: 60, y1: 40, x2: 55, y2: 60}, {x1: 55, y1: 60, x2: 45, y2: 60}, {x1: 45, y1: 60, x2: 40, y2: 40}]
+                    }
+                },
+                { 
+                    id: 9, icon: '🦅', title: 'Aquila', 
+                    text: 'The Eagle. Carries Zeus\'s thunderbolts. Altair is its brightest star.',
+                    data: {
+                        stars: [{x: 50, y: 30, size: 5}, {x: 50, y: 15, size: 3}, {x: 50, y: 85, size: 3}, {x: 20, y: 50, size: 3}, {x: 80, y: 50, size: 3}],
+                        lines: [{x1: 50, y1: 15, x2: 50, y2: 85}, {x1: 20, y1: 50, x2: 50, y2: 30}, {x1: 80, y1: 50, x2: 50, y2: 30}]
+                    }
+                },
+                { 
+                    id: 10, icon: '👸', title: 'Andromeda', 
+                    text: 'The Chained Princess. Contains the Andromeda Galaxy, our nearest galactic neighbor.',
+                    data: {
+                        stars: [{x: 20, y: 30, size: 4}, {x: 40, y: 40, size: 3}, {x: 60, y: 50, size: 3}, {x: 80, y: 60, size: 3}],
+                        lines: [{x1: 20, y1: 30, x2: 80, y2: 60}]
+                    }
+                },
+                { 
+                    id: 11, icon: '🐴', title: 'Pegasus', 
+                    text: 'The Winged Horse. Look for the "Great Square" of Pegasus in autumn.',
+                    data: {
+                        stars: [{x: 30, y: 30, size: 4}, {x: 70, y: 30, size: 4}, {x: 70, y: 70, size: 4}, {x: 30, y: 70, size: 4}, {x: 10, y: 20, size: 3}, {x: 90, y: 20, size: 3}],
+                        lines: [{x1: 30, y1: 30, x2: 70, y2: 30}, {x1: 70, y1: 30, x2: 70, y2: 70}, {x1: 70, y1: 70, x2: 30, y2: 70}, {x1: 30, y1: 70, x2: 30, y2: 30}, {x1: 30, y1: 30, x2: 10, y2: 20}, {x1: 70, y1: 30, x2: 90, y2: 20}]
+                    }
+                },
+                { 
+                    id: 12, icon: '♉', title: 'Taurus', 
+                    text: 'The Bull. The V-shape is his face (Hyades), and he protects the Pleiades (Seven Sisters).',
+                    data: {
+                        stars: [{x: 50, y: 50, size: 5}, {x: 60, y: 45, size: 3}, {x: 55, y: 60, size: 3}, {x: 20, y: 20, size: 3}, {x: 80, y: 20, size: 3}],
+                        lines: [{x1: 50, y1: 50, x2: 60, y2: 45}, {x1: 60, y1: 45, x2: 55, y2: 60}, {x1: 50, y1: 50, x2: 20, y2: 20}, {x1: 60, y1: 45, x2: 80, y2: 20}]
+                    }
+                },
+                { 
+                    id: 13, icon: '👯', title: 'Gemini', 
+                    text: 'The Twins. Castor and Pollux are the two bright stars marking their heads.',
+                    data: {
+                        stars: [{x: 30, y: 20, size: 4}, {x: 70, y: 20, size: 4}, {x: 30, y: 80, size: 3}, {x: 70, y: 80, size: 3}],
+                        lines: [{x1: 30, y1: 20, x2: 30, y2: 80}, {x1: 70, y1: 20, x2: 70, y2: 80}, {x1: 30, y1: 50, x2: 70, y2: 50}]
+                    }
+                },
+                { 
+                    id: 14, icon: '🌾', title: 'Virgo', 
+                    text: 'The Maiden. The second largest constellation. Spica is her ear of wheat.',
+                    data: {
+                        stars: [{x: 50, y: 50, size: 5}, {x: 50, y: 20, size: 3}, {x: 30, y: 40, size: 3}, {x: 70, y: 40, size: 3}, {x: 50, y: 80, size: 3}],
+                        lines: [{x1: 50, y1: 20, x2: 50, y2: 50}, {x1: 50, y1: 50, x2: 50, y2: 80}, {x1: 30, y1: 40, x2: 70, y2: 40}]
+                    }
+                },
+                { 
+                    id: 15, icon: '⚖️', title: 'Libra', 
+                    text: 'The Scales. The only zodiac sign that is an object, not a living creature.',
+                    data: {
+                        stars: [{x: 50, y: 20, size: 3}, {x: 20, y: 50, size: 4}, {x: 80, y: 50, size: 4}, {x: 50, y: 80, size: 3}],
+                        lines: [{x1: 50, y1: 20, x2: 20, y2: 50}, {x1: 50, y1: 20, x2: 80, y2: 50}, {x1: 20, y1: 50, x2: 50, y2: 80}, {x1: 80, y1: 50, x2: 50, y2: 80}]
+                    }
+                },
+                { 
+                    id: 16, icon: '🐎', title: 'Sagittarius', 
+                    text: 'The Archer. Looks exactly like a Teapot pouring steam into the Milky Way.',
+                    data: {
+                        stars: [{x: 30, y: 60, size: 3}, {x: 45, y: 60, size: 3}, {x: 55, y: 40, size: 3}, {x: 65, y: 60, size: 3}, {x: 60, y: 75, size: 3}, {x: 45, y: 75, size: 3}],
+                        lines: [{x1: 30, y1: 60, x2: 45, y2: 60}, {x1: 45, y1: 60, x2: 55, y2: 40}, {x1: 55, y1: 40, x2: 65, y2: 60}, {x1: 65, y1: 60, x2: 60, y2: 75}, {x1: 60, y1: 75, x2: 45, y2: 75}, {x1: 45, y1: 75, x2: 45, y2: 60}]
+                    }
+                },
+                { 
+                    id: 17, icon: '🐐', title: 'Capricornus', 
+                    text: 'The Sea-Goat. A faint, smile-shaped constellation best seen in early autumn.',
+                    data: {
+                        stars: [{x: 20, y: 30, size: 3}, {x: 80, y: 30, size: 3}, {x: 50, y: 70, size: 3}],
+                        lines: [{x1: 20, y1: 30, x2: 50, y2: 70}, {x1: 50, y1: 70, x2: 80, y2: 30}, {x1: 20, y1: 30, x2: 80, y2: 30}]
+                    }
+                },
+                { 
+                    id: 18, icon: '🏺', title: 'Aquarius', 
+                    text: 'The Water Bearer. Pouring water into the mouth of the Southern Fish.',
+                    data: {
+                        stars: [{x: 40, y: 20, size: 3}, {x: 50, y: 40, size: 3}, {x: 30, y: 60, size: 3}, {x: 50, y: 70, size: 3}, {x: 70, y: 80, size: 3}],
+                        lines: [{x1: 40, y1: 20, x2: 50, y2: 40}, {x1: 50, y1: 40, x2: 30, y2: 60}, {x1: 30, y1: 60, x2: 50, y2: 70}, {x1: 50, y1: 70, x2: 70, y2: 80}]
+                    }
+                },
+                { 
+                    id: 19, icon: '🐟', title: 'Pisces', 
+                    text: 'The Fishes. Two fish tied together by a cord. Faint but zodiacally important.',
+                    data: {
+                        stars: [{x: 20, y: 20, size: 3}, {x: 80, y: 50, size: 3}, {x: 50, y: 80, size: 3}],
+                        lines: [{x1: 20, y1: 20, x2: 50, y2: 80}, {x1: 50, y1: 80, x2: 80, y2: 50}]
+                    }
+                },
+                { 
+                    id: 20, icon: '🐏', title: 'Aries', 
+                    text: 'The Ram. A small crooked line of stars, marking the Golden Fleece.',
+                    data: {
+                        stars: [{x: 20, y: 50, size: 4}, {x: 40, y: 45, size: 3}, {x: 50, y: 55, size: 3}],
+                        lines: [{x1: 20, y1: 50, x2: 40, y2: 45}, {x1: 40, y1: 45, x2: 50, y2: 55}]
+                    }
+                },
+                { 
+                    id: 21, icon: '🦀', title: 'Cancer', 
+                    text: 'The Crab. Faint inverted "Y". Home to the Beehive Cluster.',
+                    data: {
+                        stars: [{x: 50, y: 50, size: 3}, {x: 50, y: 20, size: 3}, {x: 30, y: 70, size: 3}, {x: 70, y: 70, size: 3}],
+                        lines: [{x1: 50, y1: 50, x2: 50, y2: 20}, {x1: 50, y1: 50, x2: 30, y2: 70}, {x1: 50, y1: 50, x2: 70, y2: 70}]
+                    }
+                },
+                { 
+                    id: 22, icon: '🧸', title: 'Ursa Minor', 
+                    text: 'The Little Bear. The Little Dipper. The handle ends at Polaris, the North Star.',
+                    data: {
+                        stars: [{x: 80, y: 20, size: 5}, {x: 60, y: 30, size: 3}, {x: 45, y: 40, size: 3}, {x: 30, y: 50, size: 3}, {x: 10, y: 55, size: 3}, {x: 15, y: 75, size: 3}, {x: 35, y: 70, size: 3}],
+                        lines: [{x1: 80, y1: 20, x2: 60, y2: 30}, {x1: 60, y1: 30, x2: 45, y2: 40}, {x1: 45, y1: 40, x2: 30, y2: 50}, {x1: 30, y1: 50, x2: 10, y2: 55}, {x1: 10, y1: 55, x2: 15, y2: 75}, {x1: 15, y1: 75, x2: 35, y2: 70}, {x1: 35, y1: 70, x2: 30, y2: 50}]
+                    }
+                },
+                { 
+                    id: 23, icon: '🐉', title: 'Draco', 
+                    text: 'The Dragon. Winds between the two Bears. Thuban was the North Star 4000 years ago.',
+                    data: {
+                        stars: [{x: 20, y: 20, size: 3}, {x: 30, y: 25, size: 3}, {x: 40, y: 20, size: 3}, {x: 30, y: 40, size: 3}, {x: 60, y: 50, size: 3}, {x: 40, y: 70, size: 3}, {x: 70, y: 80, size: 3}],
+                        lines: [{x1: 20, y1: 20, x2: 30, y2: 25}, {x1: 30, y1: 25, x2: 40, y2: 20}, {x1: 30, y1: 25, x2: 30, y2: 40}, {x1: 30, y1: 40, x2: 60, y2: 50}, {x1: 60, y1: 50, x2: 40, y2: 70}, {x1: 40, y1: 70, x2: 70, y2: 80}]
+                    }
+                },
+                { 
+                    id: 24, icon: '💪', title: 'Hercules', 
+                    text: 'The Strongman. Look for the "Keystone" shape representing his torso.',
+                    data: {
+                        stars: [{x: 30, y: 30, size: 3}, {x: 70, y: 30, size: 3}, {x: 65, y: 60, size: 3}, {x: 35, y: 60, size: 3}, {x: 50, y: 80, size: 3}],
+                        lines: [{x1: 30, y1: 30, x2: 70, y2: 30}, {x1: 70, y1: 30, x2: 65, y2: 60}, {x1: 65, y1: 60, x2: 35, y2: 60}, {x1: 35, y1: 60, x2: 30, y2: 30}, {x1: 65, y1: 60, x2: 50, y2: 80}]
+                    }
+                },
+                { 
+                    id: 25, icon: '👑', title: 'Corona Borealis', 
+                    text: 'The Northern Crown. A perfect semi-circle of stars. Ariadne\'s wedding crown.',
+                    data: {
+                        stars: [{x: 20, y: 50, size: 3}, {x: 30, y: 35, size: 3}, {x: 50, y: 25, size: 4}, {x: 70, y: 35, size: 3}, {x: 80, y: 50, size: 3}],
+                        lines: [{x1: 20, y1: 50, x2: 30, y2: 35}, {x1: 30, y1: 35, x2: 50, y2: 25}, {x1: 50, y1: 25, x2: 70, y2: 35}, {x1: 70, y1: 35, x2: 80, y2: 50}]
+                    }
+                },
+                { 
+                    id: 26, icon: '🤠', title: 'Bootes', 
+                    text: 'The Herdsman. Looks like a kite or ice cream cone. Arcturus is at the base.',
+                    data: {
+                        stars: [{x: 50, y: 80, size: 5}, {x: 30, y: 50, size: 3}, {x: 70, y: 50, size: 3}, {x: 50, y: 20, size: 3}],
+                        lines: [{x1: 50, y1: 80, x2: 30, y2: 50}, {x1: 30, y1: 50, x2: 50, y2: 20}, {x1: 50, y1: 20, x2: 70, y2: 50}, {x1: 70, y1: 50, x2: 50, y2: 80}]
+                    }
+                },
+                { 
+                    id: 27, icon: '🚜', title: 'Auriga', 
+                    text: 'The Charioteer. A pentagon shape. Capella is the bright "Goat Star".',
+                    data: {
+                        stars: [{x: 50, y: 20, size: 5}, {x: 80, y: 35, size: 3}, {x: 70, y: 70, size: 3}, {x: 30, y: 70, size: 3}, {x: 20, y: 35, size: 3}],
+                        lines: [{x1: 50, y1: 20, x2: 80, y2: 35}, {x1: 80, y1: 35, x2: 70, y2: 70}, {x1: 70, y1: 70, x2: 30, y2: 70}, {x1: 30, y1: 70, x2: 20, y2: 35}, {x1: 20, y1: 35, x2: 50, y2: 20}]
+                    }
+                },
+                { 
+                    id: 28, icon: '⚔️', title: 'Perseus', 
+                    text: 'The Hero. Rescued Andromeda. Holds the demon star Algol (the winking eye).',
+                    data: {
+                        stars: [{x: 50, y: 20, size: 3}, {x: 50, y: 50, size: 4}, {x: 20, y: 70, size: 4}, {x: 80, y: 70, size: 3}],
+                        lines: [{x1: 50, y1: 20, x2: 50, y2: 50}, {x1: 50, y1: 50, x2: 20, y2: 70}, {x1: 50, y1: 50, x2: 80, y2: 70}]
+                    }
+                },
+                { 
+                    id: 29, icon: '🐍', title: 'Hydra', 
+                    text: 'The Water Snake. The largest constellation, winding across the sky.',
+                    data: {
+                        stars: [{x: 10, y: 40, size: 3}, {x: 20, y: 45, size: 3}, {x: 40, y: 60, size: 4}, {x: 70, y: 55, size: 3}, {x: 90, y: 50, size: 3}],
+                        lines: [{x1: 10, y1: 40, x2: 20, y2: 45}, {x1: 20, y1: 45, x2: 40, y2: 60}, {x1: 40, y1: 60, x2: 70, y2: 55}, {x1: 70, y1: 55, x2: 90, y2: 50}]
+                    }
+                },
+                { 
+                    id: 30, icon: '🐳', title: 'Cetus', 
+                    text: 'The Sea Monster. Often depicted as a whale. Contains the variable star Mira.',
+                    data: {
+                        stars: [{x: 20, y: 30, size: 3}, {x: 40, y: 50, size: 4}, {x: 70, y: 40, size: 3}, {x: 80, y: 60, size: 3}],
+                        lines: [{x1: 20, y1: 30, x2: 40, y2: 50}, {x1: 40, y1: 50, x2: 70, y2: 40}, {x1: 70, y1: 40, x2: 80, y2: 60}]
+                    }
+                },
+                { 
+                    id: 31, icon: '🐇', title: 'Lepus', 
+                    text: 'The Hare. Hiding under Orion\'s feet, being chased by the celestial dogs.',
+                    data: {
+                        stars: [{x: 30, y: 30, size: 3}, {x: 70, y: 30, size: 3}, {x: 70, y: 60, size: 3}, {x: 30, y: 60, size: 3}],
+                        lines: [{x1: 30, y1: 30, x2: 70, y2: 30}, {x1: 70, y1: 30, x2: 70, y2: 60}, {x1: 70, y1: 60, x2: 30, y2: 60}, {x1: 30, y1: 60, x2: 30, y2: 30}]
+                    }
+                },
+                { 
+                    id: 32, icon: '🦄', title: 'Monoceros', 
+                    text: 'The Unicorn. Faint, but sits right inside the Winter Triangle.',
+                    data: {
+                        stars: [{x: 20, y: 50, size: 3}, {x: 50, y: 40, size: 3}, {x: 80, y: 60, size: 3}],
+                        lines: [{x1: 20, y1: 50, x2: 50, y2: 40}, {x1: 50, y1: 40, x2: 80, y2: 60}]
+                    }
+                },
+                { 
+                    id: 33, icon: '🐬', title: 'Delphinus', 
+                    text: 'The Dolphin. A cute little diamond shape with a tail, leaping out of the water.',
+                    data: {
+                        stars: [{x: 40, y: 30, size: 3}, {x: 60, y: 35, size: 3}, {x: 50, y: 50, size: 3}, {x: 30, y: 45, size: 3}, {x: 20, y: 70, size: 3}],
+                        lines: [{x1: 40, y1: 30, x2: 60, y2: 35}, {x1: 60, y1: 35, x2: 50, y2: 50}, {x1: 50, y1: 50, x2: 30, y2: 45}, {x1: 30, y1: 45, x2: 40, y2: 30}, {x1: 30, y1: 45, x2: 20, y2: 70}]
+                    }
+                },
+                { 
+                    id: 34, icon: '🐺', title: 'Lupus', 
+                    text: 'The Wolf. Victim of the Centaur in the southern sky.',
+                    data: {
+                        stars: [{x: 30, y: 30, size: 3}, {x: 50, y: 50, size: 3}, {x: 70, y: 30, size: 3}, {x: 50, y: 80, size: 3}],
+                        lines: [{x1: 30, y1: 30, x2: 50, y2: 50}, {x1: 50, y1: 50, x2: 70, y2: 30}, {x1: 50, y1: 50, x2: 50, y2: 80}]
+                    }
+                },
+                { 
+                    id: 35, icon: '🦊', title: 'Vulpecula', 
+                    text: 'The Fox. A faint constellation containing the Dumbbell Nebula.',
+                    data: {
+                        stars: [{x: 25, y: 55, size: 3}, {x: 50, y: 50, size: 3}, {x: 75, y: 45, size: 4}],
+                        lines: [{x1: 25, y1: 55, x2: 50, y2: 50}, {x1: 50, y1: 50, x2: 75, y2: 45}]
+                    }
+                },
+                { 
+                    id: 36, icon: '🐍', title: 'Serpens', 
+                    text: 'The Serpent. The only constellation split into two parts: Head and Tail.',
+                    data: {
+                        stars: [{x: 20, y: 80, size: 3}, {x: 30, y: 60, size: 3}, {x: 70, y: 40, size: 3}, {x: 80, y: 20, size: 3}],
+                        lines: [{x1: 20, y1: 80, x2: 30, y2: 60}, {x1: 30, y1: 60, x2: 70, y2: 40}, {x1: 70, y1: 40, x2: 80, y2: 20}]
+                    }
+                },
+                { 
+                    id: 37, icon: '⚕️', title: 'Ophiuchus', 
+                    text: 'The Serpent Bearer. The "13th Zodiac sign". Holds Serpens.',
+                    data: {
+                        stars: [{x: 50, y: 20, size: 4}, {x: 30, y: 40, size: 3}, {x: 70, y: 40, size: 3}, {x: 30, y: 80, size: 3}, {x: 70, y: 80, size: 3}],
+                        lines: [{x1: 50, y1: 20, x2: 30, y2: 40}, {x1: 50, y1: 20, x2: 70, y2: 40}, {x1: 30, y1: 40, x2: 30, y2: 80}, {x1: 70, y1: 40, x2: 70, y2: 80}, {x1: 30, y1: 80, x2: 70, y2: 80}]
+                    }
+                },
+                { 
+                    id: 38, icon: '🐦‍⬛', title: 'Corvus', 
+                    text: 'The Crow. A distinct quadrilateral shape riding on Hydra\'s back.',
+                    data: {
+                        stars: [{x: 30, y: 30, size: 3}, {x: 70, y: 35, size: 3}, {x: 60, y: 70, size: 3}, {x: 20, y: 65, size: 3}],
+                        lines: [{x1: 30, y1: 30, x2: 70, y2: 35}, {x1: 70, y1: 35, x2: 60, y2: 70}, {x1: 60, y1: 70, x2: 20, y2: 65}, {x1: 20, y1: 65, x2: 30, y2: 30}]
+                    }
+                },
+                { 
+                    id: 39, icon: '🏆', title: 'Crater', 
+                    text: 'The Cup. The goblet of Apollo, also on Hydra\'s back.',
+                    data: {
+                        stars: [{x: 30, y: 30, size: 3}, {x: 70, y: 30, size: 3}, {x: 50, y: 70, size: 3}],
+                        lines: [{x1: 30, y1: 30, x2: 50, y2: 70}, {x1: 50, y1: 70, x2: 70, y2: 30}, {x1: 30, y1: 30, x2: 70, y2: 30}]
+                    }
+                },
+                { 
+                    id: 40, icon: '✝️', title: 'Crux', 
+                    text: 'The Southern Cross. The smallest but one of the most famous constellations.',
+                    data: {
+                        stars: [{x: 50, y: 15, size: 4}, {x: 50, y: 85, size: 4}, {x: 30, y: 45, size: 4}, {x: 70, y: 55, size: 3}, {x: 60, y: 70, size: 2}],
+                        lines: [{x1: 50, y1: 15, x2: 50, y2: 85}, {x1: 30, y1: 45, x2: 70, y2: 55}]
+                    }
+                },
+                { 
+                    id: 41, icon: '🐎', title: 'Centaurus', 
+                    text: 'The Centaur. Surrounds the Southern Cross. Home to Alpha Centauri.',
+                    data: {
+                        stars: [{x: 20, y: 20, size: 3}, {x: 30, y: 40, size: 3}, {x: 60, y: 40, size: 3}, {x: 40, y: 80, size: 5}, {x: 70, y: 80, size: 4}],
+                        lines: [{x1: 20, y1: 20, x2: 30, y2: 40}, {x1: 30, y1: 40, x2: 60, y2: 40}, {x1: 30, y1: 40, x2: 40, y2: 80}, {x1: 60, y1: 40, x2: 70, y2: 80}]
+                    }
+                },
+                { 
+                    id: 42, icon: '⛵', title: 'Carina', 
+                    text: 'The Keel. Part of the ship Argo Navis. Canopus is the second brightest star.',
+                    data: {
+                        stars: [{x: 50, y: 20, size: 5}, {x: 20, y: 50, size: 3}, {x: 80, y: 50, size: 3}, {x: 50, y: 70, size: 3}],
+                        lines: [{x1: 50, y1: 20, x2: 20, y2: 50}, {x1: 20, y1: 50, x2: 50, y2: 70}, {x1: 50, y1: 70, x2: 80, y2: 50}]
+                    }
+                },
+                { 
+                    id: 43, icon: '🕊️', title: 'Columba', 
+                    text: 'The Dove. Noah\'s dove, flying near the ship Argo.',
+                    data: {
+                        stars: [{x: 30, y: 40, size: 3}, {x: 50, y: 60, size: 3}, {x: 70, y: 40, size: 3}],
+                        lines: [{x1: 30, y1: 40, x2: 50, y2: 60}, {x1: 50, y1: 60, x2: 70, y2: 40}]
+                    }
+                },
+                { 
+                    id: 44, icon: '🔥', title: 'Phoenix', 
+                    text: 'The Firebird. A minor constellation in the southern sky.',
+                    data: {
+                        stars: [{x: 50, y: 20, size: 3}, {x: 30, y: 50, size: 3}, {x: 70, y: 50, size: 3}, {x: 50, y: 80, size: 3}],
+                        lines: [{x1: 50, y1: 20, x2: 50, y2: 80}, {x1: 30, y1: 50, x2: 50, y2: 50}, {x1: 50, y1: 50, x2: 70, y2: 50}]
+                    }
+                },
+                { 
+                    id: 45, icon: '🦎', title: 'Lacerta', 
+                    text: 'The Lizard. A zigzag line of stars between Cygnus and Andromeda.',
+                    data: {
+                        stars: [{x: 20, y: 80, size: 3}, {x: 40, y: 60, size: 3}, {x: 60, y: 40, size: 3}, {x: 80, y: 20, size: 3}],
+                        lines: [{x1: 20, y1: 80, x2: 40, y2: 60}, {x1: 40, y1: 60, x2: 60, y2: 40}, {x1: 60, y1: 40, x2: 80, y2: 20}]
+                    }
+                }
+            ];
+
+            const shuffleTracks = () => {
+                const shuffled = [...MUSIC_POOL].sort(() => 0.5 - Math.random());
+                setCurrentTracks(shuffled.slice(0, 4));
+            };
+
+            const shuffleConstellations = () => {
+                const shuffled = [...allConstellations].sort(() => 0.5 - Math.random());
+                setCurrentConstellations(shuffled.slice(0, 4));
+            };
+
+            useEffect(() => {
+                shuffleTracks();
+                shuffleConstellations();
+            }, []);
+
+            return (
+                <div className="p-6 max-w-2xl mx-auto pb-24">
+                    <h2 className="text-3xl font-serif text-center text-pink-200 mb-8 border-b border-slate-700 pb-4">
+                        You as a Constellation
+                    </h2>
+
+                    <div className="bg-slate-800/50 rounded-xl p-4 mb-8 border border-slate-700 backdrop-blur-sm relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-2 opacity-50 group-hover:opacity-100 transition-opacity z-10">
+                            <button 
+                                onClick={shuffleTracks} 
+                                className="p-2 bg-black/40 hover:bg-pink-500 rounded-full transition-colors"
+                                title="Shuffle Songs"
+                            >
+                                <RefreshCw size={16} className="text-white" />
+                            </button>
+                        </div>
+
+                        <div className="flex items-center gap-4 mb-4">
+                            <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-900 rounded-lg flex items-center justify-center animate-pulse">
+                                <Music className="text-white w-8 h-8" />
+                            </div>
+                            <div>
+                                <h3 className="text-white font-bold">Midnight Mixtape</h3>
+                                <p className="text-pink-400 text-sm">Vibes: Dark Side &amp; Summer Nights</p>
+                            </div>
+                        </div>
+
+                        <div className="space-y-3">
+                            {currentTracks.map((trackId, i) => (
+                                <iframe 
+                                    key={i}
+                                    style={{ borderRadius: '12px' }}
+                                    src={`https://open.spotify.com/embed/track/${trackId}?utm_source=generator&theme=0`} 
+                                    width="100%" 
+                                    height="80" 
+                                    frameBorder="0" 
+                                    allowFullScreen="" 
+                                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                                    loading="lazy"
+                                    className="bg-slate-900"
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="flex justify-between items-center mb-4 px-2">
+                        <h3 className="text-pink-200 font-bold text-lg">Star Map</h3>
+                        <button 
+                            onClick={shuffleConstellations} 
+                            className="p-2 bg-slate-800 hover:bg-pink-600/50 rounded-full transition-colors flex items-center gap-2 text-xs text-slate-400 hover:text-white"
+                        >
+                            <RefreshCw size={14} />
+                            Shuffle Stars
+                        </button>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        {currentConstellations.map((c) => (
+                            <button
+                                key={c.id}
+                                onClick={() => setActiveConstellation(c)}
+                                className="p-4 bg-slate-800/80 rounded-xl border border-slate-700 hover:border-pink-500/50 transition-all hover:scale-105 text-left group"
+                            >
+                                <div className="text-3xl mb-2 group-hover:animate-bounce shadow-white drop-shadow-md">{c.icon}</div>
+                                <h3 className="text-pink-200 font-bold text-sm">{c.title}</h3>
+                            </button>
+                        ))}
+                    </div>
+
+                    {activeConstellation && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4" onClick={() => setActiveConstellation(null)}>
+                            <div className="bg-slate-900 border border-pink-500 rounded-2xl p-6 max-w-sm w-full relative transform scale-100 transition-transform flex flex-col items-center">
+                                <button className="absolute top-2 right-2 text-slate-500 hover:text-white z-10"><X size={20}/></button>
+                                <ConstellationIllustration title={activeConstellation.title} icon={activeConstellation.icon} data={activeConstellation.data} />
+                                <h3 className="text-2xl font-serif font-bold text-pink-400 mb-2 text-center">{activeConstellation.title}</h3>
+                                <p className="text-slate-300 text-center leading-relaxed text-sm mb-4">{activeConstellation.text}</p>
+                                <div className="mt-2 text-center text-xs text-slate-600">Tap anywhere to close</div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const LoveLetter = () => {
+            return (
+                <div className="min-h-[60vh] flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-1000">
+                    <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-pink-500 shadow-[0_0_30px_rgba(236,72,153,0.6)] mb-8 bg-slate-800 flex items-center justify-center">
+                        <span className="text-6xl">🖤</span>
+                    </div>
+                    
+                    <h1 className="text-4xl font-serif text-white mb-6">For the hottest black pantheress</h1>
+                    
+                    <div className="max-w-md bg-white/5 backdrop-blur-md p-6 rounded-xl border border-white/10 text-lg leading-relaxed text-pink-100 font-serif italic">
+                        <p>
+                            I can't get over your dark aesthetic, your obsession with nectarines, and the way you look at me when I say something you like. I melt everytime you whisper my name or say that you want me. Keep spiting on my face pls 🫠
+                        </p>
+                    </div>
+
+                    <div className="mt-8 text-sm text-slate-500 font-mono">
+                        coded with ❤️ by Banos
+                    </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [view, setView] = useState('home'); 
+            const [score, setScore] = useState(0);
+
+            const NavButton = ({ target, icon: Icon, label }) => (
+                <button 
+                    onClick={() => setView(target)}
+                    className={`flex flex-col items-center gap-1 p-2 ${view === target ? 'text-pink-400' : 'text-slate-500 hover:text-slate-300'}`}
+                >
+                    <Icon size={24} />
+                    <span className="text-xs">{label}</span>
+                </button>
+            );
+
+            return (
+                <div className="bg-slate-950 min-h-screen text-slate-200 font-sans selection:bg-pink-500 selection:text-white relative overflow-hidden">
+                    <StarBackground />
+                    
+                    <main className="relative z-10 h-[calc(100vh-80px)] overflow-y-auto pb-20 scrollbar-hide">
+                        {view === 'home' && (
+                            <div className="flex flex-col items-center justify-center min-h-full p-8 text-center">
+                                <div className="mb-6 relative">
+                                    <div className="absolute inset-0 bg-pink-500 blur-3xl opacity-20 rounded-full"></div>
+                                    <Cat size={80} className="text-slate-100 relative z-10" />
+                                </div>
+                                <h1 className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-300 mb-4 tracking-tight">
+                                    The Black Cat's (you)<br/>Midnight Picnic
+                                </h1>
+                                <p className="text-slate-400 max-w-md mb-8">
+                                    A collection of mini-stuff for you &lt;3.
+                                </p>
+                                <button 
+                                    onClick={() => setView('game')}
+                                    className="px-8 py-3 bg-white text-black font-bold rounded-full hover:bg-pink-200 transition-colors flex items-center gap-2"
+                                >
+                                    <Play size={16} fill="black" /> Enter World
+                                </button>
+                            </div>
+                        )}
+
+                        {view === 'game' && <PicnicGame />}
+                        {view === 'facts' && <ConstellationGallery />}
+                        {view === 'letter' && <LoveLetter />}
+                    </main>
+
+                    <nav className="fixed bottom-0 left-0 w-full bg-slate-900/90 backdrop-blur-md border-t border-slate-800 z-50 h-20 pb-2">
+                        <div className="flex justify-around items-center h-full max-w-md mx-auto">
+                            <NavButton target="home" icon={Tent} label="Camp" />
+                            <NavButton target="game" icon={Coffee} label="Picnic" />
+                            <NavButton target="facts" icon={Star} label="Stars" />
+                            <NavButton target="letter" icon={Heart} label="Message" />
+                        </div>
+                    </nav>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
