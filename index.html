@@ -81,15 +81,6 @@
             0% { transform: scale(1) translateY(0); opacity: 1; filter: drop-shadow(0 0 10px white); }
             100% { transform: scale(0.8) translateY(-200px); opacity: 0.9; filter: drop-shadow(0 0 50px gold); }
         }
-        /* Boss Pulse Animation */
-        @keyframes boss-pulse {
-            0% { transform: scale(1); filter: drop-shadow(0 0 5px red); }
-            50% { transform: scale(1.1); filter: drop-shadow(0 0 15px red); }
-            100% { transform: scale(1); filter: drop-shadow(0 0 5px red); }
-        }
-        .boss-anim {
-            animation: boss-pulse 2s infinite ease-in-out;
-        }
     </style>
 </head>
 <body>
@@ -421,7 +412,7 @@
                                 id: Date.now() + Math.random(),
                                 x: item.x,
                                 y: item.y,
-                                text: item.value > 0 ? `+${item.value}` : `${item.value}`, // FIXED COLON HERE
+                                text: item.value > 0 ? `+${item.value}` : `${item.value}`,
                                 color: item.value > 0 ? 'text-green-400' : 'text-red-400',
                                 life: 40
                             });
@@ -561,17 +552,10 @@
                 >
                     <div className="absolute top-4 left-4 right-4 z-20 flex justify-between items-start pointer-events-none">
                         <div className="flex flex-col gap-2">
-                            <div className="text-yellow-300 font-mono text-sm font-bold bg-black/60 p-2 rounded border border-yellow-500/30 flex items-center gap-2 w-fit">
-                                <Zap size={14} /> LEVEL {currentLevelIdx + 1}
-                            </div>
-                            <div className="text-pink-300 font-mono text-lg font-bold bg-black/60 p-2 rounded border border-pink-500/30 flex items-center gap-2 w-fit">
-                                <Trophy size={16} /> 
-                                <span>{score} / {currentLevelConfig.target}</span>
-                            </div>
+                            <div className="text-yellow-300 font-mono text-sm font-bold bg-black/60 p-2 rounded border border-yellow-500/30 flex items-center gap-2 w-fit"><Zap size={14} /> LEVEL {currentLevelIdx + 1}</div>
+                            <div className="text-pink-300 font-mono text-lg font-bold bg-black/60 p-2 rounded border border-pink-500/30 flex items-center gap-2 w-fit"><Trophy size={16} /> <span>{score} / {currentLevelConfig.target}</span></div>
                         </div>
-                        <div className={`font-mono text-2xl font-bold bg-black/60 p-3 rounded-xl border flex items-center gap-2 ${timeLeft < 10 ? 'text-red-500 border-red-500 animate-pulse' : 'text-white border-slate-500'}`}>
-                            <Timer size={24} /> {timeLeft}s
-                        </div>
+                        <div className={`font-mono text-2xl font-bold bg-black/60 p-3 rounded-xl border flex items-center gap-2 ${timeLeft < 10 ? 'text-red-500 border-red-500 animate-pulse' : 'text-white border-slate-500'}`}><Timer size={24} /> {timeLeft}s</div>
                     </div>
 
                     {renderOverlay()}
@@ -621,8 +605,6 @@
         const RPGGame = ({ onFinish }) => {
             const MAP_COLS = 12;
             const MAP_ROWS = 12;
-            
-            // Updated 5 Challenges
             const INITIAL_MISSIONS = [
                 { id: 1, text: "Collect 4 Nectarines", type: 'collect', target: '🍑', current: 0, required: 4, completed: false },
                 { id: 2, text: "Defeat 3 Enemies", type: 'defeat', target: 'any', current: 0, required: 3, completed: false },
@@ -638,19 +620,10 @@
             const [gameState, setGameState] = useState('roaming'); // roaming, battle, victory
             const [battleState, setBattleState] = useState(null); 
             const [message, setMessage] = useState("Welcome to the Adventure!");
-            const [villainsDefeated, setVillainsDefeated] = useState(0);
-            const [bossSpawned, setBossSpawned] = useState(false);
-            const [showBossWarning, setShowBossWarning] = useState(false);
 
             // Determine current music track based on game state
             const getCurrentMusic = () => {
-                if (gameState === 'battle') {
-                     // Check if battling boss (entity with name Calamari)
-                     if (battleState && battleState.enemy && battleState.enemy.name === 'Calamari') {
-                         return 'boss.mp3';
-                     }
-                     return 'villain.mp3';
-                }
+                if (gameState === 'battle') return 'villain.mp3';
                 if (gameState === 'victory') return 'win.mp3';
                 return 'adv_music.mp3';
             };
@@ -716,16 +689,18 @@
                     newEntities.push({ id: id++, ...pos, type: 'item', content: '🍪', name: 'Cookie', value: 5 }); 
                 }
 
-                // Spawn Normal Villains ONLY first
+                // Spawn Villains (Mixed Types)
                 const villainTypes = [
                     { content: '⛈️', name: 'Bad Vibe', hp: 30, xp: 40 },
                     { content: '🦠', name: 'Germ', hp: 20, xp: 25 },
-                    { content: '🥀', name: 'Wilted Flower', hp: 25, xp: 30 }
+                    { content: '🥀', name: 'Wilted Flower', hp: 25, xp: 30 },
+                    { content: '🦑', name: 'Calamari', hp: 50, xp: 100 } // Stronger!
                 ];
 
                 for(let i=0; i<6; i++) {
                     const pos = getFreeCoord();
-                    const type = villainTypes[Math.floor(Math.random() * villainTypes.length)];
+                    // Calamari is rare
+                    const type = (i === 0) ? villainTypes[3] : villainTypes[Math.floor(Math.random() * 3)];
                     newEntities.push({ id: id++, ...pos, type: 'enemy', ...type, maxHp: type.hp, attack: 5 });
                 }
 
@@ -761,45 +736,6 @@
                     setGameState('victory');
                 }
             }, [missions, gameState]);
-
-            // Boss Spawning Logic
-            useEffect(() => {
-                if (villainsDefeated >= 2 && !bossSpawned) {
-                    setBossSpawned(true);
-                    setShowBossWarning(true);
-                    setTimeout(() => setShowBossWarning(false), 3000);
-
-                    // Spawn Calamari
-                    const bossType = { content: '🦑', name: 'Calamari', hp: 100, xp: 500, isBoss: true }; // High HP
-                    // Find spawn point far from player if possible, simply use free coord for now
-                    // We need to access mapGrid state, which we can in setEntities updater if needed, but let's assume getFreeCoord logic isn't easily accessible here without recreating it or refactoring.
-                    // Simplified: Spawn at fixed location (10, 10) if free, else random.
-                    // To keep it simple, we'll append to entities.
-                    
-                    setEntities(prev => {
-                         // Find a free spot
-                         let spawnX = 10, spawnY = 10;
-                         // Simple check against existing entities
-                         while (prev.find(e => e.x === spawnX && e.y === spawnY)) {
-                             spawnX = Math.floor(Math.random() * (MAP_COLS - 2)) + 1;
-                             spawnY = Math.floor(Math.random() * (MAP_ROWS - 2)) + 1;
-                         }
-                         
-                         return [...prev, { 
-                             id: Date.now(), 
-                             x: spawnX, 
-                             y: spawnY, 
-                             type: 'enemy', 
-                             ...bossType, 
-                             maxHp: bossType.hp, 
-                             attack: 15 // Stronger attack
-                         }];
-                    });
-                    
-                    setMessage("A giant shadow covers the picnic...");
-                }
-            }, [villainsDefeated, bossSpawned]);
-
 
             const movePlayer = (dx, dy) => {
                 if (gameState !== 'roaming') return;
@@ -887,9 +823,6 @@
                     updateMission('defeat', enemy.name, 1); // Specific target
                     updateMission('defeat', 'any', 1);      // Generic target
                     
-                    // Increment villains defeated count for boss spawn logic
-                    setVillainsDefeated(prev => prev + 1);
-
                     setTimeout(() => {
                         setGameState('roaming');
                         setBattleState(null);
@@ -939,91 +872,75 @@
                     </div>
 
                     {/* Flexible Game Viewport */}
-                    <div className="flex-1 w-full min-h-0 flex items-center justify-center">
-                        <div className="aspect-square max-h-full max-w-full bg-emerald-900 rounded-xl border-4 border-slate-700 overflow-hidden shadow-2xl relative">
-                            
-                            {/* Boss Warning Pop-up */}
-                            {showBossWarning && (
-                                <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 animate-in fade-in zoom-in duration-300">
-                                    <h1 className="text-4xl font-black text-red-500 animate-pulse border-4 border-red-500 p-4 rounded-xl rotate-[-5deg] bg-slate-900">
-                                        WARNING:<br/>BOSS APPROACHING!
-                                    </h1>
-                                </div>
-                            )}
+                    <div className="relative w-full max-w-md bg-emerald-900 rounded-xl border-4 border-slate-700 overflow-hidden shadow-2xl flex-shrink-1 aspect-square max-h-[50vh]">
+                        {/* Map Grid */}
+                        {gameState === 'roaming' && (
+                            <div className="absolute inset-0 grid" style={{ 
+                                gridTemplateColumns: `repeat(${MAP_COLS}, 1fr)`, 
+                                gridTemplateRows: `repeat(${MAP_ROWS}, 1fr)` 
+                            }}>
+                                {mapGrid.map((cell, i) => (
+                                    <div key={i} className={`border-[0.5px] border-white/5 relative flex items-center justify-center ${cell.isObstacle ? 'bg-slate-800/50' : 'bg-green-800/40'}`}>
+                                        {cell.decoration && <span style={{fontSize: 'clamp(8px, 1.5vw, 16px)'}} className="opacity-70">{cell.decoration}</span>}
+                                    </div>
+                                ))}
 
-                            {/* Map Grid */}
-                            {gameState === 'roaming' && (
-                                <div className="absolute inset-0 grid" style={{ 
-                                    gridTemplateColumns: `repeat(${MAP_COLS}, 1fr)`, 
-                                    gridTemplateRows: `repeat(${MAP_ROWS}, 1fr)` 
-                                }}>
-                                    {mapGrid.map((cell, i) => (
-                                        <div key={i} className={`border-[0.5px] border-white/5 relative flex items-center justify-center ${cell.isObstacle ? 'bg-slate-800/50' : 'bg-green-800/40'}`}>
-                                            {cell.decoration && <span style={{fontSize: 'clamp(8px, 1.5vw, 16px)'}} className="opacity-70">{cell.decoration}</span>}
-                                        </div>
-                                    ))}
-
-                                    {entities.map(e => (
-                                        <div key={e.id} className={`absolute flex items-center justify-center transition-all duration-300 transform hover:scale-110 z-10 ${e.isBoss ? 'boss-anim' : ''}`}
-                                             style={{ 
-                                                 width: e.isBoss ? `${(100/MAP_COLS)*3}%` : `${100/MAP_COLS}%`, // 3x size for boss
-                                                 height: e.isBoss ? `${(100/MAP_ROWS)*3}%` : `${100/MAP_ROWS}%`,
-                                                 left: `${(e.x/MAP_COLS)*100}%`, top: `${(e.y/MAP_ROWS)*100}%`,
-                                                 fontSize: e.isBoss ? 'clamp(32px, 8vw, 64px)' : 'clamp(12px, 2.5vw, 24px)',
-                                                 zIndex: e.isBoss ? 25 : 10
-                                             }}>
-                                            {e.content}
-                                        </div>
-                                    ))}
-
-                                    <div className="absolute flex items-center justify-center transition-all duration-200 z-20"
+                                {entities.map(e => (
+                                    <div key={e.id} className="absolute flex items-center justify-center transition-all duration-300 transform hover:scale-110 z-10"
                                          style={{ 
                                              width: `${100/MAP_COLS}%`, height: `${100/MAP_ROWS}%`,
-                                             left: `${(player.x/MAP_COLS)*100}%`, top: `${(player.y/MAP_ROWS)*100}%`,
-                                             fontSize: 'clamp(14px, 3vw, 28px)'
+                                             left: `${(e.x/MAP_COLS)*100}%`, top: `${(e.y/MAP_ROWS)*100}%`,
+                                             fontSize: 'clamp(12px, 2.5vw, 24px)'
                                          }}>
-                                        🐈‍⬛
+                                        {e.content}
+                                    </div>
+                                ))}
+
+                                <div className="absolute flex items-center justify-center transition-all duration-200 z-20"
+                                     style={{ 
+                                         width: `${100/MAP_COLS}%`, height: `${100/MAP_ROWS}%`,
+                                         left: `${(player.x/MAP_COLS)*100}%`, top: `${(player.y/MAP_ROWS)*100}%`,
+                                         fontSize: 'clamp(14px, 3vw, 28px)'
+                                     }}>
+                                    🐈‍⬛
+                                </div>
+                            </div>
+                        )}
+
+                        {gameState === 'battle' && battleState && (
+                            <div className="absolute inset-0 bg-slate-900/95 flex flex-col items-center justify-center p-4 animate-in fade-in z-30">
+                                <h3 className="text-xl font-bold text-red-400 mb-4 animate-pulse">BATTLE!</h3>
+                                
+                                <div className="flex justify-around w-full mb-4">
+                                    <div className="text-center">
+                                        <div className="text-3xl mb-1">🐈‍⬛</div>
+                                        <div className="text-xs font-bold text-green-400">{player.hp} HP</div>
+                                    </div>
+                                    <div className="text-center">
+                                        <div className="text-3xl mb-1 animate-bounce">{battleState.enemy.content}</div>
+                                        <div className="text-xs font-bold text-red-400">{battleState.enemy.hp} HP</div>
                                     </div>
                                 </div>
-                            )}
 
-                            {gameState === 'battle' && battleState && (
-                                <div className="absolute inset-0 bg-slate-900/95 flex flex-col items-center justify-center p-4 animate-in fade-in z-30">
-                                    <h3 className={`text-xl font-bold mb-4 animate-pulse ${battleState.enemy.isBoss ? 'text-red-600 text-3xl' : 'text-red-400'}`}>
-                                        {battleState.enemy.isBoss ? 'BOSS BATTLE!' : 'BATTLE!'}
-                                    </h3>
-                                    
-                                    <div className="flex justify-around w-full mb-4">
-                                        <div className="text-center">
-                                            <div className="text-3xl mb-1">🐈‍⬛</div>
-                                            <div className="text-xs font-bold text-green-400">{player.hp} HP</div>
-                                        </div>
-                                        <div className="text-center">
-                                            <div className={`mb-1 animate-bounce ${battleState.enemy.isBoss ? 'text-6xl' : 'text-3xl'}`}>{battleState.enemy.content}</div>
-                                            <div className="text-xs font-bold text-red-400">{battleState.enemy.hp} HP</div>
-                                        </div>
-                                    </div>
-
-                                    <div className="w-full bg-black/50 p-2 rounded mb-4 h-20 overflow-y-auto text-[10px] font-mono text-slate-300 border border-slate-700">
-                                        {battleState.log.map((l, i) => <div key={i}>{l}</div>)}
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-2 w-full text-xs">
-                                        <button onClick={() => battleAction('attack')} className="p-2 bg-red-600 rounded font-bold hover:bg-red-500 flex items-center justify-center gap-1"><Sword size={12} /> Scratch</button>
-                                        <button onClick={() => battleAction('hiss')} className="p-2 bg-orange-600 rounded font-bold hover:bg-orange-500 flex items-center justify-center gap-1"><Zap size={12}/> Hiss</button>
-                                        <button onClick={() => battleAction('heal')} className="p-2 bg-green-600 rounded font-bold hover:bg-green-500 col-span-2 flex items-center justify-center gap-1"><Heart size={12} /> Purr</button>
-                                    </div>
+                                <div className="w-full bg-black/50 p-2 rounded mb-4 h-20 overflow-y-auto text-[10px] font-mono text-slate-300 border border-slate-700">
+                                    {battleState.log.map((l, i) => <div key={i}>{l}</div>)}
                                 </div>
-                            )}
 
-                            {gameState === 'victory' && (
-                                <div className="absolute inset-0 bg-pink-900/90 flex flex-col items-center justify-center p-6 text-center animate-in zoom-in z-40">
-                                    <Trophy size={48} className="text-yellow-400 mb-2" />
-                                    <h2 className="text-2xl font-bold text-white mb-2">Adventure Complete!</h2>
-                                    <p className="text-pink-200 text-sm mb-4">You've cleared all challenges.</p>
+                                <div className="grid grid-cols-2 gap-2 w-full text-xs">
+                                    <button onClick={() => battleAction('attack')} className="p-2 bg-red-600 rounded font-bold hover:bg-red-500 flex items-center justify-center gap-1"><Sword size={12} /> Scratch</button>
+                                    <button onClick={() => battleAction('hiss')} className="p-2 bg-orange-600 rounded font-bold hover:bg-orange-500 flex items-center justify-center gap-1"><Zap size={12}/> Hiss</button>
+                                    <button onClick={() => battleAction('heal')} className="p-2 bg-green-600 rounded font-bold hover:bg-green-500 col-span-2 flex items-center justify-center gap-1"><Heart size={12} /> Purr</button>
                                 </div>
-                            )}
-                        </div>
+                            </div>
+                        )}
+
+                        {gameState === 'victory' && (
+                            <div className="absolute inset-0 bg-pink-900/90 flex flex-col items-center justify-center p-6 text-center animate-in zoom-in z-40">
+                                <Trophy size={48} className="text-yellow-400 mb-2" />
+                                <h2 className="text-2xl font-bold text-white mb-2">Adventure Complete!</h2>
+                                <p className="text-pink-200 text-sm mb-4">You've cleared all challenges.</p>
+                            </div>
+                        )}
                     </div>
 
                     {/* Compact Controls */}
