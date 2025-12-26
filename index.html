@@ -211,40 +211,82 @@
             );
         };
 
-        // --- RETRO MUSIC PLAYER (Using adv_music.mp3) ---
-        const RetroSynthesizer = ({ isActive }) => {
+        // --- RETRO MUSIC PLAYER (Dynamic Track Switching) ---
+        const RetroSynthesizer = ({ isActive, trackName }) => {
             const [muted, setMuted] = useState(false);
             const audioRef = useRef(null);
+            const currentTrackRef = useRef(null);
 
             useEffect(() => {
-                // Initialize audio with the external file
-                audioRef.current = new Audio('adv_music.mp3');
-                audioRef.current.loop = true;
-                audioRef.current.volume = 0.3; // Set background volume
-
-                return () => {
+                if (!isActive) {
                     if (audioRef.current) {
                         audioRef.current.pause();
-                        audioRef.current = null;
                     }
-                };
-            }, []);
+                    return;
+                }
 
-            useEffect(() => {
-                if (audioRef.current) {
-                    if (isActive && !muted) {
-                        const playPromise = audioRef.current.play();
-                        if (playPromise !== undefined) {
-                            playPromise.catch(error => {
-                                // Auto-play was prevented
-                                console.log("Playback prevented until interaction");
-                            });
+                // If the track changed or wasn't set yet
+                if (currentTrackRef.current !== trackName) {
+                    // Fade out old track if exists
+                    if (audioRef.current) {
+                        const oldAudio = audioRef.current;
+                        // Simple volume fade out
+                        let vol = oldAudio.volume;
+                        const fadeOut = setInterval(() => {
+                            if (vol > 0.05) {
+                                vol -= 0.05;
+                                oldAudio.volume = vol;
+                            } else {
+                                clearInterval(fadeOut);
+                                oldAudio.pause();
+                            }
+                        }, 50);
+                    }
+
+                    // Start new track
+                    if (trackName) {
+                        const newAudio = new Audio(trackName);
+                        newAudio.loop = trackName !== 'win.mp3'; // Don't loop win music
+                        newAudio.volume = 0; // Start at 0 for fade in
+                        
+                        audioRef.current = newAudio;
+                        currentTrackRef.current = trackName;
+
+                        if (!muted) {
+                            const playPromise = newAudio.play();
+                            if (playPromise !== undefined) {
+                                playPromise.then(() => {
+                                    // Fade in
+                                    let vol = 0;
+                                    const fadeIn = setInterval(() => {
+                                        if (vol < 0.3) {
+                                            vol += 0.02;
+                                            newAudio.volume = vol;
+                                        } else {
+                                            clearInterval(fadeIn);
+                                        }
+                                    }, 50);
+                                }).catch(error => {
+                                    console.log("Playback prevented");
+                                });
+                            }
                         }
                     } else {
-                        audioRef.current.pause();
+                        audioRef.current = null;
+                        currentTrackRef.current = null;
                     }
                 }
-            }, [isActive, muted]);
+            }, [isActive, trackName, muted]);
+
+            // Handle Mute Toggle immediately
+            useEffect(() => {
+                if (audioRef.current) {
+                    audioRef.current.muted = muted;
+                    if (!muted && audioRef.current.paused && isActive) {
+                         audioRef.current.play().catch(e => console.log(e));
+                    }
+                }
+            }, [muted]);
 
             return (
                 <button 
@@ -579,6 +621,13 @@
             const [battleState, setBattleState] = useState(null); 
             const [message, setMessage] = useState("Welcome to the Adventure!");
 
+            // Determine current music track based on game state
+            const getCurrentMusic = () => {
+                if (gameState === 'battle') return 'villain.mp3';
+                if (gameState === 'victory') return 'win.mp3';
+                return 'adv_music.mp3';
+            };
+
             // Initialize Map Once
             useEffect(() => {
                 generateMap();
@@ -805,8 +854,8 @@
 
             return (
                 <div className="h-full flex flex-col items-center justify-center p-2 bg-slate-900 relative w-full">
-                    {/* Add Retro Music Player to RPG Game */}
-                    <RetroSynthesizer isActive={true} />
+                    {/* Add Retro Music Player to RPG Game with dynamic track */}
+                    <RetroSynthesizer isActive={true} trackName={getCurrentMusic()} />
                     
                     {/* Compact HUD */}
                     <div className="w-full max-w-md flex justify-between items-center mb-2 bg-slate-800 p-2 rounded-lg border border-pink-500/30 text-xs">
