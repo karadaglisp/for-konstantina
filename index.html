@@ -15,15 +15,32 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        window.firebaseModules = { 
+            initializeApp, 
+            getAuth, 
+            signInAnonymously, 
+            signInWithCustomToken, 
+            onAuthStateChanged, 
+            getFirestore, 
+            doc, 
+            getDoc, 
+            setDoc, 
+            updateDoc, 
+            onSnapshot, 
+            collection 
+        };
+    </script>
+    
     <style>
-        /* Custom scrollbar hiding */
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-        }
-        .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
+        /* --- GLOBAL STYLES --- */
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         body {
             background-color: #020617; /* Slate 950 */
             color: #e2e8f0; /* Slate 200 */
@@ -81,6 +98,27 @@
             0% { transform: scale(1) translateY(0); opacity: 1; filter: drop-shadow(0 0 10px white); }
             100% { transform: scale(0.8) translateY(-200px); opacity: 0.9; filter: drop-shadow(0 0 50px gold); }
         }
+        /* Boss Pulse Animation */
+        @keyframes boss-pulse {
+            0% { transform: scale(1); filter: drop-shadow(0 0 5px red); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 15px red); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 5px red); }
+        }
+        .boss-anim {
+            animation: boss-pulse 2s infinite ease-in-out;
+        }
+        /* Float Up Animation for Reactions */
+        @keyframes float-up {
+            0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { transform: translateY(-300px) scale(1.5) rotate(20deg); opacity: 0; }
+        }
+        .animate-float-up {
+            animation: float-up 2s ease-out forwards;
+            position: absolute;
+            pointer-events: none;
+            z-index: 0;
+        }
     </style>
 </head>
 <body>
@@ -89,22 +127,25 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
         
-        // --- ICONS (Inline SVGs) ---
+        // --- FIREBASE INIT ---
+        const fbModules = window.firebaseModules || {};
+        const { initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection } = fbModules;
+        
+        const fb = { auth: null, db: null, appId: 'default-app-id' };
+
+        if (window.firebaseModules && typeof __firebase_config !== 'undefined') {
+            try {
+                const firebaseConfig = JSON.parse(__firebase_config);
+                const app = initializeApp(firebaseConfig);
+                fb.auth = getAuth(app);
+                fb.db = getFirestore(app);
+                if (typeof __app_id !== 'undefined') fb.appId = __app_id;
+            } catch (e) { console.error("Firebase Init Error:", e); }
+        }
+
+        // --- ICONS ---
         const IconBase = ({ children, size = 24, className = "", fill = "none" }) => (
-            <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                width={size} 
-                height={size} 
-                viewBox="0 0 24 24" 
-                fill={fill} 
-                stroke="currentColor" 
-                strokeWidth="2" 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                className={className}
-            >
-                {children}
-            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>{children}</svg>
         );
 
         const Heart = (props) => <IconBase {...props}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" /></IconBase>;
@@ -127,7 +168,10 @@
         const Cloud = (props) => <IconBase {...props}><path d="M17.5 19c0-1.7-1.3-3-3-3h-11c-1.7 0-3 1.3-3 3s1.3 3 3 3h11c1.7 0 3-1.3 3-3z"/><path d="M17.5 16c2.5 0 4.5-2 4.5-4.5S19.5 7 17.5 7c-.5 0-1 .1-1.4.3-.9-2.6-3.4-4.3-6.1-4.3-3.6 0-6.5 2.9-6.5 6.5 0 .4 0 .9.1 1.3C1.6 11.6 0 13.6 0 16c0 2.5 2 4.5 4.5 4.5h13c2.5 0 4.5-2 4.5-4.5z"/></IconBase>;
         const Volume2 = (props) => <IconBase {...props}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" /><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" /></IconBase>;
         const VolumeX = (props) => <IconBase {...props}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" /><line x1="23" y1="9" x2="17" y2="15" /><line x1="17" y1="9" x2="23" y2="15" /></IconBase>;
-
+        const Feather = (props) => <IconBase {...props}><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/></IconBase>;
+        const Globe = (props) => <IconBase {...props}><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></IconBase>;
+        const Gamepad = (props) => <IconBase {...props}><line x1="6" y1="12" x2="10" y2="12" /><line x1="8" y1="10" x2="8" y2="14" /><line x1="15" y1="13" x2="15.01" y2="13" /><line x1="18" y1="11" x2="18.01" y2="11" /><rect x="2" y="6" width="20" height="12" rx="2" /></IconBase>;
+        const Scissors = (props) => <IconBase {...props}><circle cx="6" cy="6" r="3" /><circle cx="6" cy="18" r="3" /><line x1="20" y1="4" x2="8.12" y2="15.88" /><line x1="14.47" y1="14.48" x2="20" y2="20" /><line x1="8.12" y1="8.12" x2="12" y2="12" /></IconBase>;
 
         // --- ASSETS & CONFIG ---
         const GAME_ITEMS = [
@@ -157,20 +201,45 @@
             { level: 5, target: 250, time: 45, speed: 8, spawnRate: 0.08, title: "The Fiercest Hunt" },
         ];
 
-        const MUSIC_POOL = [
-            "2TjdnqlpwOjhijHCwHCP2d", "4W3tM5eY5a7Xy2h8W2Lz2a", "4g2c7NoTWAOSYDy44l9nhs", "6pnwfWyaWjQiHCKTiZLItr",
-            "6mFqo63z1jD5U7aF7X4x6Z", "2ctvdKmETyOzPb2GiJJT53", "05uGBKRCuePsf43Hfm0JwX", "1tpcE1Ujav8q4fJgJMW4kb",
-            "00hbwu3tPnbiH5MNjzF14N", "3rBCyn5i76CRYE5theSiB5", "7jhyoVX7uqGLLnoEvSSSnY", "1cQ4zuzVnux91bI1tJR1G7",
-            "70LpDqsreV4MtlQzyyV87G", "5Od7Y3ihqhynfNBL10GS1V", "42wkMrkIqX4pYIGnTW70kG", "6ucNZBkwkPmw8OHiv5L7P4",
-            "7Gi8jg3h2Ac0gMetpQUXmh", "0H2zA6m04MUsu4mX2KecNr", "6XHikJpK06NoXaFwkH4tPL", "2HcMkGeghyXdJRT1g85u0t",
-            "6R2YSITVeRTFwDczaxSnQS", "4zGub7d71FopcEXaLKqxcU", "1ixXNc8iCkRniJhICf9xpy", "4l38jp3bDPcI5avo9ov482",
-            "3WSaGTmm67vd3stVi0Zu9D"
-        ];
-
         const DECORATION_ITEMS = [
             '☕', '🕯️', '🪴', '📚', '🧸', '🎧', '🧶', '🌵', '🔮', '🖼️', '🐈‍⬛', '🍑', '🌙', '✨',
             '🧁', '🍓', '🎀', '🎹', '🎻', '🎷', '🎨', '🚀', '🛸', '🪐', '🏰', '🎡', '🧸', '🥐', '🥞',
             '💐', '🍫', '🍩', '🍪', '🍬', '🍭', '🍮', '🍯', '🍼', '🥛', '🧃', '🧉', '🧊'
+        ];
+        
+        const MUSIC_POOL = [
+            // Greek Pulp-Pop / Alternative
+            "42wkMrkIqX4pYIGnTW70kG", // To Sima
+            "6ucNZBkwkPmw8OHiv5L7P4", // Pygolampides
+            "7Gi8jg3h2Ac0gMetpQUXmh", // To Koperti
+            "70LpDqsreV4MtlQzyyV87G", // San Ihthis
+            "5Od7Y3ihqhynfNBL10GS1V", // To Forema
+            "3rBCyn5i76CRYE5theSiB5", // Den Ksero
+            "7jhyoVX7uqGLLnoEvSSSnY", // O Erotas
+            "1cQ4zuzVnux91bI1tJR1G7", // Mehri Ta Haramata
+            "1tpcE1Ujav8q4fJgJMW4kb", // Fotia Sto Limani
+            "00hbwu3tPnbiH5MNjzF14N", // Oso Mikraino
+            
+            // Bedroom Pop
+            "0H2zA6m04MUsu4mX2KecNr", // Fall Down (Crumb)
+            "6XHikJpK06NoXaFwkH4tPL", // I Spend Too Much Time in My Room
+            "2HcMkGeghyXdJRT1g85u0t", // To Ease You (Men I Trust)
+            "6R2YSITVeRTFwDczaxSnQS", // Hard To See
+            
+            // Indie Surf / Dream Pop
+            "4zGub7d71FopcEXaLKqxcU", // Tom's Place
+            "1ixXNc8iCkRniJhICf9xpy", // Turning Over a New Leaf
+            "4l38jp3bDPcI5avo9ov482", // Seabird
+            "3WSaGTmm67vd3stVi0Zu9D"  // Undercurrent
+        ];
+        
+        // --- POEM DATABASE (50+ Poems) ---
+        const POEMS = [
+            { title: "Hope is the thing with feathers", author: "Emily Dickinson", lines: ["Hope is the thing with feathers", "That perches in the soul,", "And sings the tune without the words,", "And never stops at all,", "", "And sweetest in the Gale is heard;", "And sore must be the storm", "That could abash the little Bird", "That kept so many warm.", "", "I’ve heard it in the chillest land,", "And on the strangest Sea;", "Yet, never, in Extremity,", "It asked a crumb of me."] },
+            { title: "A Dream Within a Dream", author: "Edgar Allan Poe", lines: ["Take this kiss upon the brow!", "And, in parting from you now,", "Thus much let me avow —", "You are not wrong, who deem", "That my days have been a dream;", "Yet if hope has flown away", "In a night, or in a day,", "In a vision, or in none,", "Is it therefore the less gone?", "All that we see or seem", "Is but a dream within a dream."] },
+            { title: "She Walks in Beauty", author: "Lord Byron", lines: ["She walks in beauty, like the night", "Of cloudless climes and starry skies;", "And all that’s best of dark and bright", "Meet in her aspect and her eyes;", "Thus mellowed to that tender light", "Which heaven to gaudy day denies."] },
+            { title: "Wild Nights – Wild Nights!", author: "Emily Dickinson", lines: ["Wild Nights – Wild Nights!", "Were I with thee", "Wild Nights should be", "Our luxury!", "", "Futile – the Winds –", "To a Heart in port –", "Done with the Compass –", "Done with the Chart!", "", "Rowing in Eden –", "Ah, the Sea!", "Might I but moor – Tonight –", "In Thee!"] },
+            { title: "Variations on the Word Sleep", author: "Margaret Atwood", lines: ["I would like to watch you sleeping,", "which may not happen.", "I would like to watch you,", "sleeping. I would like to sleep", "with you, to enter", "your sleep as its smooth dark wave", "slides over my head."] }
         ];
 
         // --- COMPONENTS ---
@@ -194,108 +263,208 @@
             return (
                 <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
                     {stars.map((s, i) => (
-                        <div
-                            key={i}
-                            className="absolute bg-white rounded-full opacity-70 star"
-                            style={{
-                                top: `${s.top}%`,
-                                left: `${s.left}%`,
-                                width: `${s.size}px`,
-                                height: `${s.size}px`,
-                                animationDuration: `${s.duration}s`,
-                                animationDelay: `${s.delay}s`
-                            }}
-                        />
+                        <div key={i} className="absolute bg-white rounded-full opacity-70 star" style={{ top: `${s.top}%`, left: `${s.left}%`, width: `${s.size}px`, height: `${s.size}px`, animationDuration: `${s.duration}s`, animationDelay: `${s.delay}s` }} />
                     ))}
                 </div>
             );
         };
 
-        // --- RETRO MUSIC PLAYER (Dynamic Track Switching) ---
-        const RetroSynthesizer = ({ isActive, trackName }) => {
-            const [muted, setMuted] = useState(false);
-            const audioRef = useRef(null);
-            const currentTrackRef = useRef(null);
-
-            useEffect(() => {
-                if (!isActive) {
-                    if (audioRef.current) {
-                        audioRef.current.pause();
-                    }
-                    return;
-                }
-
-                // If the track changed or wasn't set yet
-                if (currentTrackRef.current !== trackName) {
-                    // Fade out old track if exists
-                    if (audioRef.current) {
-                        const oldAudio = audioRef.current;
-                        // Simple volume fade out
-                        let vol = oldAudio.volume;
-                        const fadeOut = setInterval(() => {
-                            if (vol > 0.05) {
-                                vol -= 0.05;
-                                oldAudio.volume = vol;
-                            } else {
-                                clearInterval(fadeOut);
-                                oldAudio.pause();
-                            }
-                        }, 50);
-                    }
-
-                    // Start new track
-                    if (trackName) {
-                        const newAudio = new Audio(trackName);
-                        newAudio.loop = trackName !== 'win.mp3'; // Don't loop win music
-                        newAudio.volume = 0; // Start at 0 for fade in
-                        
-                        audioRef.current = newAudio;
-                        currentTrackRef.current = trackName;
-
-                        if (!muted) {
-                            const playPromise = newAudio.play();
-                            if (playPromise !== undefined) {
-                                playPromise.then(() => {
-                                    // Fade in
-                                    let vol = 0;
-                                    const fadeIn = setInterval(() => {
-                                        if (vol < 0.3) {
-                                            vol += 0.02;
-                                            newAudio.volume = vol;
-                                        } else {
-                                            clearInterval(fadeIn);
-                                        }
-                                    }, 50);
-                                }).catch(error => {
-                                    console.log("Playback prevented");
-                                });
-                            }
-                        }
-                    } else {
-                        audioRef.current = null;
-                        currentTrackRef.current = null;
-                    }
-                }
-            }, [isActive, trackName, muted]);
-
-            // Handle Mute Toggle immediately
-            useEffect(() => {
-                if (audioRef.current) {
-                    audioRef.current.muted = muted;
-                    if (!muted && audioRef.current.paused && isActive) {
-                         audioRef.current.play().catch(e => console.log(e));
-                    }
-                }
-            }, [muted]);
+        // --- LILY COMPONENT (Blooms based on progress) ---
+        const StargazerLily = ({ progress }) => { 
+            // progress: 0 (start) -> 1 (complete)
+            // scale: 0.1 -> 1.0
+            const scale = 0.1 + (progress * 0.9);
+            const opacity = 0.4 + (progress * 0.6);
+            // Petal opening: closed (scaleY 0.2) to open (scaleY 1)
+            const bloom = 0.2 + (progress * 0.8);
 
             return (
-                <button 
-                    onClick={() => setMuted(!muted)}
-                    className="absolute top-4 right-4 z-50 p-2 bg-slate-800/80 hover:bg-slate-700 rounded-full text-white border border-slate-600"
-                    title={muted ? "Unmute Music" : "Mute Music"}
-                >
-                    {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-                </button>
+                <div className="relative w-64 h-64 flex items-center justify-center transition-all duration-1000 ease-out" style={{ transform: `scale(${scale})`, opacity: opacity }}>
+                    <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-[0_0_25px_rgba(236,72,153,0.6)]">
+                        {/* Stem */}
+                        <path d="M50 100 Q50 80 50 60" stroke="#064e3b" strokeWidth="2" fill="none" />
+                        
+                        {/* Petals Group - Rotates/Blooms */}
+                        <g transform="translate(50,50)">
+                            {[0, 60, 120, 180, 240, 300].map((angle, i) => (
+                                <g key={i} transform={`rotate(${angle}) scale(1, ${bloom})`}>
+                                    <path d="M0 0 Q-10 -40 0 -50 Q10 -40 0 0" fill="#ec4899" stroke="#be185d" strokeWidth="0.5" />
+                                    <path d="M0 -10 L0 -40" stroke="#be185d" strokeWidth="0.2" />
+                                    <circle cx="0" cy="-35" r="1" fill="#facc15" />
+                                </g>
+                            ))}
+                        </g>
+                        
+                        {/* Center */}
+                        <circle cx="50" cy="50" r={3 * progress} fill="#facc15" stroke="#a16207" strokeWidth="0.5" />
+                    </svg>
+                </div>
+            ) 
+        };
+
+        // --- POMODORO / STUDY ROOM ---
+        const Pomodoro = () => {
+            const [timeLeft, setTimeLeft] = useState(25 * 60);
+            const [isActive, setIsActive] = useState(false);
+            const [mode, setMode] = useState('focus');
+            const [isEditing, setIsEditing] = useState(false);
+            const [focusTime, setFocusTime] = useState(25);
+            const [breakTime, setBreakTime] = useState(5);
+            
+            // New: Reactions State
+            const [floatingEmojis, setFloatingEmojis] = useState([]);
+            // New: Progress for Lily
+            const [progress, setProgress] = useState(0);
+
+            const containerRef = useRef(null);
+
+            // Updated emoji list for Study Room: Teddy, Cat, Nectarine, Moon, Chicken Leg
+            const STUDY_REACTIONS = ['🧸', '🐈‍⬛', '🍑', '🌙', '🧁', '🍗'];
+
+            // Timer Logic
+            useEffect(() => {
+                let interval = null;
+                if (isActive && timeLeft > 0) {
+                    interval = setInterval(() => {
+                        setTimeLeft(t => {
+                            const newTime = t - 1;
+                            // Calculate progress for lily
+                            const totalSeconds = (mode === 'focus' ? focusTime : breakTime) * 60;
+                            const elapsed = totalSeconds - newTime;
+                            setProgress(Math.min(elapsed / totalSeconds, 1));
+                            return newTime;
+                        });
+                    }, 1000);
+                } else if (timeLeft === 0 && isActive) {
+                    setIsActive(false);
+                    setProgress(1); // Fully bloom at end
+                }
+                return () => clearInterval(interval);
+            }, [isActive, timeLeft, mode, focusTime, breakTime]);
+
+            // Handlers
+            const toggleTimer = () => setIsActive(!isActive);
+            const resetTimer = () => { 
+                setIsActive(false); 
+                const newTime = mode === 'focus' ? focusTime * 60 : breakTime * 60;
+                setTimeLeft(newTime);
+                setProgress(0); // Reset lily
+            };
+            const switchMode = (newMode) => { 
+                setMode(newMode); 
+                setIsActive(false); 
+                const newTime = newMode === 'focus' ? focusTime * 60 : breakTime * 60;
+                setTimeLeft(newTime);
+                setProgress(0); 
+            };
+            
+            const updateTimes = (newFocus, newBreak) => { 
+                const f = parseInt(newFocus) || 25; const b = parseInt(newBreak) || 5; 
+                setFocusTime(f); setBreakTime(b); 
+                if (!isActive) {
+                    const newTime = mode === 'focus' ? f * 60 : b * 60;
+                    setTimeLeft(newTime);
+                }
+            };
+            
+            const formatTime = (s) => { 
+                const m = Math.floor(s/60); 
+                const sc = s%60; 
+                return `${m}:${sc < 10 ? '0' : ''}${sc}`; 
+            };
+
+            // Reaction Logic (Instagram style flow up)
+            const handleReaction = (emoji) => {
+                const id = Date.now() + Math.random();
+                // Randomize start X slightly
+                const randomX = Math.random() * 20 - 10; // -10 to +10 px offset
+                const newReaction = { id, emoji, offset: randomX };
+                
+                setFloatingEmojis(prev => [...prev, newReaction]);
+                
+                // Cleanup after animation
+                setTimeout(() => {
+                    setFloatingEmojis(prev => prev.filter(e => e.id !== id));
+                }, 2000);
+            };
+
+            return (
+                <div className="h-full flex flex-col bg-slate-900 overflow-hidden relative" ref={containerRef}>
+                    {/* Content Area */}
+                    <div className="flex-1 flex flex-col items-center justify-center relative p-4">
+                        
+                        {/* Top Controls */}
+                        <div className="absolute top-4 w-full px-4 flex justify-between items-center z-20">
+                             <h2 className="text-2xl font-bold text-pink-300">Focus Room</h2>
+                             <button onClick={() => setIsEditing(!isEditing)} className="text-slate-400 hover:text-white"><Settings size={20} /></button>
+                        </div>
+
+                        {/* Settings Panel */}
+                        {isEditing && (
+                            <div className="absolute top-16 bg-slate-800/90 p-4 rounded-xl border border-slate-700 z-30 animate-in fade-in">
+                                <div className="flex gap-4 text-xs mb-2">
+                                    <div className="flex flex-col"><label className="text-slate-400 mb-1">Focus</label><input type="number" value={focusTime} onChange={e => updateTimes(e.target.value, breakTime)} className="w-12 bg-slate-900 text-center rounded p-1 text-white"/></div>
+                                    <div className="flex flex-col"><label className="text-slate-400 mb-1">Break</label><input type="number" value={breakTime} onChange={e => updateTimes(focusTime, e.target.value)} className="w-12 bg-slate-900 text-center rounded p-1 text-white"/></div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* The Lily (Blooms with progress) */}
+                        <div className="mb-4 relative z-10">
+                             <StargazerLily progress={progress} />
+                        </div>
+                        
+                        {/* Timer Display */}
+                        <div className="text-6xl font-mono font-bold text-white mb-8 tracking-wider drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] relative z-10">
+                            {formatTime(timeLeft)}
+                        </div>
+
+                        {/* Main Controls */}
+                        <div className="flex gap-6 relative z-10">
+                            <button onClick={toggleTimer} className="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center hover:bg-pink-100 shadow-[0_0_20px_rgba(255,255,255,0.4)] transition-transform hover:scale-105">
+                                {isActive ? <Pause size={24}/> : <Play size={24} className="ml-1"/>}
+                            </button>
+                            <button onClick={resetTimer} className="w-16 h-16 bg-slate-800 text-slate-300 border border-slate-700 rounded-full flex items-center justify-center hover:bg-slate-700 hover:text-white shadow-lg transition-transform hover:scale-105">
+                                <RefreshCw size={20}/>
+                            </button>
+                        </div>
+
+                        {/* Mode Switcher */}
+                        <div className="flex gap-2 mt-8 bg-slate-800/50 p-1 rounded-full border border-slate-700 relative z-10">
+                            <button onClick={() => switchMode('focus')} className={`px-4 py-1 rounded-full text-xs font-bold transition-colors ${mode === 'focus' ? 'bg-pink-600 text-white' : 'text-slate-400'}`}>Focus</button>
+                            <button onClick={() => switchMode('break')} className={`px-4 py-1 rounded-full text-xs font-bold transition-colors ${mode === 'break' ? 'bg-green-600 text-white' : 'text-slate-400'}`}>Break</button>
+                        </div>
+                    </div>
+
+                    {/* Floating Emojis Container */}
+                    <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+                         {floatingEmojis.map(reaction => (
+                             <div 
+                                key={reaction.id}
+                                className="animate-float-up text-4xl absolute bottom-20"
+                                style={{ 
+                                    left: `calc(50% + ${reaction.offset}px)`,
+                                    marginLeft: '-1rem' // Center roughly
+                                }}
+                             >
+                                 {reaction.emoji}
+                             </div>
+                         ))}
+                    </div>
+
+                    {/* Bottom Reaction Bar */}
+                    <div className="h-20 bg-slate-900/80 backdrop-blur-md border-t border-slate-800 flex items-center justify-center gap-4 px-4 pb-4 z-20">
+                         {STUDY_REACTIONS.map((emoji, i) => (
+                             <button 
+                                key={i}
+                                onClick={() => handleReaction(emoji)}
+                                className="text-2xl hover:scale-125 active:scale-90 transition-transform p-2"
+                             >
+                                 {emoji}
+                             </button>
+                         ))}
+                    </div>
+                </div>
             );
         };
 
@@ -552,10 +721,17 @@
                 >
                     <div className="absolute top-4 left-4 right-4 z-20 flex justify-between items-start pointer-events-none">
                         <div className="flex flex-col gap-2">
-                            <div className="text-yellow-300 font-mono text-sm font-bold bg-black/60 p-2 rounded border border-yellow-500/30 flex items-center gap-2 w-fit"><Zap size={14} /> LEVEL {currentLevelIdx + 1}</div>
-                            <div className="text-pink-300 font-mono text-lg font-bold bg-black/60 p-2 rounded border border-pink-500/30 flex items-center gap-2 w-fit"><Trophy size={16} /> <span>{score} / {currentLevelConfig.target}</span></div>
+                            <div className="text-yellow-300 font-mono text-sm font-bold bg-black/60 p-2 rounded border border-yellow-500/30 flex items-center gap-2 w-fit">
+                                <Zap size={14} /> LEVEL {currentLevelIdx + 1}
+                            </div>
+                            <div className="text-pink-300 font-mono text-lg font-bold bg-black/60 p-2 rounded border border-pink-500/30 flex items-center gap-2 w-fit">
+                                <Trophy size={16} /> 
+                                <span>{score} / {currentLevelConfig.target}</span>
+                            </div>
                         </div>
-                        <div className={`font-mono text-2xl font-bold bg-black/60 p-3 rounded-xl border flex items-center gap-2 ${timeLeft < 10 ? 'text-red-500 border-red-500 animate-pulse' : 'text-white border-slate-500'}`}><Timer size={24} /> {timeLeft}s</div>
+                        <div className={`font-mono text-2xl font-bold bg-black/60 p-3 rounded-xl border flex items-center gap-2 ${timeLeft < 10 ? 'text-red-500 border-red-500 animate-pulse' : 'text-white border-slate-500'}`}>
+                            <Timer size={24} /> {timeLeft}s
+                        </div>
                     </div>
 
                     {renderOverlay()}
@@ -602,7 +778,10 @@
             );
         };
 
-        const RPGGame = ({ onFinish }) => {
+        // ==========================================
+        // PAGE: ADVENTURE GAME (Hidden Logic)
+        // ==========================================
+        const RPGGame = ({ onFinish, isActive }) => {
             const MAP_COLS = 12;
             const MAP_ROWS = 12;
             const INITIAL_MISSIONS = [
@@ -620,13 +799,9 @@
             const [gameState, setGameState] = useState('roaming'); // roaming, battle, victory
             const [battleState, setBattleState] = useState(null); 
             const [message, setMessage] = useState("Welcome to the Adventure!");
-
-            // Determine current music track based on game state
-            const getCurrentMusic = () => {
-                if (gameState === 'battle') return 'villain.mp3';
-                if (gameState === 'victory') return 'win.mp3';
-                return 'adv_music.mp3';
-            };
+            const [villainsDefeated, setVillainsDefeated] = useState(0);
+            const [bossSpawned, setBossSpawned] = useState(false);
+            const [showBossWarning, setShowBossWarning] = useState(false);
 
             // Initialize Map Once
             useEffect(() => {
@@ -689,18 +864,16 @@
                     newEntities.push({ id: id++, ...pos, type: 'item', content: '🍪', name: 'Cookie', value: 5 }); 
                 }
 
-                // Spawn Villains (Mixed Types)
+                // Spawn Normal Villains ONLY first
                 const villainTypes = [
                     { content: '⛈️', name: 'Bad Vibe', hp: 30, xp: 40 },
                     { content: '🦠', name: 'Germ', hp: 20, xp: 25 },
-                    { content: '🥀', name: 'Wilted Flower', hp: 25, xp: 30 },
-                    { content: '🦑', name: 'Calamari', hp: 50, xp: 100 } // Stronger!
+                    { content: '🥀', name: 'Wilted Flower', hp: 25, xp: 30 }
                 ];
 
                 for(let i=0; i<6; i++) {
                     const pos = getFreeCoord();
-                    // Calamari is rare
-                    const type = (i === 0) ? villainTypes[3] : villainTypes[Math.floor(Math.random() * 3)];
+                    const type = villainTypes[Math.floor(Math.random() * villainTypes.length)];
                     newEntities.push({ id: id++, ...pos, type: 'enemy', ...type, maxHp: type.hp, attack: 5 });
                 }
 
@@ -736,6 +909,45 @@
                     setGameState('victory');
                 }
             }, [missions, gameState]);
+
+            // Boss Spawning Logic
+            useEffect(() => {
+                if (villainsDefeated >= 2 && !bossSpawned) {
+                    setBossSpawned(true);
+                    setShowBossWarning(true);
+                    setTimeout(() => setShowBossWarning(false), 3000);
+
+                    // Spawn Calamari
+                    const bossType = { content: '🦑', name: 'Calamari', hp: 100, xp: 500, isBoss: true }; // High HP
+                    // Find spawn point far from player if possible, simply use free coord for now
+                    // We need to access mapGrid state, which we can in setEntities updater if needed, but let's assume getFreeCoord logic isn't easily accessible here without recreating it or refactoring.
+                    // Simplified: Spawn at fixed location (10, 10) if free, else random.
+                    // To keep it simple, we'll append to entities.
+                    
+                    setEntities(prev => {
+                         // Find a free spot
+                         let spawnX = 10, spawnY = 10;
+                         // Simple check against existing entities
+                         while (prev.find(e => e.x === spawnX && e.y === spawnY)) {
+                             spawnX = Math.floor(Math.random() * (MAP_COLS - 2)) + 1;
+                             spawnY = Math.floor(Math.random() * (MAP_ROWS - 2)) + 1;
+                         }
+                         
+                         return [...prev, { 
+                             id: Date.now(), 
+                             x: spawnX, 
+                             y: spawnY, 
+                             type: 'enemy', 
+                             ...bossType, 
+                             maxHp: bossType.hp, 
+                             attack: 15 // Stronger attack
+                         }];
+                    });
+                    
+                    setMessage("A giant shadow covers the picnic...");
+                }
+            }, [villainsDefeated, bossSpawned]);
+
 
             const movePlayer = (dx, dy) => {
                 if (gameState !== 'roaming') return;
@@ -823,6 +1035,9 @@
                     updateMission('defeat', enemy.name, 1); // Specific target
                     updateMission('defeat', 'any', 1);      // Generic target
                     
+                    // Increment villains defeated count for boss spawn logic
+                    setVillainsDefeated(prev => prev + 1);
+
                     setTimeout(() => {
                         setGameState('roaming');
                         setBattleState(null);
@@ -854,8 +1069,6 @@
 
             return (
                 <div className="h-full flex flex-col items-center justify-center p-2 bg-slate-900 relative w-full">
-                    {/* Add Retro Music Player to RPG Game with dynamic track */}
-                    <RetroSynthesizer isActive={true} trackName={getCurrentMusic()} />
                     
                     {/* Compact HUD */}
                     <div className="w-full max-w-md flex justify-between items-center mb-2 bg-slate-800 p-2 rounded-lg border border-pink-500/30 text-xs">
@@ -872,75 +1085,91 @@
                     </div>
 
                     {/* Flexible Game Viewport */}
-                    <div className="relative w-full max-w-md bg-emerald-900 rounded-xl border-4 border-slate-700 overflow-hidden shadow-2xl flex-shrink-1 aspect-square max-h-[50vh]">
-                        {/* Map Grid */}
-                        {gameState === 'roaming' && (
-                            <div className="absolute inset-0 grid" style={{ 
-                                gridTemplateColumns: `repeat(${MAP_COLS}, 1fr)`, 
-                                gridTemplateRows: `repeat(${MAP_ROWS}, 1fr)` 
-                            }}>
-                                {mapGrid.map((cell, i) => (
-                                    <div key={i} className={`border-[0.5px] border-white/5 relative flex items-center justify-center ${cell.isObstacle ? 'bg-slate-800/50' : 'bg-green-800/40'}`}>
-                                        {cell.decoration && <span style={{fontSize: 'clamp(8px, 1.5vw, 16px)'}} className="opacity-70">{cell.decoration}</span>}
-                                    </div>
-                                ))}
+                    <div className="flex-1 w-full min-h-0 flex items-center justify-center">
+                        <div className="aspect-square max-h-full max-w-full bg-emerald-900 rounded-xl border-4 border-slate-700 overflow-hidden shadow-2xl relative">
+                            
+                            {/* Boss Warning Pop-up */}
+                            {showBossWarning && (
+                                <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 animate-in fade-in zoom-in duration-300">
+                                    <h1 className="text-4xl font-black text-red-500 animate-pulse border-4 border-red-500 p-4 rounded-xl rotate-[-5deg] bg-slate-900">
+                                        WARNING:<br/>BOSS APPROACHING!
+                                    </h1>
+                                </div>
+                            )}
 
-                                {entities.map(e => (
-                                    <div key={e.id} className="absolute flex items-center justify-center transition-all duration-300 transform hover:scale-110 z-10"
+                            {/* Map Grid */}
+                            {gameState === 'roaming' && (
+                                <div className="absolute inset-0 grid bg-slate-700 gap-px border border-slate-700" style={{ 
+                                    gridTemplateColumns: `repeat(${MAP_COLS}, 1fr)`, 
+                                    gridTemplateRows: `repeat(${MAP_ROWS}, 1fr)` 
+                                }}>
+                                    {mapGrid.map((cell, i) => (
+                                        <div key={i} className={`relative flex items-center justify-center ${cell.isObstacle ? 'bg-slate-800/50' : 'bg-green-800/40'}`}>
+                                            {cell.decoration && <span style={{fontSize: 'clamp(8px, 1.5vw, 16px)'}} className="opacity-70">{cell.decoration}</span>}
+                                        </div>
+                                    ))}
+
+                                    {entities.map(e => (
+                                        <div key={e.id} className={`absolute flex items-center justify-center transition-all duration-300 transform hover:scale-110 z-10 ${e.isBoss ? 'boss-anim' : ''}`}
+                                             style={{ 
+                                                 width: e.isBoss ? `${(100/MAP_COLS)*3}%` : `${100/MAP_COLS}%`, // 3x size for boss
+                                                 height: e.isBoss ? `${(100/MAP_ROWS)*3}%` : `${100/MAP_ROWS}%`,
+                                                 left: `${(e.x/MAP_COLS)*100}%`, top: `${(e.y/MAP_ROWS)*100}%`,
+                                                 fontSize: e.isBoss ? 'clamp(32px, 8vw, 64px)' : 'clamp(12px, 2.5vw, 24px)',
+                                                 zIndex: e.isBoss ? 25 : 10
+                                             }}>
+                                            {e.content}
+                                        </div>
+                                    ))}
+
+                                    <div className="absolute flex items-center justify-center transition-all duration-200 z-20"
                                          style={{ 
                                              width: `${100/MAP_COLS}%`, height: `${100/MAP_ROWS}%`,
-                                             left: `${(e.x/MAP_COLS)*100}%`, top: `${(e.y/MAP_ROWS)*100}%`,
-                                             fontSize: 'clamp(12px, 2.5vw, 24px)'
+                                             left: `${(player.x/MAP_COLS)*100}%`, top: `${(player.y/MAP_ROWS)*100}%`,
+                                             fontSize: 'clamp(14px, 3vw, 28px)'
                                          }}>
-                                        {e.content}
-                                    </div>
-                                ))}
-
-                                <div className="absolute flex items-center justify-center transition-all duration-200 z-20"
-                                     style={{ 
-                                         width: `${100/MAP_COLS}%`, height: `${100/MAP_ROWS}%`,
-                                         left: `${(player.x/MAP_COLS)*100}%`, top: `${(player.y/MAP_ROWS)*100}%`,
-                                         fontSize: 'clamp(14px, 3vw, 28px)'
-                                     }}>
-                                    🐈‍⬛
-                                </div>
-                            </div>
-                        )}
-
-                        {gameState === 'battle' && battleState && (
-                            <div className="absolute inset-0 bg-slate-900/95 flex flex-col items-center justify-center p-4 animate-in fade-in z-30">
-                                <h3 className="text-xl font-bold text-red-400 mb-4 animate-pulse">BATTLE!</h3>
-                                
-                                <div className="flex justify-around w-full mb-4">
-                                    <div className="text-center">
-                                        <div className="text-3xl mb-1">🐈‍⬛</div>
-                                        <div className="text-xs font-bold text-green-400">{player.hp} HP</div>
-                                    </div>
-                                    <div className="text-center">
-                                        <div className="text-3xl mb-1 animate-bounce">{battleState.enemy.content}</div>
-                                        <div className="text-xs font-bold text-red-400">{battleState.enemy.hp} HP</div>
+                                        🐈‍⬛
                                     </div>
                                 </div>
+                            )}
 
-                                <div className="w-full bg-black/50 p-2 rounded mb-4 h-20 overflow-y-auto text-[10px] font-mono text-slate-300 border border-slate-700">
-                                    {battleState.log.map((l, i) => <div key={i}>{l}</div>)}
+                            {gameState === 'battle' && battleState && (
+                                <div className="absolute inset-0 bg-slate-900/95 flex flex-col items-center justify-center p-4 animate-in fade-in z-30">
+                                    <h3 className={`text-xl font-bold mb-4 animate-pulse ${battleState.enemy.isBoss ? 'text-red-600 text-3xl' : 'text-red-400'}`}>
+                                        {battleState.enemy.isBoss ? 'BOSS BATTLE!' : 'BATTLE!'}
+                                    </h3>
+                                    
+                                    <div className="flex justify-around w-full mb-4">
+                                        <div className="text-center">
+                                            <div className="text-3xl mb-1">🐈‍⬛</div>
+                                            <div className="text-xs font-bold text-green-400">{player.hp} HP</div>
+                                        </div>
+                                        <div className="text-center">
+                                            <div className={`mb-1 animate-bounce ${battleState.enemy.isBoss ? 'text-6xl' : 'text-3xl'}`}>{battleState.enemy.content}</div>
+                                            <div className="text-xs font-bold text-red-400">{battleState.enemy.hp} HP</div>
+                                        </div>
+                                    </div>
+
+                                    <div className="w-full bg-black/50 p-2 rounded mb-4 h-20 overflow-y-auto text-[10px] font-mono text-slate-300 border border-slate-700">
+                                        {battleState.log.map((l, i) => <div key={i}>{l}</div>)}
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-2 w-full text-xs">
+                                        <button onClick={() => battleAction('attack')} className="p-2 bg-red-600 rounded font-bold hover:bg-red-500 flex items-center justify-center gap-1"><Sword size={12} /> Scratch</button>
+                                        <button onClick={() => battleAction('hiss')} className="p-2 bg-orange-600 rounded font-bold hover:bg-orange-500 flex items-center justify-center gap-1"><Zap size={12}/> Hiss</button>
+                                        <button onClick={() => battleAction('heal')} className="p-2 bg-green-600 rounded font-bold hover:bg-green-500 col-span-2 flex items-center justify-center gap-1"><Heart size={12} /> Purr</button>
+                                    </div>
                                 </div>
+                            )}
 
-                                <div className="grid grid-cols-2 gap-2 w-full text-xs">
-                                    <button onClick={() => battleAction('attack')} className="p-2 bg-red-600 rounded font-bold hover:bg-red-500 flex items-center justify-center gap-1"><Sword size={12} /> Scratch</button>
-                                    <button onClick={() => battleAction('hiss')} className="p-2 bg-orange-600 rounded font-bold hover:bg-orange-500 flex items-center justify-center gap-1"><Zap size={12}/> Hiss</button>
-                                    <button onClick={() => battleAction('heal')} className="p-2 bg-green-600 rounded font-bold hover:bg-green-500 col-span-2 flex items-center justify-center gap-1"><Heart size={12} /> Purr</button>
+                            {gameState === 'victory' && (
+                                <div className="absolute inset-0 bg-pink-900/90 flex flex-col items-center justify-center p-6 text-center animate-in zoom-in z-40">
+                                    <Trophy size={48} className="text-yellow-400 mb-2" />
+                                    <h2 className="text-2xl font-bold text-white mb-2">Adventure Complete!</h2>
+                                    <p className="text-pink-200 text-sm mb-4">You've cleared all challenges.</p>
                                 </div>
-                            </div>
-                        )}
-
-                        {gameState === 'victory' && (
-                            <div className="absolute inset-0 bg-pink-900/90 flex flex-col items-center justify-center p-6 text-center animate-in zoom-in z-40">
-                                <Trophy size={48} className="text-yellow-400 mb-2" />
-                                <h2 className="text-2xl font-bold text-white mb-2">Adventure Complete!</h2>
-                                <p className="text-pink-200 text-sm mb-4">You've cleared all challenges.</p>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
 
                     {/* Compact Controls */}
@@ -1073,11 +1302,93 @@
             const shuffleTracks = () => { const shuffled = [...MUSIC_POOL].sort(() => 0.5 - Math.random()); setCurrentTracks(shuffled.slice(0, 4)); };
             const shuffleConstellations = () => { const shuffled = [...allConstellations].sort(() => 0.5 - Math.random()); setCurrentConstellations(shuffled.slice(0, 4)); };
             useEffect(() => { shuffleTracks(); shuffleConstellations(); }, []);
-            return ( <div className="p-6 max-w-2xl mx-auto pb-24"> <h2 className="text-3xl font-serif text-center text-pink-200 mb-8 border-b border-slate-700 pb-4"> You as a Constellation </h2> <div className="bg-slate-800/50 rounded-xl p-4 mb-8 border border-slate-700 backdrop-blur-sm relative overflow-hidden group"> <div className="absolute top-0 right-0 p-2 opacity-50 group-hover:opacity-100 transition-opacity z-10"> <button onClick={shuffleTracks} className="p-2 bg-black/40 hover:bg-pink-500 rounded-full transition-colors" title="Shuffle Songs"> <RefreshCw size={16} className="text-white" /> </button> </div> <div className="flex items-center gap-4 mb-4"> <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-900 rounded-lg flex items-center justify-center animate-pulse"> <Music className="text-white w-8 h-8" /> </div> <div> <h3 className="text-white font-bold">Midnight Mixtape</h3> <p className="text-pink-400 text-sm">Music I listen to when I'm thinking of you</p> </div> </div> <div className="space-y-3"> {currentTracks.map((trackId, i) => ( <iframe key={i} style={{ borderRadius: '12px' }} src={`https://open.spotify.com/embed/track/${trackId}?utm_source=generator&theme=0`} width="100%" height="80" frameBorder="0" allowFullScreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" className="bg-slate-900" /> ))} </div> </div> <div className="flex justify-between items-center mb-4 px-2"> <h3 className="text-pink-200 font-bold text-lg">Star Map</h3> <button onClick={shuffleConstellations} className="p-2 bg-slate-800 hover:bg-pink-600/50 rounded-full transition-colors flex items-center gap-2 text-xs text-slate-400 hover:text-white"> <RefreshCw size={14} /> Shuffle Stars </button> </div> <div className="grid grid-cols-2 gap-4"> {currentConstellations.map((c) => ( <button key={c.id} onClick={() => setActiveConstellation(c)} className="p-4 bg-slate-800/80 rounded-xl border border-slate-700 hover:border-pink-500/50 transition-all hover:scale-105 text-left group"> <div className="text-3xl mb-2 group-hover:animate-bounce shadow-white drop-shadow-md">{c.icon}</div> <h3 className="text-pink-200 font-bold text-sm">{c.title}</h3> </button> ))} </div> {activeConstellation && ( <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4" onClick={() => setActiveConstellation(null)}> <div className="bg-slate-900 border border-pink-500 rounded-2xl p-6 max-w-sm w-full relative transform scale-100 transition-transform flex flex-col items-center"> <button className="absolute top-2 right-2 text-slate-500 hover:text-white z-10"><X size={20}/></button> <ConstellationIllustration title={activeConstellation.title} icon={activeConstellation.icon} data={activeConstellation.data} /> <h3 className="text-2xl font-serif font-bold text-pink-400 mb-2 text-center">{activeConstellation.title}</h3> <p className="text-slate-300 text-center leading-relaxed text-sm mb-4">{activeConstellation.text}</p> <div className="mt-2 text-center text-xs text-slate-600">Tap anywhere to close</div> </div> </div> )} </div> );
+            return ( <div className="p-6 max-w-2xl mx-auto pb-24"> <h2 className="text-3xl font-serif text-center text-pink-200 mb-8 border-b border-slate-700 pb-4"> You as a Constellation </h2> <div className="bg-slate-800/50 rounded-xl p-4 mb-8 border border-slate-700 backdrop-blur-sm relative overflow-hidden group"> <div className="absolute top-0 right-0 p-2 opacity-50 group-hover:opacity-100 transition-opacity z-10"> <button onClick={shuffleTracks} className="p-2 bg-black/40 hover:bg-pink-500 rounded-full transition-colors" title="Shuffle Songs"> <RefreshCw size={16} className="text-white" /> </button> </div> <div className="flex items-center gap-4 mb-4"> <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-900 rounded-lg flex items-center justify-center animate-pulse"> <Music className="text-white w-8 h-8" /> </div> <div> <h3 className="text-white font-bold">Midnight Mixtape</h3> <p className="text-pink-400 text-sm">Vibes: Dark Side &amp; Summer Nights</p> </div> </div> <div className="space-y-3"> {currentTracks.map((trackId, i) => ( <iframe key={i} style={{ borderRadius: '12px' }} src={`https://open.spotify.com/embed/track/${trackId}?utm_source=generator&theme=0`} width="100%" height="80" frameBorder="0" allowFullScreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" className="bg-slate-900" /> ))} </div> </div> <div className="flex justify-between items-center mb-4 px-2"> <h3 className="text-pink-200 font-bold text-lg">Star Map</h3> <button onClick={shuffleConstellations} className="p-2 bg-slate-800 hover:bg-pink-600/50 rounded-full transition-colors flex items-center gap-2 text-xs text-slate-400 hover:text-white"> <RefreshCw size={14} /> Shuffle Stars </button> </div> <div className="grid grid-cols-2 gap-4"> {currentConstellations.map((c) => ( <button key={c.id} onClick={() => setActiveConstellation(c)} className="p-4 bg-slate-800/80 rounded-xl border border-slate-700 hover:border-pink-500/50 transition-all hover:scale-105 text-left group"> <div className="text-3xl mb-2 group-hover:animate-bounce shadow-white drop-shadow-md">{c.icon}</div> <h3 className="text-pink-200 font-bold text-sm">{c.title}</h3> </button> ))} </div> {activeConstellation && ( <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4" onClick={() => setActiveConstellation(null)}> <div className="bg-slate-900 border border-pink-500 rounded-2xl p-6 max-w-sm w-full relative transform scale-100 transition-transform flex flex-col items-center"> <button className="absolute top-2 right-2 text-slate-500 hover:text-white z-10"><X size={20}/></button> <ConstellationIllustration title={activeConstellation.title} icon={activeConstellation.icon} data={activeConstellation.data} /> <h3 className="text-2xl font-serif font-bold text-pink-400 mb-2 text-center">{activeConstellation.title}</h3> <p className="text-slate-300 text-center leading-relaxed text-sm mb-4">{activeConstellation.text}</p> <div className="mt-2 text-center text-xs text-slate-600">Tap anywhere to close</div> </div> </div> )} </div> );
         };
 
         const LoveLetter = () => {
-            return ( <div className="min-h-[60vh] flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-1000"> <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-pink-500 shadow-[0_0_30px_rgba(236,72,153,0.6)] mb-8 bg-slate-800 flex items-center justify-center"> <span className="text-6xl">🖤</span> </div> <h1 className="text-4xl font-serif text-white mb-6">For the hottest black pantheress</h1> <div className="max-w-md bg-white/5 backdrop-blur-md p-6 rounded-xl border border-white/10 text-lg leading-relaxed text-pink-100 font-serif italic"> <p> I can't get over your dark aesthetic, your obsession with nectarines, and the way you look at me when I say something you like. I melt everytime you whisper my name or say that you want me. Keep s(p)it(t)ing on my face pls 🫠 </p> </div> <div className="mt-8 text-sm text-slate-500 font-mono"> coded with ❤️ by Banos </div> </div> );
+            return ( <div className="min-h-[60vh] flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-1000"> <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-pink-500 shadow-[0_0_30px_rgba(236,72,153,0.6)] mb-8 bg-slate-800 flex items-center justify-center"> <span className="text-6xl">🖤</span> </div> <h1 className="text-4xl font-serif text-white mb-6">For the hottest black pantheress</h1> <div className="max-w-md bg-white/5 backdrop-blur-md p-6 rounded-xl border border-white/10 text-lg leading-relaxed text-pink-100 font-serif italic"> <p> I can't get over your dark aesthetic, your obsession with nectarines, and the way you look at me when I say something you like. I melt everytime you whisper my name or say that you want me. Keep spiting on my face pls 🫠 </p> </div> <div className="mt-8 text-sm text-slate-500 font-mono"> coded with ❤️ by Banos </div> </div> );
+        };
+
+        const DailyPoem = () => {
+             const [viewMode, setViewMode] = useState('local'); // 'local' or 'external'
+             const [todayPoem, setTodayPoem] = useState(POEMS[0]);
+             const [externalPoem, setExternalPoem] = useState(null);
+             const [loading, setLoading] = useState(false);
+
+             useEffect(() => {
+                 const now = new Date();
+                 const start = new Date(now.getFullYear(), 0, 0);
+                 const diff = now - start;
+                 const oneDay = 1000 * 60 * 60 * 24;
+                 const day = Math.floor(diff / oneDay);
+                 setTodayPoem(POEMS[day % POEMS.length]);
+             }, []);
+
+             const shufflePoem = () => {
+                 setTodayPoem(POEMS[Math.floor(Math.random() * POEMS.length)]);
+             };
+             
+             const fetchExternalPoem = async () => {
+                 setLoading(true);
+                 try {
+                     const response = await fetch('https://poetrydb.org/random');
+                     const data = await response.json();
+                     if (data && data.length > 0) setExternalPoem(data[0]);
+                 } catch (error) { console.error("Failed to fetch poem", error); } finally { setLoading(false); }
+             };
+
+             useEffect(() => {
+                 if (viewMode === 'external' && !externalPoem) fetchExternalPoem();
+             }, [viewMode]);
+
+             return (
+                 <div className="h-full flex flex-col items-center justify-center p-4 animate-in fade-in duration-1000">
+                     <div className="flex bg-slate-800 rounded-full p-1 mb-4 border border-slate-700 shadow-lg">
+                        <button onClick={() => setViewMode('local')} className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${viewMode === 'local' ? 'bg-pink-600 text-white' : 'text-slate-400 hover:text-white'}`}>Classic</button>
+                        <button onClick={() => setViewMode('external')} className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${viewMode === 'external' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'}`}>Discover</button>
+                     </div>
+
+                     <div className="w-full max-w-2xl bg-slate-800/50 border border-slate-700 rounded-2xl shadow-2xl relative overflow-hidden flex flex-col h-[75vh]">
+                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 z-10"></div>
+                         
+                         {viewMode === 'local' ? (
+                             <>
+                                 <button onClick={shufflePoem} className="absolute top-4 right-4 p-2 text-slate-500 hover:text-white z-20 bg-slate-800/50 rounded-full"><RefreshCw size={18} /></button>
+                                 <div className="p-8 flex flex-col h-full">
+                                     <div className="mb-6 flex-shrink-0 text-center">
+                                         <h2 className="text-2xl font-serif font-bold text-pink-200 mb-2">{todayPoem.title}</h2>
+                                         <p className="text-sm text-slate-400 uppercase tracking-widest">by {todayPoem.author}</p>
+                                     </div>
+                                     <div className="font-serif text-slate-300 leading-relaxed text-lg italic space-y-2 overflow-y-auto scrollbar-hide flex-1 pb-4 px-2 text-center">
+                                         {todayPoem.lines.map((line, i) => <p key={i} className={line === "" ? "h-4" : ""}>{line}</p>)}
+                                     </div>
+                                     <div className="mt-4 flex-shrink-0 flex justify-center"><Feather className="text-pink-500/50 w-6 h-6" /></div>
+                                 </div>
+                             </>
+                         ) : (
+                             <div className="p-8 flex flex-col h-full relative">
+                                 <button onClick={fetchExternalPoem} className="absolute top-4 right-4 p-2 text-slate-500 hover:text-white z-20 bg-slate-800/50 rounded-full"><RefreshCw size={18} className={loading ? "animate-spin" : ""} /></button>
+                                 {loading ? (
+                                     <div className="flex items-center justify-center h-full text-slate-400 font-mono animate-pulse">Fetching inspiration...</div>
+                                 ) : externalPoem ? (
+                                     <>
+                                         <div className="mb-6 flex-shrink-0 text-center">
+                                             <h2 className="text-2xl font-serif font-bold text-indigo-200 mb-2">{externalPoem.title}</h2>
+                                             <p className="text-sm text-slate-400 uppercase tracking-widest">by {externalPoem.author}</p>
+                                         </div>
+                                         <div className="font-serif text-slate-300 leading-relaxed text-lg italic space-y-2 overflow-y-auto scrollbar-hide flex-1 pb-4 px-2 text-center">
+                                             {externalPoem.lines.map((line, i) => <p key={i} className={line === "" ? "h-4" : ""}>{line}</p>)}
+                                         </div>
+                                         <div className="mt-4 flex-shrink-0 flex justify-center text-xs text-slate-500 font-mono">Source: PoetryDB.org</div>
+                                     </>
+                                 ) : (
+                                     <div className="flex flex-col items-center justify-center h-full text-slate-400 gap-4"><p>Could not fetch a poem.</p><button onClick={fetchExternalPoem} className="px-4 py-2 bg-indigo-600 rounded-full text-white text-sm">Try Again</button></div>
+                                 )}
+                             </div>
+                         )}
+                     </div>
+                 </div>
+             );
         };
 
         const ThoughtShrinker = () => {
@@ -1089,40 +1400,6 @@
              const [timeLeft, setTimeLeft] = useState(60);
              const [titleText, setTitleText] = useState("What's on your mind?");
              const [isGriefMode, setIsGriefMode] = useState(false);
-             const [isMuted, setIsMuted] = useState(false);
-             const audioRef = useRef(null);
-
-             useEffect(() => {
-                // Initialize audio
-                // Note: This expects a file named 'kitty_ray_dont_panic.mp3' in the root directory
-                audioRef.current = new Audio('kitty_ray_dont_panic.mp3'); 
-                audioRef.current.volume = 0.2;
-                audioRef.current.loop = true;
-
-                // Attempt play
-                const playAudio = async () => {
-                    try {
-                        await audioRef.current.play();
-                    } catch (err) {
-                        console.log("Autoplay blocked, waiting for interaction");
-                    }
-                };
-                playAudio();
-
-                return () => {
-                    if (audioRef.current) {
-                        audioRef.current.pause();
-                        audioRef.current = null;
-                    }
-                };
-             }, []);
-
-             const toggleMute = () => {
-                if (audioRef.current) {
-                    audioRef.current.muted = !isMuted;
-                    setIsMuted(!isMuted);
-                }
-             };
 
              useEffect(() => {
                  if (isReleased) {
@@ -1210,11 +1487,10 @@
              return (
                  <div className="h-full flex flex-col items-center justify-center p-6 text-center relative overflow-hidden">
                     <button 
-                        onClick={toggleMute} 
                         className="absolute top-4 right-4 z-50 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors text-white"
-                        title={isMuted ? "Unmute" : "Mute"}
+                        title="Mute"
                     >
-                        {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+                        <VolumeX size={20} />
                     </button>
 
                     {!isReleased ? (
@@ -1275,12 +1551,252 @@
              )
         }
 
-        const StargazerLily = ({ progress }) => { const scale = 0.2 + (progress / 100) * 0.8; const opacity = 0.5 + (progress / 100) * 0.5; return ( <div className="relative w-48 h-48 flex items-center justify-center transition-all duration-1000 ease-out mb-6" style={{ transform: `scale(${scale})`, opacity: opacity }}> <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-[0_0_15px_rgba(236,72,153,0.6)]"> <g fill="#ec4899" stroke="#be185d" strokeWidth="1"> <path d="M50 50 Q30 80 50 100 Q70 80 50 50" /> <path d="M50 50 Q30 20 50 0 Q70 20 50 50" /> <path d="M50 50 Q80 30 100 50 Q80 70 50 50" /> <path d="M50 50 Q20 30 0 50 Q20 70 50 50" /> <path d="M50 50 Q20 20 15 15 Q40 10 50 50" transform="rotate(45 50 50)" /> <path d="M50 50 Q80 80 85 85 Q60 90 50 50" transform="rotate(45 50 50)" /> </g> <g fill="#be185d"> <circle cx="50" cy="40" r="1.5" /> <circle cx="50" cy="30" r="1.5" /> <circle cx="60" cy="50" r="1.5" /> <circle cx="70" cy="50" r="1.5" /> <circle cx="40" cy="50" r="1.5" /> <circle cx="30" cy="50" r="1.5" /> <circle cx="50" cy="60" r="1.5" /> <circle cx="50" cy="70" r="1.5" /> </g> <circle cx="50" cy="50" r="6" fill="#facc15" stroke="#a16207" /> <path d="M50 50 L40 40 M50 50 L60 40 M50 50 L40 60 M50 50 L60 60" stroke="#facc15" strokeWidth="2" strokeLinecap="round" /> </svg> </div> ) };
-        const Pomodoro = () => { const [timeLeft, setTimeLeft] = useState(25 * 60); const [isActive, setIsActive] = useState(false); const [mode, setMode] = useState('focus'); const [cycle, setCycle] = useState(0); const [decorations, setDecorations] = useState([]); const [activeDrag, setActiveDrag] = useState(null); const [flowerProgress, setFlowerProgress] = useState(0); const [modalMessage, setModalMessage] = useState(null); const [focusTime, setFocusTime] = useState(25); const [breakTime, setBreakTime] = useState(5); const [isEditing, setIsEditing] = useState(false); const DECORATION_ITEMS = [ '☕', '🕯️', '🪴', '📚', '🧸', '🎧', '🧶', '🌵', '🔮', '🖼️', '🐈‍⬛', '🍑', '🌙', '✨', '🧁', '🍓', '🎀', '🎹', '🎻', '🎷', '🎨', '🚀', '🛸', '🪐', '🏰', '🎡', '🧸', '🥐', '🥞', '💐', '🍫', '🍩', '🍪', '🍬', '🍭', '🍮', '🍯', '🍼', '🥛', '🧃', '🧉', '🧊' ]; useEffect(() => { const saved = localStorage.getItem('cat_decorations'); if (saved) setDecorations(JSON.parse(saved)); }, []); useEffect(() => { localStorage.setItem('cat_decorations', JSON.stringify(decorations)); }, [decorations]); useEffect(() => { let interval = null; if (isActive && timeLeft > 0) { interval = setInterval(() => { setTimeLeft(t => t - 1); if (mode === 'focus') { const total = focusTime * 60; setFlowerProgress(((total - (timeLeft - 1)) / total) * 100); } }, 1000); } else if (timeLeft === 0 && isActive) { setIsActive(false); if (mode === 'focus') { setCycle(c => c + 1); unlockReward(); const lilyDeco = { id: Date.now() + 1, type: 'lily', content: 'lily', x: 50 + (Math.random() * 20 - 10), y: 50 + (Math.random() * 20 - 10) }; setDecorations(prev => [...prev, lilyDeco]); setModalMessage({ title: "Good job, kitten!", text: "You did amazing! 🖤 Here is a treat for you. Take a well-deserved break.", button: "Start Break", nextMode: "break" }); setFlowerProgress(100); } else { setModalMessage({ title: "Break's Over!", text: "Ready to conquer the world again? Keep going! 💪", button: "Start Focus", nextMode: "focus" }); setFlowerProgress(0); } } return () => clearInterval(interval); }, [isActive, timeLeft, mode, focusTime]); const toggleTimer = () => setIsActive(!isActive); const resetTimer = () => { setIsActive(false); setTimeLeft(mode === 'focus' ? focusTime * 60 : breakTime * 60); if (mode === 'focus') setFlowerProgress(0); }; const switchMode = (newMode) => { setMode(newMode); setIsActive(false); setTimeLeft(newMode === 'focus' ? focusTime * 60 : breakTime * 60); if (newMode === 'focus') setFlowerProgress(0); }; const updateTimes = (newFocus, newBreak) => { const f = parseInt(newFocus) || 25; const b = parseInt(newBreak) || 5; setFocusTime(f); setBreakTime(b); if (!isActive) { setTimeLeft(mode === 'focus' ? f * 60 : b * 60); } }; const quickSet = (f, b) => { updateTimes(f, b); if (!isActive) { setTimeLeft(mode === 'focus' ? f * 60 : b * 60); } }; const unlockReward = () => { const item = DECORATION_ITEMS[Math.floor(Math.random() * DECORATION_ITEMS.length)]; const newDeco = { id: Date.now(), content: item, x: 20 + Math.random() * 60, y: 20 + Math.random() * 60 }; setDecorations(prev => [...prev, newDeco]); }; const handlePointerDown = (e, id) => { e.preventDefault(); setActiveDrag({ id }); }; const containerRef = useRef(null); const onContainerMove = (e) => { if (!activeDrag || !containerRef.current) return; e.preventDefault(); const rect = containerRef.current.getBoundingClientRect(); const clientX = e.touches ? e.touches[0].clientX : e.clientX; const clientY = e.touches ? e.touches[0].clientY : e.clientY; const xPct = ((clientX - rect.left) / rect.width) * 100; const yPct = ((clientY - rect.top) / rect.height) * 100; setDecorations(prev => prev.map(d => d.id === activeDrag.id ? { ...d, x: Math.min(95, Math.max(5, xPct)), y: Math.min(95, Math.max(5, yPct)) } : d )); }; const onContainerUp = () => { setActiveDrag(null); }; const formatTime = (seconds) => { const mins = Math.floor(seconds / 60); const secs = seconds % 60; return `${mins}:${secs < 10 ? '0' : ''}${secs}`; }; const handleModalClose = () => { if (modalMessage.nextMode) { switchMode(modalMessage.nextMode); } setModalMessage(null); }; return ( <div className="h-full flex flex-col bg-slate-900 overflow-hidden relative" onMouseMove={onContainerMove} onTouchMove={onContainerMove} onMouseUp={onContainerUp} onTouchEnd={onContainerUp} ref={containerRef}> {modalMessage && ( <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in"> <div className="bg-slate-800 border-2 border-pink-500 rounded-xl p-6 max-w-sm text-center shadow-2xl m-4"> <h3 className="text-2xl font-bold text-pink-400 mb-2">{modalMessage.title}</h3> <p className="text-slate-300 mb-6">{modalMessage.text}</p> <button onClick={handleModalClose} className="px-6 py-3 bg-pink-600 hover:bg-pink-500 text-white rounded-full font-bold transition-all transform hover:scale-105"> {modalMessage.button} </button> </div> </div> )} <div className="p-2 text-center z-10 flex flex-col items-center w-full"> <div className="flex justify-between items-center w-full px-4 mb-2"> <h2 className="text-2xl font-bold text-pink-300">Focus Room</h2> <button onClick={() => setIsEditing(!isEditing)} className="text-slate-400 hover:text-white transition-colors"> <Settings size={20} /> </button> </div> {isEditing && ( <div className="bg-slate-800/90 p-4 rounded-xl mb-4 border border-slate-700 w-full max-w-xs animate-in slide-in-from-top-2"> <div className="flex gap-2 mb-4 justify-center"> <div className="flex flex-col"> <label className="text-xs text-slate-400 mb-1">Focus (min)</label> <input type="number" value={focusTime} onChange={(e) => updateTimes(e.target.value, breakTime)} className="bg-slate-900 border border-slate-600 rounded p-2 w-20 text-center text-white" /> </div> <div className="flex flex-col"> <label className="text-xs text-slate-400 mb-1">Break (min)</label> <input type="number" value={breakTime} onChange={(e) => updateTimes(focusTime, e.target.value)} className="bg-slate-900 border border-slate-600 rounded p-2 w-20 text-center text-white" /> </div> </div> <div className="flex gap-2 justify-center text-xs"> <button onClick={() => quickSet(25, 5)} className="px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded">25/5</button> <button onClick={() => quickSet(50, 10)} className="px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded">50/10</button> <button onClick={() => quickSet(60, 15)} className="px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded">60/15</button> </div> </div> )} <div className="flex justify-center gap-2 mb-4"> <button onClick={() => switchMode('focus')} className={`px-4 py-1 rounded-full text-sm font-bold transition-colors ${mode === 'focus' ? 'bg-pink-600 text-white' : 'bg-slate-800 text-slate-400'}`}>Focus</button> <button onClick={() => switchMode('break')} className={`px-4 py-1 rounded-full text-sm font-bold transition-colors ${mode === 'break' ? 'bg-green-600 text-white' : 'bg-slate-800 text-slate-400'}`}>Break</button> </div> {mode === 'focus' && !isEditing && <StargazerLily progress={flowerProgress} />} <div className="text-5xl font-mono font-bold text-white mb-4 tracking-wider drop-shadow-lg"> {formatTime(timeLeft)} </div> <div className="flex justify-center gap-4"> <button onClick={toggleTimer} className="w-14 h-14 bg-white text-black rounded-full flex items-center justify-center hover:bg-pink-100 transition-colors shadow-lg"> {isActive ? <Pause /> : <Play />} </button> <button onClick={resetTimer} className="w-14 h-14 bg-slate-800 text-slate-300 rounded-full flex items-center justify-center hover:bg-slate-700 transition-colors shadow-lg"> <RefreshCw /> </button> </div> <div className="mt-2 text-xs text-slate-500"> Sessions Completed: {cycle} </div> </div> <div className="flex-1 relative bg-slate-800/50 m-4 rounded-xl border-2 border-slate-700 shadow-inner overflow-hidden"> <div className="absolute inset-0 pointer-events-none opacity-10 flex items-center justify-center text-8xl"> 📚 </div> <div className="absolute bottom-2 left-0 right-0 text-center text-xs text-slate-500 pointer-events-none"> Drag items to decorate your space </div> {decorations.map(deco => ( <div key={deco.id} className="absolute text-3xl cursor-grab active:cursor-grabbing hover:scale-125 transition-transform select-none" style={{ left: `${deco.x}%`, top: `${deco.y}%`, transform: 'translate(-50%, -50%)' }} onMouseDown={(e) => handlePointerDown(e, deco.id)} onTouchStart={(e) => handlePointerDown(e, deco.id)}> {deco.type === 'lily' ? ( <div style={{ width: '60px', height: '60px' }}> <StargazerLily progress={100} /> </div> ) : ( deco.content )} </div> ))} </div> </div> ); };
+        const RockPaperScissors = ({ user }) => {
+            const [roomCode, setRoomCode] = useState('');
+            const [joinedRoom, setJoinedRoom] = useState(null);
+            const [playerId, setPlayerId] = useState(null); // 'player1' or 'player2'
+            const [gameState, setGameState] = useState(null); // The firestore doc data
+            const [statusMessage, setStatusMessage] = useState('');
+            const unsubscribeRef = useRef(null);
+
+            const choices = [
+                { id: 'rock', icon: '🪨' },
+                { id: 'paper', icon: '📄' },
+                { id: 'scissors', icon: '✂️' }
+            ];
+
+            useEffect(() => {
+                return () => {
+                    if (unsubscribeRef.current) unsubscribeRef.current();
+                }
+            }, []);
+
+            const joinRoom = async () => {
+                if (!roomCode) return;
+                if (!fb.db || !user) {
+                    setStatusMessage("Connecting to server...");
+                    return;
+                }
+
+                const uid = user.uid;
+                const roomRef = doc(fb.db, 'artifacts', fb.appId, 'public', 'data', 'rps_matches', roomCode);
+                
+                try {
+                    const roomSnap = await getDoc(roomRef);
+
+                    if (!roomSnap.exists()) {
+                        // Create room as player 1
+                        await setDoc(roomRef, {
+                            player1: uid,
+                            player2: null,
+                            p1Choice: null,
+                            p2Choice: null,
+                            p1Score: 0,
+                            p2Score: 0,
+                            round: 1
+                        });
+                        setPlayerId('player1');
+                    } else {
+                        const data = roomSnap.data();
+                        if (data.player1 === uid) {
+                            setPlayerId('player1'); // Rejoining
+                        } else if (!data.player2 || data.player2 === uid) {
+                            // Join as player 2
+                            if (data.player2 !== uid) {
+                                await updateDoc(roomRef, { player2: uid });
+                            }
+                            setPlayerId('player2');
+                        } else {
+                            setStatusMessage("Room is full!");
+                            return;
+                        }
+                    }
+
+                    setJoinedRoom(roomCode);
+                    
+                    // Listen for updates
+                    unsubscribeRef.current = onSnapshot(roomRef, (doc) => {
+                        if (doc.exists()) {
+                            setGameState(doc.data());
+                        }
+                    });
+
+                } catch (error) {
+                    console.error("Error joining room:", error);
+                    setStatusMessage("Error joining room.");
+                }
+            };
+
+            const makeMove = async (choiceId) => {
+                if (!joinedRoom || !playerId) return;
+                const roomRef = doc(fb.db, 'artifacts', fb.appId, 'public', 'data', 'rps_matches', joinedRoom);
+                
+                const updateField = playerId === 'player1' ? 'p1Choice' : 'p2Choice';
+                await updateDoc(roomRef, { [updateField]: choiceId });
+            };
+
+            const resetRound = async () => {
+                if (!joinedRoom) return;
+                const roomRef = doc(fb.db, 'artifacts', fb.appId, 'public', 'data', 'rps_matches', joinedRoom);
+                
+                // Determine winner to update score before resetting? 
+                // Or just simple reset for now.
+                // Let's do simple reset of choices.
+                await updateDoc(roomRef, { 
+                    p1Choice: null, 
+                    p2Choice: null 
+                });
+            };
+            
+            // Helper to get winner text
+            const getResultText = () => {
+                if (!gameState || !gameState.p1Choice || !gameState.p2Choice) return "Waiting...";
+                
+                const p1 = gameState.p1Choice;
+                const p2 = gameState.p2Choice;
+                
+                if (p1 === p2) return "It's a Tie!";
+                
+                if (
+                    (p1 === 'rock' && p2 === 'scissors') ||
+                    (p1 === 'paper' && p2 === 'rock') ||
+                    (p1 === 'scissors' && p2 === 'paper')
+                ) {
+                    return "Player 1 Wins!";
+                } else {
+                    return "Player 2 Wins!";
+                }
+            };
+
+            // --- RENDER: LOBBY ---
+            if (!joinedRoom) {
+                return (
+                    <div className="h-full flex flex-col items-center justify-center p-6 text-center animate-in fade-in">
+                        <h2 className="text-3xl font-bold text-pink-400 mb-8">Multiplayer RPS</h2>
+                        
+                        <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 w-full max-w-xs">
+                            <label className="block text-slate-400 text-sm mb-2">Secret Code</label>
+                            <input 
+                                type="text" 
+                                value={roomCode}
+                                onChange={(e) => setRoomCode(e.target.value.toLowerCase())}
+                                placeholder="e.g. love"
+                                className="w-full bg-slate-900 text-white border border-slate-600 rounded-lg p-3 text-center mb-4 focus:border-pink-500 outline-none uppercase font-bold tracking-widest"
+                            />
+                            <button 
+                                onClick={joinRoom}
+                                disabled={!roomCode}
+                                className="w-full bg-pink-600 hover:bg-pink-500 text-white font-bold py-3 rounded-lg transition-colors disabled:opacity-50"
+                            >
+                                Join Room
+                            </button>
+                            {statusMessage && <p className="text-red-400 text-xs mt-2">{statusMessage}</p>}
+                        </div>
+                    </div>
+                );
+            }
+
+            // --- RENDER: GAME ---
+            const myChoice = playerId === 'player1' ? gameState?.p1Choice : gameState?.p2Choice;
+            const opponentChoice = playerId === 'player1' ? gameState?.p2Choice : gameState?.p1Choice;
+            const bothChose = gameState?.p1Choice && gameState?.p2Choice;
+
+            return (
+                <div className="h-full flex flex-col items-center justify-center p-6 text-center relative animate-in fade-in">
+                    
+                     <div className="absolute top-4 left-4">
+                        <button onClick={() => setJoinedRoom(null)} className="text-slate-500 hover:text-white flex items-center gap-1 text-xs">
+                           <X size={14}/> Leave
+                        </button>
+                     </div>
+
+                     <div className="mb-8">
+                         <span className="text-pink-300 font-bold tracking-widest uppercase">ROOM: {joinedRoom}</span>
+                     </div>
+                     
+                    <div className="mb-12 relative w-full max-w-sm flex justify-between items-center px-8">
+                         {/* Player (You) */}
+                         <div className="flex flex-col items-center gap-2">
+                             <div className="text-slate-400 text-xs font-bold">YOU</div>
+                             <div className={`w-20 h-20 bg-slate-800 rounded-2xl flex items-center justify-center text-4xl border-2 ${myChoice ? 'border-pink-500' : 'border-slate-700'}`}>
+                                 {myChoice ? (choices.find(c=>c.id===myChoice).icon) : '?'}
+                             </div>
+                         </div>
+
+                         <div className="text-2xl font-black text-slate-600">VS</div>
+
+                         {/* Opponent */}
+                         <div className="flex flex-col items-center gap-2">
+                             <div className="text-slate-400 text-xs font-bold">OPPONENT</div>
+                             <div className={`w-20 h-20 bg-slate-800 rounded-2xl flex items-center justify-center text-4xl border-2 ${opponentChoice && bothChose ? 'border-indigo-500' : 'border-slate-700'}`}>
+                                 {/* Only show opponent choice if both have chosen */}
+                                 {opponentChoice && bothChose ? (choices.find(c=>c.id===opponentChoice).icon) : (opponentChoice ? '✔️' : '?')}
+                             </div>
+                         </div>
+                    </div>
+
+                    <div className="mb-8 h-12 flex items-center justify-center">
+                        {bothChose ? (
+                            <div className="flex flex-col items-center gap-2">
+                                <div className="text-3xl font-bold text-white animate-bounce">{getResultText()}</div>
+                                <button onClick={resetRound} className="text-xs bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-full text-white">Play Again</button>
+                            </div>
+                        ) : (
+                            <div className="text-slate-400 animate-pulse">
+                                {!gameState?.player2 ? "Waiting for opponent..." : 
+                                 !myChoice ? "Make your choice!" : "Waiting for them..."}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Controls */}
+                    <div className={`flex gap-4 transition-opacity duration-300 ${bothChose || !gameState?.player2 ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
+                        {choices.map((choice) => (
+                            <button
+                                key={choice.id}
+                                onClick={() => makeMove(choice.id)}
+                                className={`w-20 h-20 bg-slate-800 rounded-2xl text-4xl shadow-lg border-2 transition-all transform hover:scale-110 active:scale-95 flex items-center justify-center
+                                    ${myChoice === choice.id ? 'border-pink-500 bg-slate-700' : 'border-slate-700 hover:border-pink-400'}
+                                `}
+                            >
+                                {choice.icon}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
         
+        // ==========================================
+        // PAGE: APP COMPONENT
+        // ==========================================
         const App = () => {
             const [view, setView] = useState('home'); 
-            const [score, setScore] = useState(0);
+            const [user, setUser] = useState(null);
+            const [showChangelog, setShowChangelog] = useState(false);
+
+            useEffect(() => {
+                if (fb.auth) {
+                    const initAuth = async () => {
+                         try {
+                            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                                await signInWithCustomToken(fb.auth, __initial_auth_token);
+                            } else {
+                                await signInAnonymously(fb.auth);
+                            }
+                         } catch(e) { console.error(e); }
+                    };
+                    initAuth();
+                    return onAuthStateChanged(fb.auth, setUser);
+                }
+            }, []);
+            
+            useEffect(() => {
+                if (!localStorage.getItem('changelog_v4')) {
+                    setShowChangelog(true);
+                    localStorage.setItem('changelog_v4', 'true');
+                }
+            }, []);
 
             const NavButton = ({ target, icon: Icon, label }) => (
                 <button 
@@ -1296,6 +1812,25 @@
                 <div className="bg-slate-950 min-h-screen text-slate-200 font-sans selection:bg-pink-500 selection:text-white relative overflow-hidden">
                     <StarBackground />
                     
+                    {/* Changelog Modal */}
+                    {showChangelog && (
+                        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in">
+                            <div className="bg-slate-900 border border-pink-500 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
+                                <button onClick={() => setShowChangelog(false)} className="absolute top-2 right-2 text-slate-500 hover:text-white"><X size={20}/></button>
+                                <h2 className="text-xl font-bold text-pink-400 mb-2">✨ Update Log</h2>
+                                <p className="text-xs text-slate-500 font-mono mb-4">Latest Changes</p>
+                                <div className="text-left text-sm text-slate-300 space-y-2 mb-6 bg-slate-800/50 p-4 rounded-lg">
+                                    <ul className="list-disc pl-4 space-y-1">
+                                        <li><b>Updated:</b> Focus Room reactions (🧸🐈‍⬛🍑🌙🍗)</li>
+                                        <li><b>Added:</b> Blooming Stargazer Lily 🌸</li>
+                                        <li><b>Improved:</b> Floating emoji animations 🫧</li>
+                                    </ul>
+                                </div>
+                                <button onClick={() => setShowChangelog(false)} className="w-full py-2 bg-pink-600 hover:bg-pink-500 text-white rounded-lg font-bold">Cool, thanks!</button>
+                            </div>
+                        </div>
+                    )}
+                    
                     <main className="relative z-10 h-[calc(100vh-80px)] overflow-y-auto pb-20 scrollbar-hide">
                         {view === 'home' && (
                             <div className="flex flex-col items-center justify-center min-h-full p-8 text-center">
@@ -1310,7 +1845,7 @@
                                     A collection of mini-stuff for you &lt;3.
                                 </p>
                                 <button 
-                                    onClick={() => setView('game')}
+                                    onClick={() => setView('poems')}
                                     className="px-8 py-3 bg-white text-black font-bold rounded-full hover:bg-pink-200 transition-colors flex items-center gap-2"
                                 >
                                     <Play size={16} fill="black" /> Enter World
@@ -1318,12 +1853,20 @@
                             </div>
                         )}
 
-                        {view === 'game' && <PicnicGame />}
-                        {view === 'rpg' && <RPGGame />}
+                        {/* Hidden Games to preserve state */}
+                        <div className={view === 'game' ? 'h-full w-full' : 'hidden'}>
+                            <PicnicGame />
+                        </div>
+                        <div className={view === 'rpg' ? 'h-full w-full' : 'hidden'}>
+                            <RPGGame isActive={view === 'rpg'} />
+                        </div>
+
                         {view === 'study' && <Pomodoro />}
                         {view === 'calm' && <ThoughtShrinker />}
                         {view === 'facts' && <ConstellationGallery />}
                         {view === 'letter' && <LoveLetter />}
+                        {view === 'poems' && <DailyPoem />}
+                        {view === 'rps' && <RockPaperScissors user={user} />}
                     </main>
 
                     <nav className="fixed bottom-0 left-0 w-full bg-slate-900/90 backdrop-blur-md border-t border-slate-800 z-50 h-20 pb-2">
@@ -1333,19 +1876,15 @@
                             
                             <div className="w-px h-6 bg-white/10"></div>
                             
-                            {/* Group: Games */}
-                            <NavButton target="game" icon={Coffee} label="Picnic" />
-                            <NavButton target="rpg" icon={MapIcon} label="Adv" />
-                            
-                            <div className="w-px h-6 bg-white/10"></div>
-                            
                             {/* Group: Focus/Calm */}
                             <NavButton target="study" icon={Book} label="Study" />
                             <NavButton target="calm" icon={Cloud} label="Calm" />
+                            <NavButton target="rps" icon={Scissors} label="RPS" />
 
                             <div className="w-px h-6 bg-white/10"></div>
                             
                             {/* Group: Content */}
+                            <NavButton target="poems" icon={Feather} label="Poems" />
                             <NavButton target="facts" icon={Star} label="Stars" />
                             <NavButton target="letter" icon={Heart} label="Msg" />
                         </div>
