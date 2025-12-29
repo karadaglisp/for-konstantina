@@ -127,21 +127,14 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
         
-        // --- FIREBASE INIT ---
-        const fbModules = window.firebaseModules || {};
-        const { initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection } = fbModules;
-        
-        const fb = { auth: null, db: null, appId: 'default-app-id' };
-
-        if (window.firebaseModules && typeof __firebase_config !== 'undefined') {
-            try {
-                const firebaseConfig = JSON.parse(__firebase_config);
-                const app = initializeApp(firebaseConfig);
-                fb.auth = getAuth(app);
-                fb.db = getFirestore(app);
-                if (typeof __app_id !== 'undefined') fb.appId = __app_id;
-            } catch (e) { console.error("Firebase Init Error:", e); }
-        }
+        // --- FIREBASE INIT WRAPPER ---
+        // We use a mutable object to hold instances so components can access them even if loaded async
+        const fb = { 
+            auth: null, 
+            db: null, 
+            appId: 'default-app-id', 
+            initialized: false 
+        };
 
         // --- ICONS ---
         const IconBase = ({ children, size = 24, className = "", fill = "none" }) => (
@@ -1571,13 +1564,19 @@
                 }
             }, []);
 
+            // Safely get Firebase modules
+            const getModules = () => window.firebaseModules || {};
+
             const joinRoom = async () => {
                 if (!roomCode) return;
-                if (!fb.db || !user) {
+                
+                const modules = getModules();
+                if (!fb.db || !user || !modules.doc) {
                     setStatusMessage("Connecting to server...");
                     return;
                 }
 
+                const { doc, getDoc, setDoc, updateDoc, onSnapshot } = modules;
                 const uid = user.uid;
                 const roomRef = doc(fb.db, 'artifacts', fb.appId, 'public', 'data', 'rps_matches', roomCode);
                 
@@ -1629,6 +1628,10 @@
 
             const makeMove = async (choiceId) => {
                 if (!joinedRoom || !playerId) return;
+                const modules = getModules();
+                if (!modules.doc) return;
+                
+                const { doc, updateDoc } = modules;
                 const roomRef = doc(fb.db, 'artifacts', fb.appId, 'public', 'data', 'rps_matches', joinedRoom);
                 
                 const updateField = playerId === 'player1' ? 'p1Choice' : 'p2Choice';
@@ -1637,11 +1640,12 @@
 
             const resetRound = async () => {
                 if (!joinedRoom) return;
+                const modules = getModules();
+                if (!modules.doc) return;
+
+                const { doc, updateDoc } = modules;
                 const roomRef = doc(fb.db, 'artifacts', fb.appId, 'public', 'data', 'rps_matches', joinedRoom);
                 
-                // Determine winner to update score before resetting? 
-                // Or just simple reset for now.
-                // Let's do simple reset of choices.
                 await updateDoc(roomRef, { 
                     p1Choice: null, 
                     p2Choice: null 
@@ -1774,21 +1778,38 @@
             const [view, setView] = useState('home'); 
             const [user, setUser] = useState(null);
             const [showChangelog, setShowChangelog] = useState(false);
+            const [fbReady, setFbReady] = useState(false);
 
             useEffect(() => {
-                if (fb.auth) {
-                    const initAuth = async () => {
-                         try {
+                // Poll for Firebase modules
+                const initAuth = async () => {
+                    if (window.firebaseModules && typeof __firebase_config !== 'undefined') {
+                        try {
+                            const { initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, getFirestore } = window.firebaseModules;
+                            const firebaseConfig = JSON.parse(__firebase_config);
+                            const app = initializeApp(firebaseConfig);
+                            
+                            fb.auth = getAuth(app);
+                            fb.db = getFirestore(app);
+                            if (typeof __app_id !== 'undefined') fb.appId = __app_id;
+                            
+                            fb.initialized = true;
+                            setFbReady(true);
+
                             if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                                 await signInWithCustomToken(fb.auth, __initial_auth_token);
                             } else {
                                 await signInAnonymously(fb.auth);
                             }
-                         } catch(e) { console.error(e); }
-                    };
-                    initAuth();
-                    return onAuthStateChanged(fb.auth, setUser);
-                }
+                            
+                            onAuthStateChanged(fb.auth, setUser);
+                        } catch(e) { console.error("FB Init:", e); }
+                    } else {
+                        setTimeout(initAuth, 200);
+                    }
+                };
+                
+                initAuth();
             }, []);
             
             useEffect(() => {
