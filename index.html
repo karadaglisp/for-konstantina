@@ -127,6 +127,19 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
         
+        // --- MANUAL CONFIGURATION FOR GITHUB PAGES ---
+        // If deploying to GitHub, you MUST replace these empty strings with your own Firebase Project keys.
+        // Go to console.firebase.google.com > Create Project > Add Web App > Copy config
+        const MANUAL_FIREBASE_CONFIG = {
+            apiKey: "", 
+            authDomain: "", 
+            projectId: "", 
+            storageBucket: "", 
+            messagingSenderId: "", 
+            appId: "" 
+        };
+        const MANUAL_APP_ID = "picnic-v1";
+
         // --- FIREBASE INIT WRAPPER ---
         // We use a mutable object to hold instances so components can access them even if loaded async
         const fb = { 
@@ -1783,15 +1796,32 @@
             useEffect(() => {
                 // Poll for Firebase modules
                 const initAuth = async () => {
-                    if (window.firebaseModules && typeof __firebase_config !== 'undefined') {
+                    if (window.firebaseModules) {
                         try {
                             const { initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, getFirestore } = window.firebaseModules;
-                            const firebaseConfig = JSON.parse(__firebase_config);
-                            const app = initializeApp(firebaseConfig);
+                            
+                            // Determine Config (Env vs Manual)
+                            let config = null;
+                            if (typeof __firebase_config !== 'undefined') {
+                                config = JSON.parse(__firebase_config);
+                            } else if (MANUAL_FIREBASE_CONFIG.apiKey !== "") {
+                                config = MANUAL_FIREBASE_CONFIG;
+                            } else {
+                                console.warn("No Firebase Config found. Multiplayer disabled.");
+                                return;
+                            }
+
+                            const app = initializeApp(config);
                             
                             fb.auth = getAuth(app);
                             fb.db = getFirestore(app);
-                            if (typeof __app_id !== 'undefined') fb.appId = __app_id;
+                            
+                            // Determine App ID
+                            if (typeof __app_id !== 'undefined') {
+                                fb.appId = __app_id;
+                            } else {
+                                fb.appId = MANUAL_APP_ID;
+                            }
                             
                             fb.initialized = true;
                             setFbReady(true);
