@@ -136,7 +136,7 @@
             projectId: "black-pantheress", 
             storageBucket: "black-pantheress.firebasestorage.app", 
             messagingSenderId: "259041426350", 
-            appId: "1:259041426350:web:4dd5d7b628241644cce63f" 
+            appId: "1:259041426350:web:4dd5d7b628241644cce63f"  
         };
         const MANUAL_APP_ID = "picnic-v1";
 
@@ -1563,6 +1563,7 @@
             const [playerId, setPlayerId] = useState(null); // 'player1' or 'player2'
             const [gameState, setGameState] = useState(null); // The firestore doc data
             const [statusMessage, setStatusMessage] = useState('');
+            const [selectedAvatar, setSelectedAvatar] = useState('🐈‍⬛'); // Default avatar
             const unsubscribeRef = useRef(null);
 
             const choices = [
@@ -1570,6 +1571,8 @@
                 { id: 'paper', icon: '📄' },
                 { id: 'scissors', icon: '✂️' }
             ];
+
+            const AVATARS = ['🐈‍⬛', '🍑', '🍗', '💦', '🫠', '🦵', '🐾', '🍆'];
 
             useEffect(() => {
                 return () => {
@@ -1605,6 +1608,8 @@
                             p2Choice: null,
                             p1Score: 0,
                             p2Score: 0,
+                            p1Avatar: selectedAvatar,
+                            p2Avatar: null,
                             round: 1
                         });
                         setPlayerId('player1');
@@ -1612,10 +1617,19 @@
                         const data = roomSnap.data();
                         if (data.player1 === uid) {
                             setPlayerId('player1'); // Rejoining
+                            if (data.p1Avatar !== selectedAvatar) {
+                                await updateDoc(roomRef, { p1Avatar: selectedAvatar });
+                            }
                         } else if (!data.player2 || data.player2 === uid) {
                             // Join as player 2
                             if (data.player2 !== uid) {
-                                await updateDoc(roomRef, { player2: uid });
+                                await updateDoc(roomRef, { 
+                                    player2: uid,
+                                    p2Avatar: selectedAvatar
+                                });
+                            } else if (data.p2Avatar !== selectedAvatar) {
+                                // Update avatar if rejoining
+                                await updateDoc(roomRef, { p2Avatar: selectedAvatar });
                             }
                             setPlayerId('player2');
                         } else {
@@ -1651,7 +1665,44 @@
                 await updateDoc(roomRef, { [updateField]: choiceId });
             };
 
-            const resetRound = async () => {
+            // Logic to check round winner
+            const getRoundResult = (p1, p2) => {
+                if (!p1 || !p2) return null;
+                if (p1 === p2) return 'tie';
+                if (
+                    (p1 === 'rock' && p2 === 'scissors') ||
+                    (p1 === 'paper' && p2 === 'rock') ||
+                    (p1 === 'scissors' && p2 === 'paper')
+                ) {
+                    return 'p1';
+                }
+                return 'p2';
+            };
+
+            const nextRound = async () => {
+                if (!joinedRoom || !gameState) return;
+                // Guard against double clicks: only update if choices exist
+                if (!gameState.p1Choice || !gameState.p2Choice) return;
+
+                const modules = getModules();
+                if (!modules.doc) return;
+
+                const { doc, updateDoc } = modules;
+                const roomRef = doc(fb.db, 'artifacts', fb.appId, 'public', 'data', 'rps_matches', joinedRoom);
+                
+                const result = getRoundResult(gameState.p1Choice, gameState.p2Choice);
+                const updates = {
+                    p1Choice: null,
+                    p2Choice: null
+                };
+
+                if (result === 'p1') updates.p1Score = (gameState.p1Score || 0) + 1;
+                if (result === 'p2') updates.p2Score = (gameState.p2Score || 0) + 1;
+                
+                await updateDoc(roomRef, updates);
+            };
+
+            const restartMatch = async () => {
                 if (!joinedRoom) return;
                 const modules = getModules();
                 if (!modules.doc) return;
@@ -1659,39 +1710,44 @@
                 const { doc, updateDoc } = modules;
                 const roomRef = doc(fb.db, 'artifacts', fb.appId, 'public', 'data', 'rps_matches', joinedRoom);
                 
-                await updateDoc(roomRef, { 
-                    p1Choice: null, 
-                    p2Choice: null 
+                await updateDoc(roomRef, {
+                    p1Score: 0,
+                    p2Score: 0,
+                    p1Choice: null,
+                    p2Choice: null
                 });
             };
             
-            // Helper to get winner text
+            // Helper to get winner text for display
             const getResultText = () => {
                 if (!gameState || !gameState.p1Choice || !gameState.p2Choice) return "Waiting...";
-                
-                const p1 = gameState.p1Choice;
-                const p2 = gameState.p2Choice;
-                
-                if (p1 === p2) return "It's a Tie!";
-                
-                if (
-                    (p1 === 'rock' && p2 === 'scissors') ||
-                    (p1 === 'paper' && p2 === 'rock') ||
-                    (p1 === 'scissors' && p2 === 'paper')
-                ) {
-                    return "Player 1 Wins!";
-                } else {
-                    return "Player 2 Wins!";
-                }
+                const res = getRoundResult(gameState.p1Choice, gameState.p2Choice);
+                if (res === 'tie') return "It's a Tie!";
+                if (res === 'p1') return "Player 1 Wins Round!";
+                if (res === 'p2') return "Player 2 Wins Round!";
+                return "Processing...";
             };
 
             // --- RENDER: LOBBY ---
             if (!joinedRoom) {
                 return (
                     <div className="h-full flex flex-col items-center justify-center p-6 text-center animate-in fade-in">
-                        <h2 className="text-3xl font-bold text-pink-400 mb-8">Multiplayer RPS</h2>
+                        <h2 className="text-3xl font-bold text-pink-400 mb-6">Let me destroy you in Rock Paper Scissors too</h2>
                         
                         <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 w-full max-w-xs">
+                            <label className="block text-slate-400 text-sm mb-4">Choose Your Fighter</label>
+                            <div className="grid grid-cols-4 gap-2 mb-6">
+                                {AVATARS.map((avatar) => (
+                                    <button
+                                        key={avatar}
+                                        onClick={() => setSelectedAvatar(avatar)}
+                                        className={`text-2xl p-2 rounded-lg transition-all ${selectedAvatar === avatar ? 'bg-pink-600 scale-110 shadow-lg' : 'bg-slate-700 hover:bg-slate-600'}`}
+                                    >
+                                        {avatar}
+                                    </button>
+                                ))}
+                            </div>
+
                             <label className="block text-slate-400 text-sm mb-2">Secret Code</label>
                             <input 
                                 type="text" 
@@ -1713,10 +1769,43 @@
                 );
             }
 
+            // --- RENDER: GAME OVER ---
+            const p1Score = gameState?.p1Score || 0;
+            const p2Score = gameState?.p2Score || 0;
+            const matchWinner = p1Score >= 5 ? 'Player 1' : (p2Score >= 5 ? 'Player 2' : null);
+            const winnerAvatar = matchWinner === 'Player 1' ? gameState?.p1Avatar : gameState?.p2Avatar;
+
+            if (matchWinner) {
+                return (
+                    <div className="h-full flex flex-col items-center justify-center p-6 text-center animate-in fade-in bg-slate-900/95 z-50">
+                        <div className="text-6xl mb-4 animate-bounce">{winnerAvatar || '🏆'}</div>
+                        <h2 className="text-4xl font-black text-white mb-2">{matchWinner} Wins!</h2>
+                        <div className="text-2xl font-mono text-pink-300 mb-8">{p1Score} - {p2Score}</div>
+                        <div className="flex gap-4">
+                            <button 
+                                onClick={restartMatch} 
+                                className="px-8 py-3 bg-pink-600 hover:bg-pink-500 text-white rounded-full font-bold shadow-lg transform hover:scale-105 transition-all"
+                            >
+                                Rematch
+                            </button>
+                            <button 
+                                onClick={() => setJoinedRoom(null)} 
+                                className="px-8 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-full font-bold shadow-lg transition-all"
+                            >
+                                Leave
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
             // --- RENDER: GAME ---
             const myChoice = playerId === 'player1' ? gameState?.p1Choice : gameState?.p2Choice;
             const opponentChoice = playerId === 'player1' ? gameState?.p2Choice : gameState?.p1Choice;
             const bothChose = gameState?.p1Choice && gameState?.p2Choice;
+            
+            const myAvatar = playerId === 'player1' ? gameState?.p1Avatar : gameState?.p2Avatar;
+            const oppAvatar = playerId === 'player1' ? gameState?.p2Avatar : gameState?.p1Avatar;
 
             return (
                 <div className="h-full flex flex-col items-center justify-center p-6 text-center relative animate-in fade-in">
@@ -1727,16 +1816,29 @@
                         </button>
                      </div>
 
-                     <div className="mb-8">
+                     {/* Scoreboard */}
+                     <div className="absolute top-4 right-4 flex items-center gap-4 bg-slate-800/80 p-2 rounded-lg border border-slate-700 font-mono text-sm font-bold shadow-lg">
+                        <div className={`flex items-center gap-2 ${playerId === 'player1' ? "text-pink-400" : "text-slate-400"}`}>
+                            <span>{gameState?.p1Avatar || 'P1'}</span>
+                            <span>{p1Score}</span>
+                        </div>
+                        <div className="text-slate-600">|</div>
+                        <div className={`flex items-center gap-2 ${playerId === 'player2' ? "text-pink-400" : "text-slate-400"}`}>
+                            <span>{p2Score}</span>
+                            <span>{gameState?.p2Avatar || 'P2'}</span>
+                        </div>
+                     </div>
+
+                     <div className="mb-8 mt-8">
                          <span className="text-pink-300 font-bold tracking-widest uppercase">ROOM: {joinedRoom}</span>
                      </div>
                      
                     <div className="mb-12 relative w-full max-w-sm flex justify-between items-center px-8">
                          {/* Player (You) */}
                          <div className="flex flex-col items-center gap-2">
-                             <div className="text-slate-400 text-xs font-bold">YOU</div>
+                             <div className="text-slate-400 text-xs font-bold flex items-center gap-1">YOU</div>
                              <div className={`w-20 h-20 bg-slate-800 rounded-2xl flex items-center justify-center text-4xl border-2 ${myChoice ? 'border-pink-500' : 'border-slate-700'}`}>
-                                 {myChoice ? (choices.find(c=>c.id===myChoice).icon) : '?'}
+                                 {myChoice ? (choices.find(c=>c.id===myChoice).icon) : (myAvatar || '?')}
                              </div>
                          </div>
 
@@ -1744,10 +1846,10 @@
 
                          {/* Opponent */}
                          <div className="flex flex-col items-center gap-2">
-                             <div className="text-slate-400 text-xs font-bold">OPPONENT</div>
+                             <div className="text-slate-400 text-xs font-bold flex items-center gap-1">OPP</div>
                              <div className={`w-20 h-20 bg-slate-800 rounded-2xl flex items-center justify-center text-4xl border-2 ${opponentChoice && bothChose ? 'border-indigo-500' : 'border-slate-700'}`}>
                                  {/* Only show opponent choice if both have chosen */}
-                                 {opponentChoice && bothChose ? (choices.find(c=>c.id===opponentChoice).icon) : (opponentChoice ? '✔️' : '?')}
+                                 {opponentChoice && bothChose ? (choices.find(c=>c.id===opponentChoice).icon) : (opponentChoice ? '✔️' : (oppAvatar || '?'))}
                              </div>
                          </div>
                     </div>
@@ -1755,8 +1857,13 @@
                     <div className="mb-8 h-12 flex items-center justify-center">
                         {bothChose ? (
                             <div className="flex flex-col items-center gap-2">
-                                <div className="text-3xl font-bold text-white animate-bounce">{getResultText()}</div>
-                                <button onClick={resetRound} className="text-xs bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-full text-white">Play Again</button>
+                                <div className="text-xl font-bold text-white animate-bounce">{getResultText()}</div>
+                                <button 
+                                    onClick={nextRound} 
+                                    className="text-xs bg-pink-600 hover:bg-pink-500 px-6 py-2 rounded-full text-white font-bold shadow-lg"
+                                >
+                                    Next Round
+                                </button>
                             </div>
                         ) : (
                             <div className="text-slate-400 animate-pulse">
@@ -1783,11 +1890,62 @@
                 </div>
             );
         };
+
+        // --- ACCESS GATE (LOCK SCREEN) ---
+        const AccessGate = ({ onUnlock }) => {
+            const [input, setInput] = useState('');
+            const [shake, setShake] = useState(false);
+            
+            // CONFIG: CHANGE THE PASSWORD HERE
+            const PASSCODE = "blackcat"; 
+
+            const checkCode = () => {
+                if (input.toLowerCase().trim() === PASSCODE) {
+                    onUnlock();
+                } else {
+                    setShake(true);
+                    setTimeout(() => setShake(false), 500);
+                    setInput('');
+                }
+            };
+
+            return (
+                <div className="fixed inset-0 z-[100] bg-slate-950 flex items-center justify-center p-4">
+                    <StarBackground />
+                    <div className={`max-w-xs w-full bg-slate-900/80 backdrop-blur-md border border-slate-700 p-8 rounded-3xl shadow-[0_0_50px_rgba(236,72,153,0.1)] flex flex-col items-center transition-all duration-100 ${shake ? 'translate-x-2 border-red-500' : ''}`}>
+                        <div className="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center mb-6 shadow-inner">
+                            <span className="text-4xl">🔒</span>
+                        </div>
+                        <h2 className="text-white font-bold mb-2 font-serif text-xl">Secret Picnic</h2>
+                        <p className="text-slate-400 text-xs mb-6 text-center">Enter the passcode to join the midnight party.</p>
+                        
+                        <input 
+                            type="password" 
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && checkCode()}
+                            className="w-full bg-slate-800 border border-slate-600 rounded-xl px-4 py-3 text-center text-white outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 mb-4 transition-all placeholder-slate-600"
+                            placeholder="Passcode..."
+                            autoFocus
+                        />
+                        
+                        <button 
+                            onClick={checkCode}
+                            className="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold py-3 rounded-xl shadow-lg transition-transform active:scale-95"
+                        >
+                            Unlock
+                        </button>
+                    </div>
+                </div>
+            );
+        };
         
         // ==========================================
         // PAGE: APP COMPONENT
         // ==========================================
         const App = () => {
+            // Check if user has already unlocked the site
+            const [isLocked, setIsLocked] = useState(!localStorage.getItem('picnic_unlocked'));
             const [view, setView] = useState('home'); 
             const [user, setUser] = useState(null);
             const [showChangelog, setShowChangelog] = useState(false);
@@ -1843,11 +2001,12 @@
             }, []);
             
             useEffect(() => {
-                if (!localStorage.getItem('changelog_v4')) {
+                // Only show changelog if unlocked and not seen version
+                if (!isLocked && !localStorage.getItem('changelog_v4')) {
                     setShowChangelog(true);
                     localStorage.setItem('changelog_v4', 'true');
                 }
-            }, []);
+            }, [isLocked]);
 
             const NavButton = ({ target, icon: Icon, label }) => (
                 <button 
@@ -1858,6 +2017,14 @@
                     <span className="text-xs">{label}</span>
                 </button>
             );
+
+            // --- LOCK SCREEN RENDER ---
+            if (isLocked) {
+                return <AccessGate onUnlock={() => {
+                    localStorage.setItem('picnic_unlocked', 'true');
+                    setIsLocked(false);
+                }} />;
+            }
 
             return (
                 <div className="bg-slate-950 min-h-screen text-slate-200 font-sans selection:bg-pink-500 selection:text-white relative overflow-hidden">
@@ -1876,7 +2043,7 @@
                                         <li><b>Also added:</b> Poems & RPS Game🧸</li>
                                     </ul>
                                 </div>
-                                <button onClick={() => setShowChangelog(false)} className="w-full py-2 bg-pink-600 hover:bg-pink-500 text-white rounded-lg font-bold">Cool, thanks!</button>
+                                <button onClick={() => setShowChangelog(false)} className="w-full py-2 bg-pink-600 hover:bg-pink-500 text-white rounded-lg font-bold">Thx my bitch&lt;3</button>
                             </div>
                         </div>
                     )}
