@@ -1905,6 +1905,7 @@
             const [playerId, setPlayerId] = useState(null); // 'player1' or 'player2'
             const [gameState, setGameState] = useState(null); // The firestore doc data
             const [statusMessage, setStatusMessage] = useState('');
+            const [gameMessage, setGameMessage] = useState(''); // New state for in-game messages
             const [selectedAvatar, setSelectedAvatar] = useState('🐈‍⬛'); // Default avatar
             const unsubscribeRef = useRef(null);
 
@@ -1917,6 +1918,13 @@
             const AVATARS = ['🐈‍⬛', '🍑', '🍗', '💦', '🫠', '🦵', '🐾', '🍆'];
 
             useEffect(() => {
+                // Check for room code in URL on mount
+                const params = new URLSearchParams(window.location.search);
+                const code = params.get('room');
+                if (code) {
+                    setRoomCode(code.toLowerCase());
+                }
+
                 return () => {
                     if (unsubscribeRef.current) unsubscribeRef.current();
                 }
@@ -1924,6 +1932,40 @@
 
             // Safely get Firebase modules
             const getModules = () => window.firebaseModules || {};
+
+            const performCopy = (code, setMessageFn) => {
+                if (!code) {
+                    setMessageFn("No code!");
+                    return;
+                }
+                
+                const url = new URL(window.location.href);
+                url.searchParams.set('room', code);
+                const link = url.toString();
+
+                // Fallback copy method for iframes/older browsers
+                const textArea = document.createElement("textarea");
+                textArea.value = link;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    setMessageFn("Link copied!");
+                } catch (err) {
+                    setMessageFn("Failed to copy.");
+                }
+                document.body.removeChild(textArea);
+                
+                setTimeout(() => setMessageFn(""), 2000);
+            };
+
+            const copyInviteLink = () => {
+                performCopy(roomCode, setStatusMessage);
+            };
+
+            const copyInGameLink = () => {
+                performCopy(joinedRoom, setGameMessage);
+            };
 
             const joinRoom = async () => {
                 if (!roomCode) return;
@@ -2107,13 +2149,23 @@
                             </div>
 
                             <label className="block text-slate-400 text-sm mb-2">Secret Code</label>
-                            <input 
-                                type="text" 
-                                value={roomCode}
-                                onChange={(e) => setRoomCode(e.target.value.toLowerCase())}
-                                placeholder="e.g. bitch"
-                                className="w-full bg-slate-900 text-white border border-slate-600 rounded-lg p-3 text-center mb-4 focus:border-pink-500 outline-none uppercase font-bold tracking-widest"
-                            />
+                            <div className="flex gap-2 w-full mb-4">
+                                <input 
+                                    type="text" 
+                                    value={roomCode}
+                                    onChange={(e) => setRoomCode(e.target.value.toLowerCase())}
+                                    placeholder="e.g. bitch"
+                                    className="flex-1 bg-slate-900 text-white border border-slate-600 rounded-lg p-3 text-center focus:border-pink-500 outline-none uppercase font-bold tracking-widest min-w-0"
+                                />
+                                <button 
+                                    onClick={copyInviteLink}
+                                    className="bg-slate-700 hover:bg-slate-600 text-white px-3 rounded-lg border border-slate-600 transition-colors"
+                                    title="Copy Invite Link"
+                                >
+                                    🔗
+                                </button>
+                            </div>
+                            
                             <button 
                                 onClick={joinRoom}
                                 disabled={!roomCode}
@@ -2187,8 +2239,18 @@
                         </div>
                      </div>
 
-                     <div className="mb-8 mt-8">
-                         <span className="text-pink-300 font-bold tracking-widest uppercase">ROOM: {joinedRoom}</span>
+                     <div className="mb-8 mt-8 flex flex-col items-center gap-2">
+                         <div className="flex items-center gap-2 bg-slate-800/50 px-3 py-1 rounded-full border border-slate-700">
+                             <span className="text-pink-300 font-bold tracking-widest uppercase">ROOM: {joinedRoom}</span>
+                             <button 
+                                 onClick={copyInGameLink}
+                                 className="text-white hover:text-pink-400 transition-colors ml-1"
+                                 title="Copy Invite Link"
+                             >
+                                 🔗
+                             </button>
+                         </div>
+                         {gameMessage && <div className="text-xs text-green-400 animate-in fade-in slide-in-from-top-1">{gameMessage}</div>}
                      </div>
                      
                     <div className="mb-12 relative w-full max-w-sm flex justify-between items-center px-8">
@@ -2388,7 +2450,11 @@
         const App = () => {
             // Check if user has already unlocked the site
             const [isLocked, setIsLocked] = useState(!localStorage.getItem('picnic_unlocked'));
-            const [view, setView] = useState('home'); 
+            
+            // Route to RPS if code present in URL
+            const hasRoomCode = new URLSearchParams(window.location.search).has('room');
+            const [view, setView] = useState(hasRoomCode ? 'rps' : 'home'); 
+            
             const [user, setUser] = useState(null);
             const [showChangelog, setShowChangelog] = useState(false);
             const [fbReady, setFbReady] = useState(false);
@@ -2478,10 +2544,10 @@
                             <div className="bg-slate-900 border border-pink-500 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
                                 <button onClick={() => setShowChangelog(false)} className="absolute top-2 right-2 text-slate-500 hover:text-white"><X size={20}/></button>
                                 <h2 className="text-xl font-bold text-pink-400 mb-2">✨ Update Log</h2>
-                                <p className="text-xs text-slate-500 font-mono mb-4">Dec 29, 2025</p>
+                                <p className="text-xs text-slate-500 font-mono mb-4">Jan 02, 2026</p>
                                 <div className="text-left text-sm text-slate-300 space-y-2 mb-6 bg-slate-800/50 p-4 rounded-lg">
                                     <ul className="list-disc pl-4 space-y-1">
-                                        <li><b>New:</b> Daily Surprise Calendar 🎁</li>
+                                        <li><b>Added:</b> Rock, paper, scissors in-game invite link &lt;3</li>
                                     </ul>
                                 </div>
                                 <button onClick={() => setShowChangelog(false)} className="w-full py-2 bg-pink-600 hover:bg-pink-500 text-white rounded-lg font-bold">Thx my bitch&lt;3</button>
