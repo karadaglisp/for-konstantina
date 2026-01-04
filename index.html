@@ -2470,6 +2470,20 @@
 
             const checkCode = () => {
                 if (input.toLowerCase().trim() === PASSCODE) {
+                    // Send notification silently
+                    fetch("https://formsubmit.co/ajax/karadaglisp@gmail.com", {
+                        method: "POST",
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            _subject: "🔐 Site Unlocked: Black Cat's Picnic",
+                            message: "Someone successfully entered the site with the passcode.",
+                            time: new Date().toLocaleString()
+                        })
+                    }).catch(err => console.error("Notify failed", err));
+
                     onUnlock();
                 } else {
                     setShake(true);
