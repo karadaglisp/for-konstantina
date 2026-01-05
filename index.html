@@ -1738,94 +1738,534 @@
 
             // FULL 88 CONSTELLATIONS DATABASE
             const CONSTELLATIONS_DB = [
-                { id: 'and', icon: '👸', title: 'Andromeda', text: 'The Chained Princess. Daughter of Cepheus and Cassiopeia, saved by Perseus from the sea monster Cetus.', data: { s: [[80,20], [65,35], [50,50], [35,65], [35,35]], l: [[0,1], [1,2], [2,3]] } },
-                { id: 'ant', icon: '💨', title: 'Antlia', text: 'The Air Pump. Created by Lacaille to represent the air pump invented by Robert Boyle.', data: { s: [[30,40], [50,60], [70,50]], l: [[0,1], [1,2]] } },
-                { id: 'aps', icon: '🐦', title: 'Apus', text: 'The Bird of Paradise. Represents the exotic birds of the East Indies.', data: { s: [[30,30], [50,40], [70,50], [60,70]], l: [[0,1], [1,2], [2,3]] } },
-                { id: 'aql', icon: '🦅', title: 'Aquila', text: 'The Eagle. The bird that carried Zeus\'s thunderbolts and abducted Ganymede.', data: { s: [[50,20,5], [20,50], [80,50], [50,80]], l: [[0,1], [0,2], [1,3], [2,3], [0,3]] } },
-                { id: 'aqr', icon: '♒', title: 'Aquarius', text: 'The Water Bearer. Ganymede pouring water (the nectar of the gods) from a jar.', data: { s: [[30,20], [50,20], [40,40], [20,60], [60,60], [50,80], [70,80]], l: [[0,1], [1,2], [2,0], [2,3], [2,4], [4,5], [4,6]] } },
-                { id: 'ara', icon: '⛩️', title: 'Ara', text: 'The Altar. The burning altar where the gods swore allegiance before battling the Titans.', data: { s: [[30,20], [70,20], [30,60], [70,60], [50,40,4], [50,80]], l: [[0,2], [1,3], [0,1], [2,3], [4,5]] } },
-                { id: 'ari', icon: '♈', title: 'Aries', text: 'The Ram. The golden ram that rescued Phrixus and Helle, whose fleece was sought by Jason.', data: { s: [[20,60], [50,50], [80,40,5]], l: [[0,1], [1,2]] } },
-                { id: 'aur', icon: '🧔', title: 'Auriga', text: 'The Charioteer. Often associated with Erichthonius of Athens, inventor of the quadriga.', data: { s: [[50,10,5], [20,40], [80,40], [30,80], [70,80]], l: [[0,1], [0,2], [1,3], [2,4], [3,4]] } },
-                { id: 'boo', icon: '🍦', title: 'Boötes', text: 'The Herdsman. The driver of the oxen (Ursa Major). Contains Arcturus, the bear guard.', data: { s: [[50,90,5], [30,50], [70,50], [50,20]], l: [[0,1], [0,2], [1,3], [2,3]] } },
-                { id: 'cae', icon: '🔨', title: 'Caelum', text: 'The Chisel. Represents the sculptor\'s tools.', data: { s: [[40,30], [45,50], [50,70]], l: [[0,1], [1,2]] } },
-                { id: 'cam', icon: '🦒', title: 'Camelopardalis', text: 'The Giraffe. A large but faint constellation representing the "camel-leopard".', data: { s: [[50,10], [30,40], [50,50], [40,80], [70,40]], l: [[0,1], [1,2], [2,3], [0,4]] } },
-                { id: 'cnc', icon: '♋', title: 'Cancer', text: 'The Crab. Sent by Hera to distract Hercules during his fight with the Hydra.', data: { s: [[50,50,4], [20,30], [80,30], [20,70], [80,70]], l: [[0,1], [0,2], [0,3], [0,4]] } },
-                { id: 'cvn', icon: '🐕', title: 'Canes Venatici', text: 'The Hunting Dogs. Asterion and Chara, held on a leash by Boötes.', data: { s: [[30,40], [70,60,4]], l: [[0,1]] } },
-                { id: 'cma', icon: '🐕', title: 'Canis Major', text: 'The Great Dog. Orion\'s larger hunting dog, chasing the Hare (Lepus).', data: { s: [[50,30,6], [60,35], [70,60], [60,80], [30,70], [40,50]], l: [[0,1], [1,2], [2,3], [0,5], [5,4]] } },
-                { id: 'cmi', icon: '🐕', title: 'Canis Minor', text: 'The Lesser Dog. Orion\'s smaller hunting dog.', data: { s: [[20,50], [80,50,5]], l: [[0,1]] } },
-                { id: 'cap', icon: '♑', title: 'Capricornus', text: 'The Sea Goat. Often associated with Pan, who jumped into the Nile to escape Typhon.', data: { s: [[10,20], [30,40], [50,50], [80,20], [50,80]], l: [[0,1], [1,2], [2,3], [2,4]] } },
-                { id: 'car', icon: '⛵', title: 'Carina', text: 'The Keel. Part of the ship Argo Navis used by Jason and the Argonauts.', data: { s: [[20,80,6], [30,60], [60,60], [80,50], [50,90]], l: [[0,1], [1,2], [2,3], [1,4]] } },
-                { id: 'cas', icon: '👑', title: 'Cassiopeia', text: 'The Queen. Vain queen of Aethiopia, punished to circle the pole star upside down.', data: { s: [[10,30], [30,60], [50,40,4], [70,60], [90,30]], l: [[0,1], [1,2], [2,3], [3,4]] } },
-                { id: 'cen', icon: '🐎', title: 'Centaurus', text: 'The Centaur. Often represents Chiron, the wise tutor of heroes.', data: { s: [[20,70,5], [40,60,5], [50,30], [70,30], [60,50], [80,50], [50,80]], l: [[0,1], [1,4], [2,3], [2,4], [3,5], [4,6], [5,6]] } },
-                { id: 'cep', icon: '👑', title: 'Cepheus', text: 'The King. King of Aethiopia, husband of Cassiopeia and father of Andromeda.', data: { s: [[50,10], [30,30], [70,30], [30,70], [70,70]], l: [[0,1], [0,2], [1,3], [2,4], [3,4]] } },
-                { id: 'cet', icon: '🐳', title: 'Cetus', text: 'The Sea Monster. Sent by Poseidon to devour Andromeda.', data: { s: [[10,30], [30,40], [60,30], [80,20], [90,40], [80,50], [60,40], [40,80]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [2,6], [1,7]] } },
-                { id: 'cha', icon: '🦎', title: 'Chamaeleon', text: 'The Chameleon. Introduced by Plancius in the 16th century.', data: { s: [[30,50], [40,30], [60,30], [70,50]], l: [[0,1], [1,2], [2,3]] } },
-                { id: 'cir', icon: '📐', title: 'Circinus', text: 'The Compass. Drafting tool used for drawing circles.', data: { s: [[50,20], [30,80], [70,80]], l: [[0,1], [0,2]] } },
-                { id: 'col', icon: '🕊️', title: 'Columba', text: 'The Dove. Noah\'s dove or the dove released by the Argonauts.', data: { s: [[20,30], [50,50], [80,30], [50,70]], l: [[0,1], [1,2], [1,3]] } },
-                { id: 'com', icon: '💇‍♀️', title: 'Coma Berenices', text: 'Berenice\'s Hair. Queen Berenice II sacrificed her hair for her husband\'s safe return.', data: { s: [[50,20], [50,50], [80,50]], l: [[0,1], [1,2]] } },
-                { id: 'cra', icon: '👑', title: 'Corona Australis', text: 'The Southern Crown. A wreath placed in the sky by Dionysus.', data: { s: [[20,60], [35,50], [50,45], [65,50], [80,60]], l: [[0,1], [1,2], [2,3], [3,4]] } },
-                { id: 'crb', icon: '👑', title: 'Corona Borealis', text: 'The Northern Crown. The crown of Ariadne, given by Dionysus.', data: { s: [[20,40], [35,50], [50,55,4], [65,50], [80,40]], l: [[0,1], [1,2], [2,3], [3,4]] } },
-                { id: 'crv', icon: '🐦', title: 'Corvus', text: 'The Crow. Sent by Apollo to fetch water, delayed by figs.', data: { s: [[30,30], [70,30], [20,70], [80,70]], l: [[0,1], [1,3], [3,2], [2,0]] } },
-                { id: 'crt', icon: '🏆', title: 'Crater', text: 'The Cup. The cup of Apollo.', data: { s: [[20,20], [80,20], [50,80], [35,50], [65,50]], l: [[0,3], [1,4], [3,2], [4,2], [3,4]] } },
-                { id: 'cru', icon: '✝️', title: 'Crux', text: 'The Southern Cross. Smallest constellation, vital for navigation.', data: { s: [[50,10], [50,90,5], [20,50], [80,40], [70,60]], l: [[0,1], [2,3]] } },
-                { id: 'cyg', icon: '🦢', title: 'Cygnus', text: 'The Swan. Often associated with Zeus in swan form or Orpheus.', data: { s: [[50,10,4], [50,50], [50,90], [10,50], [90,50]], l: [[0,1], [1,2], [3,1], [1,4]] } },
-                { id: 'del', icon: '🐬', title: 'Delphinus', text: 'The Dolphin. Saved the poet Arion or carried Amphitrite to Poseidon.', data: { s: [[40,20], [60,20], [70,40], [50,40], [30,40], [30,80]], l: [[0,1], [1,2], [2,3], [3,0], [3,4], [4,5]] } },
-                { id: 'dor', icon: '🐠', title: 'Dorado', text: 'The Dolphinfish (Mahi-mahi). Home of the Large Magellanic Cloud.', data: { s: [[50,20], [50,80], [30,50]], l: [[0,1], [1,2]] } },
-                { id: 'dra', icon: '🐉', title: 'Draco', text: 'The Dragon. Ladon, the dragon that guarded the golden apples.', data: { s: [[80,20], [70,30], [60,20], [50,40], [40,30], [30,60], [20,80], [10,70], [30,90]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,7], [6,8], [7,8]] } },
-                { id: 'equ', icon: '🐴', title: 'Equuleus', text: 'The Little Horse. Celeris, foal of Pegasus, or Cyllarus.', data: { s: [[40,40], [60,40], [50,60]], l: [[0,1], [1,2], [2,0]] } },
-                { id: 'eri', icon: '🌊', title: 'Eridanus', text: 'The River. The celestial river (Po/Nile/Euphrates).', data: { s: [[10,10], [30,20], [20,40], [40,50], [30,70], [80,90,5]], l: [[0,1], [1,2], [2,3], [3,4], [4,5]] } },
-                { id: 'for', icon: '🔥', title: 'Fornax', text: 'The Furnace. The chemical furnace.', data: { s: [[30,40], [70,50], [50,70]], l: [[0,1], [1,2]] } },
-                { id: 'gem', icon: '♊', title: 'Gemini', text: 'The Twins. Castor (mortal) and Pollux (immortal).', data: { s: [[30,20,4], [70,20,4], [30,80], [70,80], [30,50], [70,50]], l: [[0,4], [4,2], [1,5], [5,3], [0,1], [2,3]] } },
-                { id: 'gru', icon: '🦢', title: 'Grus', text: 'The Crane. Originally part of Piscis Austrinus.', data: { s: [[50,20,4], [30,40], [70,40], [50,80]], l: [[0,1], [0,2], [0,3]] } },
-                { id: 'her', icon: '💪', title: 'Hercules', text: 'The Hero. Greatest of Greek heroes, kneeling.', data: { s: [[30,30], [70,30], [30,60], [70,60], [20,80], [80,80]], l: [[0,1], [1,3], [3,2], [2,0], [2,4], [3,5]] } },
-                { id: 'hor', icon: '🕰️', title: 'Horologium', text: 'The Clock. Represents a pendulum clock.', data: { s: [[30,80], [50,50], [70,30]], l: [[0,1], [1,2]] } },
-                { id: 'hya', icon: '🐍', title: 'Hydra', text: 'The Water Snake. The multi-headed beast killed by Hercules.', data: { s: [[10,40], [30,45], [50,50], [70,55], [90,60]], l: [[0,1], [1,2], [2,3], [3,4]] } },
-                { id: 'hyi', icon: '🐍', title: 'Hydrus', text: 'The Male Water Snake.', data: { s: [[20,30], [50,50], [80,40]], l: [[0,1], [1,2]] } },
-                { id: 'ind', icon: '🏹', title: 'Indus', text: 'The Indian. Represents an indigenous person.', data: { s: [[40,30], [40,70], [60,50]], l: [[0,1], [0,2]] } },
-                { id: 'lac', icon: '🦎', title: 'Lacerta', text: 'The Lizard. A small zig-zag of stars.', data: { s: [[40,20], [50,40], [40,60], [50,80]], l: [[0,1], [1,2], [2,3]] } },
-                { id: 'leo', icon: '♌', title: 'Leo', text: 'The Lion. The Nemean Lion killed by Hercules.', data: { s: [[70,30], [60,20], [45,25], [40,40,5], [20,50], [30,70], [60,65]], l: [[0,1], [1,2], [2,3], [3,0], [3,6], [6,5], [5,4], [4,3]] } },
-                { id: 'lmi', icon: '🦁', title: 'Leo Minor', text: 'The Lesser Lion. Located between Leo and Ursa Major.', data: { s: [[30,50], [70,50], [50,30]], l: [[0,1], [1,2]] } },
-                { id: 'lep', icon: '🐰', title: 'Lepus', text: 'The Hare. Chased by Orion\'s dogs.', data: { s: [[30,40], [70,40], [30,70], [70,70], [50,55]], l: [[0,2], [1,3], [0,4], [1,4], [2,3]] } },
-                { id: 'lib', icon: '♎', title: 'Libra', text: 'The Scales. Scales of justice held by Astraea (Virgo).', data: { s: [[50,20], [20,50], [80,50], [50,80]], l: [[0,1], [0,2], [1,3], [2,3]] } },
-                { id: 'lup', icon: '🐺', title: 'Lupus', text: 'The Wolf. Sacrificed by Centaurus.', data: { s: [[30,30], [60,30], [40,60], [70,50], [50,80]], l: [[0,1], [0,2], [2,4], [1,3], [3,4]] } },
-                { id: 'lyn', icon: '🐈', title: 'Lynx', text: 'The Lynx. So faint you need lynx eyes to see it.', data: { s: [[10,20], [30,40], [50,30], [70,50], [90,40]], l: [[0,1], [1,2], [2,3], [3,4]] } },
-                { id: 'lyr', icon: '🎵', title: 'Lyra', text: 'The Harp. The lyre of Orpheus.', data: { s: [[50,15,5], [40,30], [60,30], [40,50], [60,50]], l: [[0,1], [0,2], [1,2], [1,3], [2,4], [3,4]] } },
-                { id: 'men', icon: '⛰️', title: 'Mensa', text: 'Table Mountain. Named after Table Mountain in South Africa.', data: { s: [[30,40], [70,40], [50,70]], l: [[0,1], [1,2], [2,0]] } },
-                { id: 'mic', icon: '🔬', title: 'Microscopium', text: 'The Microscope.', data: { s: [[40,30], [40,70], [60,70]], l: [[0,1], [1,2]] } },
-                { id: 'mon', icon: '🦄', title: 'Monoceros', text: 'The Unicorn. Faint constellation in the winter sky.', data: { s: [[20,50], [40,40], [60,50], [80,40]], l: [[0,1], [1,2], [2,3]] } },
-                { id: 'mus', icon: '🪰', title: 'Musca', text: 'The Fly. Originally Apis the Bee.', data: { s: [[30,40], [70,40], [40,70], [60,70]], l: [[0,2], [1,3], [2,3]] } },
-                { id: 'nor', icon: '📏', title: 'Norma', text: 'The Level. Carpenter\'s square.', data: { s: [[40,30], [40,70], [70,70]], l: [[0,1], [1,2]] } },
-                { id: 'oct', icon: '🧭', title: 'Octans', text: 'The Octant. Contains the South Celestial Pole.', data: { s: [[30,30], [70,50], [50,80]], l: [[0,1], [1,2], [2,0]] } },
-                { id: 'oph', icon: '⚕️', title: 'Ophiuchus', text: 'The Serpent Bearer. Asclepius, the healer.', data: { s: [[50,20], [30,50], [70,50], [40,80], [60,80]], l: [[0,1], [0,2], [1,3], [2,4], [3,4]] } },
-                { id: 'ori', icon: '🏹', title: 'Orion', text: 'The Hunter. A giant hunter placed in the stars.', data: { s: [[25,20,4], [75,25,4], [45,50], [50,50], [55,50], [30,80,4], [70,85,5]], l: [[0,2], [1,4], [2,3], [3,4], [2,5], [4,6]] } },
-                { id: 'pav', icon: '🦚', title: 'Pavo', text: 'The Peacock. Sacred bird of Hera.', data: { s: [[80,20,4], [60,40], [40,50], [20,80]], l: [[0,1], [1,2], [2,3]] } },
-                { id: 'peg', icon: '🐎', title: 'Pegasus', text: 'The Winged Horse. Born from Medusa\'s blood.', data: { s: [[30,30], [70,30], [70,70], [30,70], [85,20], [20,20]], l: [[0,1], [1,2], [2,3], [3,0], [1,4], [0,5]] } },
-                { id: 'per', icon: '⚔️', title: 'Perseus', text: 'The Hero. Slayer of Medusa and savior of Andromeda.', data: { s: [[50,20], [30,50], [50,50,4], [70,60], [40,80]], l: [[0,2], [1,2], [2,3], [2,4]] } },
-                { id: 'phe', icon: '🔥', title: 'Phoenix', text: 'The Firebird. Represents the mythical bird reborn from ashes.', data: { s: [[50,20], [20,50], [80,50], [40,80], [60,80]], l: [[0,1], [0,2], [1,3], [2,4], [3,4]] } },
-                { id: 'pic', icon: '🎨', title: 'Pictor', text: 'The Easel. Painter\'s easel.', data: { s: [[30,50], [70,50], [50,80]], l: [[0,2], [1,2]] } },
-                { id: 'psc', icon: '♓', title: 'Pisces', text: 'The Fishes. Aphrodite and Eros tied together.', data: { s: [[20,50], [40,70], [60,70], [80,30], [50,50]], l: [[0,4], [4,3], [0,1], [1,2], [2,3]] } },
-                { id: 'psa', icon: '🐟', title: 'Piscis Austrinus', text: 'The Southern Fish. Drinks water from Aquarius\'s jar.', data: { s: [[20,50], [50,30], [80,50,5], [50,70]], l: [[0,1], [1,2], [2,3], [3,0]] } },
-                { id: 'pup', icon: '🚢', title: 'Puppis', text: 'The Poop Deck. Stern of the Argo Navis.', data: { s: [[30,20], [50,50], [70,30], [50,80]], l: [[0,1], [1,2], [1,3]] } },
-                { id: 'pyx', icon: '🧭', title: 'Pyxis', text: 'The Compass Box. Mariner\'s compass of the Argo.', data: { s: [[40,30], [40,70], [60,50]], l: [[0,1], [0,2]] } },
-                { id: 'ret', icon: '🕸️', title: 'Reticulum', text: 'The Reticle. Represents the crosshairs in a telescope eyepiece.', data: { s: [[50,20], [20,50], [80,50], [50,80]], l: [[0,1], [1,3], [3,2], [2,0]] } },
-                { id: 'sge', icon: '🏹', title: 'Sagitta', text: 'The Arrow. Arrow of Hercules or Cupid.', data: { s: [[20,50], [70,50], [80,40], [80,60]], l: [[0,1], [1,2], [1,3]] } },
-                { id: 'sgr', icon: '♐', title: 'Sagittarius', text: 'The Archer. A centaur, usually Chiron or Crotus.', data: { s: [[30,40], [70,40], [20,70], [80,70], [50,20], [50,50], [40,60], [60,60]], l: [[0,6], [6,2], [6,7], [7,3], [7,1], [0,5], [1,5], [5,4]] } },
-                { id: 'sco', icon: '♏', title: 'Scorpius', text: 'The Scorpion. Sent to kill Orion.', data: { s: [[80,20], [70,25], [60,30,5], [50,40], [45,50], [40,60], [35,70], [40,80], [50,85], [60,80]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,7], [7,8], [8,9]] } },
-                { id: 'scl', icon: '🗿', title: 'Sculptor', text: 'The Sculptor. Sculptor\'s workshop.', data: { s: [[30,50], [70,50], [50,80]], l: [[0,1], [1,2]] } },
-                { id: 'sct', icon: '🛡️', title: 'Scutum', text: 'The Shield. Shield of Sobieski.', data: { s: [[30,40], [70,40], [50,70]], l: [[0,1], [1,2], [2,0]] } },
-                { id: 'ser', icon: '🐍', title: 'Serpens', text: 'The Serpent. Held by Ophiuchus.', data: { s: [[20,50], [40,40], [60,60], [80,50]], l: [[0,1], [1,2], [2,3]] } },
-                { id: 'sex', icon: '🔭', title: 'Sextans', text: 'The Sextant. Astronomical instrument.', data: { s: [[40,30], [60,50], [40,70]], l: [[0,1], [1,2]] } },
-                { id: 'tau', icon: '♉', title: 'Taurus', text: 'The Bull. Zeus in disguise carrying Europa.', data: { s: [[20,50], [35,60], [50,65,5], [60,45], [75,30], [80,35], [45,80]], l: [[0,1], [1,2], [2,3], [3,4], [3,5], [2,6]] } },
-                { id: 'tel', icon: '🔭', title: 'Telescopium', text: 'The Telescope.', data: { s: [[40,30], [40,80], [60,80]], l: [[0,1], [1,2]] } },
-                { id: 'tri', icon: '📐', title: 'Triangulum', text: 'The Triangle.', data: { s: [[30,40], [70,50], [50,70]], l: [[0,1], [1,2], [2,0]] } },
-                { id: 'tra', icon: '📐', title: 'Triangulum Australe', text: 'The Southern Triangle.', data: { s: [[50,20], [20,70], [80,70]], l: [[0,1], [1,2], [2,0]] } },
-                { id: 'tuc', icon: '🦜', title: 'Tucana', text: 'The Toucan.', data: { s: [[40,30], [60,50], [40,70]], l: [[0,1], [1,2]] } },
-                { id: 'uma', icon: '🐻', title: 'Ursa Major', text: 'The Great Bear. Callisto turned into a bear.', data: { s: [[10,30], [25,25], [35,35], [50,45], [75,45], [75,70], [50,70]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,3]] } },
-                { id: 'umi', icon: '🐻', title: 'Ursa Minor', text: 'The Little Bear. Arcas, son of Callisto.', data: { s: [[80,20,5], [70,30], [60,40], [50,45], [30,45], [25,60], [45,60]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,3]] } },
-                { id: 'vel', icon: '⛵', title: 'Vela', text: 'The Sails. Sails of the Argo Navis.', data: { s: [[30,30], [70,30], [50,60], [50,80]], l: [[0,1], [0,2], [1,2], [2,3]] } },
-                { id: 'vir', icon: '♍', title: 'Virgo', text: 'The Maiden. Associated with justice and harvest.', data: { s: [[50,50], [20,40], [80,40], [50,80,5], [35,30], [65,30], [50,20]], l: [[0,1], [0,2], [0,3], [1,4], [2,5], [4,6], [5,6]] } },
-                { id: 'vol', icon: '🐟', title: 'Volans', text: 'The Flying Fish.', data: { s: [[30,30], [70,30], [50,60]], l: [[0,1], [1,2], [2,0]] } },
-                { id: 'vul', icon: '🦊', title: 'Vulpecula', text: 'The Fox. The little fox with the goose.', data: { s: [[30,50], [70,50]], l: [[0,1]] } }
+                { 
+                    id: 'and', icon: '👸', title: 'Andromeda', 
+                    text: 'The Chained Princess. Daughter of Cepheus and Cassiopeia, saved by Perseus from the sea monster Cetus.', 
+                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '90°N to 40°S', time: '9 PM (November)' },
+                    data: { s: [[80,20], [65,35], [50,50], [35,65], [35,35]], l: [[0,1], [1,2], [2,3]] } 
+                },
+                { 
+                    id: 'ant', icon: '💨', title: 'Antlia', 
+                    text: 'The Air Pump. Created by Lacaille to represent the air pump invented by Robert Boyle.', 
+                    visibility: { season: 'Spring', hemisphere: 'Southern', lat: '45°N to 90°S', time: '9 PM (April)' },
+                    data: { s: [[30,40], [50,60], [70,50]], l: [[0,1], [1,2]] } 
+                },
+                { 
+                    id: 'aps', icon: '🐦', title: 'Apus', 
+                    text: 'The Bird of Paradise. Represents the exotic birds of the East Indies.', 
+                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '5°N to 90°S', time: '9 PM (July)' },
+                    data: { s: [[30,30], [50,40], [70,50], [60,70]], l: [[0,1], [1,2], [2,3]] } 
+                },
+                { 
+                    id: 'aql', icon: '🦅', title: 'Aquila', 
+                    text: 'The Eagle. The bird that carried Zeus\'s thunderbolts and abducted Ganymede.', 
+                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 75°S', time: '9 PM (August)' },
+                    data: { s: [[50,20,5], [20,50], [80,50], [50,80]], l: [[0,1], [0,2], [1,3], [2,3], [0,3]] } 
+                },
+                { 
+                    id: 'aqr', icon: '♒', title: 'Aquarius', 
+                    text: 'The Water Bearer. Ganymede pouring water (the nectar of the gods) from a jar.', 
+                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '65°N to 90°S', time: '9 PM (October)' },
+                    data: { s: [[30,20], [50,20], [40,40], [20,60], [60,60], [50,80], [70,80]], l: [[0,1], [1,2], [2,0], [2,3], [2,4], [4,5], [4,6]] } 
+                },
+                { 
+                    id: 'ara', icon: '⛩️', title: 'Ara', 
+                    text: 'The Altar. The burning altar where the gods swore allegiance before battling the Titans.', 
+                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '25°N to 90°S', time: '9 PM (July)' },
+                    data: { s: [[30,20], [70,20], [30,60], [70,60], [50,40,4], [50,80]], l: [[0,2], [1,3], [0,1], [2,3], [4,5]] } 
+                },
+                { 
+                    id: 'ari', icon: '♈', title: 'Aries', 
+                    text: 'The Ram. The golden ram that rescued Phrixus and Helle, whose fleece was sought by Jason.', 
+                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '90°N to 60°S', time: '9 PM (December)' },
+                    data: { s: [[20,60], [50,50], [80,40,5]], l: [[0,1], [1,2]] } 
+                },
+                { 
+                    id: 'aur', icon: '🧔', title: 'Auriga', 
+                    text: 'The Charioteer. Often associated with Erichthonius of Athens, inventor of the quadriga.', 
+                    visibility: { season: 'Winter', hemisphere: 'Northern', lat: '90°N to 40°S', time: '9 PM (February)' },
+                    data: { s: [[50,10,5], [20,40], [80,40], [30,80], [70,80]], l: [[0,1], [0,2], [1,3], [2,4], [3,4]] } 
+                },
+                { 
+                    id: 'boo', icon: '🍦', title: 'Boötes', 
+                    text: 'The Herdsman. The driver of the oxen (Ursa Major). Contains Arcturus, the bear guard.', 
+                    visibility: { season: 'Spring', hemisphere: 'Northern', lat: '90°N to 50°S', time: '9 PM (June)' },
+                    data: { s: [[50,90,5], [30,50], [70,50], [50,20]], l: [[0,1], [0,2], [1,3], [2,3]] } 
+                },
+                { 
+                    id: 'cae', icon: '🔨', title: 'Caelum', 
+                    text: 'The Chisel. Represents the sculptor\'s tools.', 
+                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '40°N to 90°S', time: '9 PM (January)' },
+                    data: { s: [[40,30], [45,50], [50,70]], l: [[0,1], [1,2]] } 
+                },
+                { 
+                    id: 'cam', icon: '🦒', title: 'Camelopardalis', 
+                    text: 'The Giraffe. A large but faint constellation representing the "camel-leopard".', 
+                    visibility: { season: 'Winter', hemisphere: 'Northern', lat: '90°N to 10°S', time: '9 PM (February)' },
+                    data: { s: [[50,10], [30,40], [50,50], [40,80], [70,40]], l: [[0,1], [1,2], [2,3], [0,4]] } 
+                },
+                { 
+                    id: 'cnc', icon: '♋', title: 'Cancer', 
+                    text: 'The Crab. Sent by Hera to distract Hercules during his fight with the Hydra.', 
+                    visibility: { season: 'Spring', hemisphere: 'Northern', lat: '90°N to 60°S', time: '9 PM (March)' },
+                    data: { s: [[50,50,4], [20,30], [80,30], [20,70], [80,70]], l: [[0,1], [0,2], [0,3], [0,4]] } 
+                },
+                { 
+                    id: 'cvn', icon: '🐕', title: 'Canes Venatici', 
+                    text: 'The Hunting Dogs. Asterion and Chara, held on a leash by Boötes.', 
+                    visibility: { season: 'Spring', hemisphere: 'Northern', lat: '90°N to 40°S', time: '9 PM (May)' },
+                    data: { s: [[30,40], [70,60,4]], l: [[0,1]] } 
+                },
+                { 
+                    id: 'cma', icon: '🐕', title: 'Canis Major', 
+                    text: 'The Great Dog. Orion\'s larger hunting dog, chasing the Hare (Lepus).', 
+                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '60°N to 90°S', time: '9 PM (February)' },
+                    data: { s: [[50,30,6], [60,35], [70,60], [60,80], [30,70], [40,50]], l: [[0,1], [1,2], [2,3], [0,5], [5,4]] } 
+                },
+                { 
+                    id: 'cmi', icon: '🐕', title: 'Canis Minor', 
+                    text: 'The Lesser Dog. Orion\'s smaller hunting dog.', 
+                    visibility: { season: 'Winter', hemisphere: 'Northern', lat: '90°N to 75°S', time: '9 PM (March)' },
+                    data: { s: [[20,50], [80,50,5]], l: [[0,1]] } 
+                },
+                { 
+                    id: 'cap', icon: '♑', title: 'Capricornus', 
+                    text: 'The Sea Goat. Often associated with Pan, who jumped into the Nile to escape Typhon.', 
+                    visibility: { season: 'Autumn', hemisphere: 'Southern', lat: '60°N to 90°S', time: '9 PM (September)' },
+                    data: { s: [[10,20], [30,40], [50,50], [80,20], [50,80]], l: [[0,1], [1,2], [2,3], [2,4]] } 
+                },
+                { 
+                    id: 'car', icon: '⛵', title: 'Carina', 
+                    text: 'The Keel. Part of the ship Argo Navis used by Jason and the Argonauts.', 
+                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '20°N to 90°S', time: '9 PM (March)' },
+                    data: { s: [[20,80,6], [30,60], [60,60], [80,50], [50,90]], l: [[0,1], [1,2], [2,3], [1,4]] } 
+                },
+                { 
+                    id: 'cas', icon: '👑', title: 'Cassiopeia', 
+                    text: 'The Queen. Vain queen of Aethiopia, punished to circle the pole star upside down.', 
+                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '90°N to 20°S', time: '9 PM (November)' },
+                    data: { s: [[10,30], [30,60], [50,40,4], [70,60], [90,30]], l: [[0,1], [1,2], [2,3], [3,4]] } 
+                },
+                { 
+                    id: 'cen', icon: '🐎', title: 'Centaurus', 
+                    text: 'The Centaur. Often represents Chiron, the wise tutor of heroes.', 
+                    visibility: { season: 'Spring', hemisphere: 'Southern', lat: '25°N to 90°S', time: '9 PM (May)' },
+                    data: { s: [[20,70,5], [40,60,5], [50,30], [70,30], [60,50], [80,50], [50,80]], l: [[0,1], [1,4], [2,3], [2,4], [3,5], [4,6], [5,6]] } 
+                },
+                { 
+                    id: 'cep', icon: '👑', title: 'Cepheus', 
+                    text: 'The King. King of Aethiopia, husband of Cassiopeia and father of Andromeda.', 
+                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '90°N to 10°S', time: '9 PM (October)' },
+                    data: { s: [[50,10], [30,30], [70,30], [30,70], [70,70]], l: [[0,1], [0,2], [1,3], [2,4], [3,4]] } 
+                },
+                { 
+                    id: 'cet', icon: '🐳', title: 'Cetus', 
+                    text: 'The Sea Monster. Sent by Poseidon to devour Andromeda.', 
+                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '70°N to 90°S', time: '9 PM (November)' },
+                    data: { s: [[10,30], [30,40], [60,30], [80,20], [90,40], [80,50], [60,40], [40,80]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [2,6], [1,7]] } 
+                },
+                { 
+                    id: 'cha', icon: '🦎', title: 'Chamaeleon', 
+                    text: 'The Chameleon. Introduced by Plancius in the 16th century.', 
+                    visibility: { season: 'Spring', hemisphere: 'Southern', lat: '0° to 90°S', time: '9 PM (April)' },
+                    data: { s: [[30,50], [40,30], [60,30], [70,50]], l: [[0,1], [1,2], [2,3]] } 
+                },
+                { 
+                    id: 'cir', icon: '📐', title: 'Circinus', 
+                    text: 'The Compass. Drafting tool used for drawing circles.', 
+                    visibility: { season: 'Spring', hemisphere: 'Southern', lat: '30°N to 90°S', time: '9 PM (June)' },
+                    data: { s: [[50,20], [30,80], [70,80]], l: [[0,1], [0,2]] } 
+                },
+                { 
+                    id: 'col', icon: '🕊️', title: 'Columba', 
+                    text: 'The Dove. Noah\'s dove or the dove released by the Argonauts.', 
+                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '45°N to 90°S', time: '9 PM (February)' },
+                    data: { s: [[20,30], [50,50], [80,30], [50,70]], l: [[0,1], [1,2], [1,3]] } 
+                },
+                { 
+                    id: 'com', icon: '💇‍♀️', title: 'Coma Berenices', 
+                    text: 'Berenice\'s Hair. Queen Berenice II sacrificed her hair for her husband\'s safe return.', 
+                    visibility: { season: 'Spring', hemisphere: 'Northern', lat: '90°N to 55°S', time: '9 PM (May)' },
+                    data: { s: [[50,20], [50,50], [80,50]], l: [[0,1], [1,2]] } 
+                },
+                { 
+                    id: 'cra', icon: '👑', title: 'Corona Australis', 
+                    text: 'The Southern Crown. A wreath placed in the sky by Dionysus.', 
+                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '40°N to 90°S', time: '9 PM (August)' },
+                    data: { s: [[20,60], [35,50], [50,45], [65,50], [80,60]], l: [[0,1], [1,2], [2,3], [3,4]] } 
+                },
+                { 
+                    id: 'crb', icon: '👑', title: 'Corona Borealis', 
+                    text: 'The Northern Crown. The crown of Ariadne, given by Dionysus.', 
+                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 50°S', time: '9 PM (July)' },
+                    data: { s: [[20,40], [35,50], [50,55,4], [65,50], [80,40]], l: [[0,1], [1,2], [2,3], [3,4]] } 
+                },
+                { 
+                    id: 'crv', icon: '🐦', title: 'Corvus', 
+                    text: 'The Crow. Sent by Apollo to fetch water, delayed by figs.', 
+                    visibility: { season: 'Spring', hemisphere: 'Southern', lat: '60°N to 90°S', time: '9 PM (May)' },
+                    data: { s: [[30,30], [70,30], [20,70], [80,70]], l: [[0,1], [1,3], [3,2], [2,0]] } 
+                },
+                { 
+                    id: 'crt', icon: '🏆', title: 'Crater', 
+                    text: 'The Cup. The cup of Apollo.', 
+                    visibility: { season: 'Spring', hemisphere: 'Southern', lat: '65°N to 90°S', time: '9 PM (April)' },
+                    data: { s: [[20,20], [80,20], [50,80], [35,50], [65,50]], l: [[0,3], [1,4], [3,2], [4,2], [3,4]] } 
+                },
+                { 
+                    id: 'cru', icon: '✝️', title: 'Crux', 
+                    text: 'The Southern Cross. Smallest constellation, vital for navigation.', 
+                    visibility: { season: 'Spring', hemisphere: 'Southern', lat: '20°N to 90°S', time: '9 PM (May)' },
+                    data: { s: [[50,10], [50,90,5], [20,50], [80,40], [70,60]], l: [[0,1], [2,3]] } 
+                },
+                { 
+                    id: 'cyg', icon: '🦢', title: 'Cygnus', 
+                    text: 'The Swan. Often associated with Zeus in swan form or Orpheus.', 
+                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 40°S', time: '9 PM (September)' },
+                    data: { s: [[50,10,4], [50,50], [50,90], [10,50], [90,50]], l: [[0,1], [1,2], [3,1], [1,4]] } 
+                },
+                { 
+                    id: 'del', icon: '🐬', title: 'Delphinus', 
+                    text: 'The Dolphin. Saved the poet Arion or carried Amphitrite to Poseidon.', 
+                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 70°S', time: '9 PM (September)' },
+                    data: { s: [[40,20], [60,20], [70,40], [50,40], [30,40], [30,80]], l: [[0,1], [1,2], [2,3], [3,0], [3,4], [4,5]] } 
+                },
+                { 
+                    id: 'dor', icon: '🐠', title: 'Dorado', 
+                    text: 'The Dolphinfish (Mahi-mahi). Home of the Large Magellanic Cloud.', 
+                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '20°N to 90°S', time: '9 PM (January)' },
+                    data: { s: [[50,20], [50,80], [30,50]], l: [[0,1], [1,2]] } 
+                },
+                { 
+                    id: 'dra', icon: '🐉', title: 'Draco', 
+                    text: 'The Dragon. Ladon, the dragon that guarded the golden apples.', 
+                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 15°S', time: '9 PM (July)' },
+                    data: { s: [[80,20], [70,30], [60,20], [50,40], [40,30], [30,60], [20,80], [10,70], [30,90]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,7], [6,8], [7,8]] } 
+                },
+                { 
+                    id: 'equ', icon: '🐴', title: 'Equuleus', 
+                    text: 'The Little Horse. Celeris, foal of Pegasus, or Cyllarus.', 
+                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '90°N to 80°S', time: '9 PM (September)' },
+                    data: { s: [[40,40], [60,40], [50,60]], l: [[0,1], [1,2], [2,0]] } 
+                },
+                { 
+                    id: 'eri', icon: '🌊', title: 'Eridanus', 
+                    text: 'The River. The celestial river (Po/Nile/Euphrates).', 
+                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '30°N to 90°S', time: '9 PM (December)' },
+                    data: { s: [[10,10], [30,20], [20,40], [40,50], [30,70], [80,90,5]], l: [[0,1], [1,2], [2,3], [3,4], [4,5]] } 
+                },
+                { 
+                    id: 'for', icon: '🔥', title: 'Fornax', 
+                    text: 'The Furnace. The chemical furnace.', 
+                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '50°N to 90°S', time: '9 PM (December)' },
+                    data: { s: [[30,40], [70,50], [50,70]], l: [[0,1], [1,2]] } 
+                },
+                { 
+                    id: 'gem', icon: '♊', title: 'Gemini', 
+                    text: 'The Twins. Castor (mortal) and Pollux (immortal).', 
+                    visibility: { season: 'Winter', hemisphere: 'Northern', lat: '90°N to 60°S', time: '9 PM (February)' },
+                    data: { s: [[30,20,4], [70,20,4], [30,80], [70,80], [30,50], [70,50]], l: [[0,4], [4,2], [1,5], [5,3], [0,1], [2,3]] } 
+                },
+                { 
+                    id: 'gru', icon: '🦢', title: 'Grus', 
+                    text: 'The Crane. Originally part of Piscis Austrinus.', 
+                    visibility: { season: 'Autumn', hemisphere: 'Southern', lat: '35°N to 90°S', time: '9 PM (October)' },
+                    data: { s: [[50,20,4], [30,40], [70,40], [50,80]], l: [[0,1], [0,2], [0,3]] } 
+                },
+                { 
+                    id: 'her', icon: '💪', title: 'Hercules', 
+                    text: 'The Hero. Greatest of Greek heroes, kneeling.', 
+                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 50°S', time: '9 PM (July)' },
+                    data: { s: [[30,30], [70,30], [30,60], [70,60], [20,80], [80,80]], l: [[0,1], [1,3], [3,2], [2,0], [2,4], [3,5]] } 
+                },
+                { 
+                    id: 'hor', icon: '🕰️', title: 'Horologium', 
+                    text: 'The Clock. Represents a pendulum clock.', 
+                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '20°N to 90°S', time: '9 PM (December)' },
+                    data: { s: [[30,80], [50,50], [70,30]], l: [[0,1], [1,2]] } 
+                },
+                { 
+                    id: 'hya', icon: '🐍', title: 'Hydra', 
+                    text: 'The Water Snake. The multi-headed beast killed by Hercules.', 
+                    visibility: { season: 'Spring', hemisphere: 'Southern', lat: '55°N to 85°S', time: '9 PM (April)' },
+                    data: { s: [[10,40], [30,45], [50,50], [70,55], [90,60]], l: [[0,1], [1,2], [2,3], [3,4]] } 
+                },
+                { 
+                    id: 'hyi', icon: '🐍', title: 'Hydrus', 
+                    text: 'The Male Water Snake.', 
+                    visibility: { season: 'Autumn', hemisphere: 'Southern', lat: '8°N to 90°S', time: '9 PM (November)' },
+                    data: { s: [[20,30], [50,50], [80,40]], l: [[0,1], [1,2]] } 
+                },
+                { 
+                    id: 'ind', icon: '🏹', title: 'Indus', 
+                    text: 'The Indian. Represents an indigenous person.', 
+                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '15°N to 90°S', time: '9 PM (September)' },
+                    data: { s: [[40,30], [40,70], [60,50]], l: [[0,1], [0,2]] } 
+                },
+                { 
+                    id: 'lac', icon: '🦎', title: 'Lacerta', 
+                    text: 'The Lizard. A small zig-zag of stars.', 
+                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '90°N to 35°S', time: '9 PM (October)' },
+                    data: { s: [[40,20], [50,40], [40,60], [50,80]], l: [[0,1], [1,2], [2,3]] } 
+                },
+                { 
+                    id: 'leo', icon: '♌', title: 'Leo', 
+                    text: 'The Lion. The Nemean Lion killed by Hercules.', 
+                    visibility: { season: 'Spring', hemisphere: 'Northern', lat: '90°N to 65°S', time: '9 PM (April)' },
+                    data: { s: [[70,30], [60,20], [45,25], [40,40,5], [20,50], [30,70], [60,65]], l: [[0,1], [1,2], [2,3], [3,0], [3,6], [6,5], [5,4], [4,3]] } 
+                },
+                { 
+                    id: 'lmi', icon: '🦁', title: 'Leo Minor', 
+                    text: 'The Lesser Lion. Located between Leo and Ursa Major.', 
+                    visibility: { season: 'Spring', hemisphere: 'Northern', lat: '90°N to 45°S', time: '9 PM (April)' },
+                    data: { s: [[30,50], [70,50], [50,30]], l: [[0,1], [1,2]] } 
+                },
+                { 
+                    id: 'lep', icon: '🐰', title: 'Lepus', 
+                    text: 'The Hare. Chased by Orion\'s dogs.', 
+                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '60°N to 90°S', time: '9 PM (January)' },
+                    data: { s: [[30,40], [70,40], [30,70], [70,70], [50,55]], l: [[0,2], [1,3], [0,4], [1,4], [2,3]] } 
+                },
+                { 
+                    id: 'lib', icon: '♎', title: 'Libra', 
+                    text: 'The Scales. Scales of justice held by Astraea (Virgo).', 
+                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '65°N to 90°S', time: '9 PM (June)' },
+                    data: { s: [[50,20], [20,50], [80,50], [50,80]], l: [[0,1], [0,2], [1,3], [2,3]] } 
+                },
+                { 
+                    id: 'lup', icon: '🐺', title: 'Lupus', 
+                    text: 'The Wolf. Sacrificed by Centaurus.', 
+                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '35°N to 90°S', time: '9 PM (June)' },
+                    data: { s: [[30,30], [60,30], [40,60], [70,50], [50,80]], l: [[0,1], [0,2], [2,4], [1,3], [3,4]] } 
+                },
+                { 
+                    id: 'lyn', icon: '🐈', title: 'Lynx', 
+                    text: 'The Lynx. So faint you need lynx eyes to see it.', 
+                    visibility: { season: 'Spring', hemisphere: 'Northern', lat: '90°N to 55°S', time: '9 PM (March)' },
+                    data: { s: [[10,20], [30,40], [50,30], [70,50], [90,40]], l: [[0,1], [1,2], [2,3], [3,4]] } 
+                },
+                { 
+                    id: 'lyr', icon: '🎵', title: 'Lyra', 
+                    text: 'The Harp. The lyre of Orpheus.', 
+                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 40°S', time: '9 PM (August)' },
+                    data: { s: [[50,15,5], [40,30], [60,30], [40,50], [60,50]], l: [[0,1], [0,2], [1,2], [1,3], [2,4], [3,4]] } 
+                },
+                { 
+                    id: 'men', icon: '⛰️', title: 'Mensa', 
+                    text: 'Table Mountain. Named after Table Mountain in South Africa.', 
+                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '5°N to 90°S', time: '9 PM (January)' },
+                    data: { s: [[30,40], [70,40], [50,70]], l: [[0,1], [1,2], [2,0]] } 
+                },
+                { 
+                    id: 'mic', icon: '🔬', title: 'Microscopium', 
+                    text: 'The Microscope.', 
+                    visibility: { season: 'Autumn', hemisphere: 'Southern', lat: '45°N to 90°S', time: '9 PM (September)' },
+                    data: { s: [[40,30], [40,70], [60,70]], l: [[0,1], [1,2]] } 
+                },
+                { 
+                    id: 'mon', icon: '🦄', title: 'Monoceros', 
+                    text: 'The Unicorn. Faint constellation in the winter sky.', 
+                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '75°N to 85°S', time: '9 PM (February)' },
+                    data: { s: [[20,50], [40,40], [60,50], [80,40]], l: [[0,1], [1,2], [2,3]] } 
+                },
+                { 
+                    id: 'mus', icon: '🪰', title: 'Musca', 
+                    text: 'The Fly. Originally Apis the Bee.', 
+                    visibility: { season: 'Spring', hemisphere: 'Southern', lat: '15°N to 90°S', time: '9 PM (May)' },
+                    data: { s: [[30,40], [70,40], [40,70], [60,70]], l: [[0,2], [1,3], [2,3]] } 
+                },
+                { 
+                    id: 'nor', icon: '📏', title: 'Norma', 
+                    text: 'The Level. Carpenter\'s square.', 
+                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '30°N to 90°S', time: '9 PM (July)' },
+                    data: { s: [[40,30], [40,70], [70,70]], l: [[0,1], [1,2]] } 
+                },
+                { 
+                    id: 'oct', icon: '🧭', title: 'Octans', 
+                    text: 'The Octant. Contains the South Celestial Pole.', 
+                    visibility: { season: 'Autumn', hemisphere: 'Southern', lat: '0° to 90°S', time: '9 PM (October)' },
+                    data: { s: [[30,30], [70,50], [50,80]], l: [[0,1], [1,2], [2,0]] } 
+                },
+                { 
+                    id: 'oph', icon: '⚕️', title: 'Ophiuchus', 
+                    text: 'The Serpent Bearer. Asclepius, the healer.', 
+                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '80°N to 80°S', time: '9 PM (July)' },
+                    data: { s: [[50,20], [30,50], [70,50], [40,80], [60,80]], l: [[0,1], [0,2], [1,3], [2,4], [3,4]] } 
+                },
+                { 
+                    id: 'ori', icon: '🏹', title: 'Orion', 
+                    text: 'The Hunter. A giant hunter placed in the stars.', 
+                    visibility: { season: 'Winter', hemisphere: 'Northern', lat: '85°N to 75°S', time: '9 PM (January)' },
+                    data: { s: [[25,20,4], [75,25,4], [45,50], [50,50], [55,50], [30,80,4], [70,85,5]], l: [[0,2], [1,4], [2,3], [3,4], [2,5], [4,6]] } 
+                },
+                { 
+                    id: 'pav', icon: '🦚', title: 'Pavo', 
+                    text: 'The Peacock. Sacred bird of Hera.', 
+                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '30°N to 90°S', time: '9 PM (August)' },
+                    data: { s: [[80,20,4], [60,40], [40,50], [20,80]], l: [[0,1], [1,2], [2,3]] } 
+                },
+                { 
+                    id: 'peg', icon: '🐎', title: 'Pegasus', 
+                    text: 'The Winged Horse. Born from Medusa\'s blood.', 
+                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '90°N to 60°S', time: '9 PM (October)' },
+                    data: { s: [[30,30], [70,30], [70,70], [30,70], [85,20], [20,20]], l: [[0,1], [1,2], [2,3], [3,0], [1,4], [0,5]] } 
+                },
+                { 
+                    id: 'per', icon: '⚔️', title: 'Perseus', 
+                    text: 'The Hero. Slayer of Medusa and savior of Andromeda.', 
+                    visibility: { season: 'Winter', hemisphere: 'Northern', lat: '90°N to 35°S', time: '9 PM (December)' },
+                    data: { s: [[50,20], [30,50], [50,50,4], [70,60], [40,80]], l: [[0,2], [1,2], [2,3], [2,4]] } 
+                },
+                { 
+                    id: 'phe', icon: '🔥', title: 'Phoenix', 
+                    text: 'The Firebird. Represents the mythical bird reborn from ashes.', 
+                    visibility: { season: 'Autumn', hemisphere: 'Southern', lat: '32°N to 90°S', time: '9 PM (November)' },
+                    data: { s: [[50,20], [20,50], [80,50], [40,80], [60,80]], l: [[0,1], [0,2], [1,3], [2,4], [3,4]] } 
+                },
+                { 
+                    id: 'pic', icon: '🎨', title: 'Pictor', 
+                    text: 'The Easel. Painter\'s easel.', 
+                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '25°N to 90°S', time: '9 PM (January)' },
+                    data: { s: [[30,50], [70,50], [50,80]], l: [[0,2], [1,2]] } 
+                },
+                { 
+                    id: 'psc', icon: '♓', title: 'Pisces', 
+                    text: 'The Fishes. Aphrodite and Eros tied together.', 
+                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '90°N to 65°S', time: '9 PM (November)' },
+                    data: { s: [[20,50], [40,70], [60,70], [80,30], [50,50]], l: [[0,4], [4,3], [0,1], [1,2], [2,3]] } 
+                },
+                { 
+                    id: 'psa', icon: '🐟', title: 'Piscis Austrinus', 
+                    text: 'The Southern Fish. Drinks water from Aquarius\'s jar.', 
+                    visibility: { season: 'Autumn', hemisphere: 'Southern', lat: '55°N to 90°S', time: '9 PM (October)' },
+                    data: { s: [[20,50], [50,30], [80,50,5], [50,70]], l: [[0,1], [1,2], [2,3], [3,0]] } 
+                },
+                { 
+                    id: 'pup', icon: '🚢', title: 'Puppis', 
+                    text: 'The Poop Deck. Stern of the Argo Navis.', 
+                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '40°N to 90°S', time: '9 PM (February)' },
+                    data: { s: [[30,20], [50,50], [70,30], [50,80]], l: [[0,1], [1,2], [1,3]] } 
+                },
+                { 
+                    id: 'pyx', icon: '🧭', title: 'Pyxis', 
+                    text: 'The Compass Box. Mariner\'s compass of the Argo.', 
+                    visibility: { season: 'Spring', hemisphere: 'Southern', lat: '50°N to 90°S', time: '9 PM (March)' },
+                    data: { s: [[40,30], [40,70], [60,50]], l: [[0,1], [0,2]] } 
+                },
+                { 
+                    id: 'ret', icon: '🕸️', title: 'Reticulum', 
+                    text: 'The Reticle. Represents the crosshairs in a telescope eyepiece.', 
+                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '23°N to 90°S', time: '9 PM (December)' },
+                    data: { s: [[50,20], [20,50], [80,50], [50,80]], l: [[0,1], [1,3], [3,2], [2,0]] } 
+                },
+                { 
+                    id: 'sge', icon: '🏹', title: 'Sagitta', 
+                    text: 'The Arrow. Arrow of Hercules or Cupid.', 
+                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 70°S', time: '9 PM (August)' },
+                    data: { s: [[20,50], [70,50], [80,40], [80,60]], l: [[0,1], [1,2], [1,3]] } 
+                },
+                { 
+                    id: 'sgr', icon: '♐', title: 'Sagittarius', 
+                    text: 'The Archer. A centaur, usually Chiron or Crotus.', 
+                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '55°N to 90°S', time: '9 PM (August)' },
+                    data: { s: [[30,40], [70,40], [20,70], [80,70], [50,20], [50,50], [40,60], [60,60]], l: [[0,6], [6,2], [6,7], [7,3], [7,1], [0,5], [1,5], [5,4]] } 
+                },
+                { 
+                    id: 'sco', icon: '♏', title: 'Scorpius', 
+                    text: 'The Scorpion. Sent to kill Orion.', 
+                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '40°N to 90°S', time: '9 PM (July)' },
+                    data: { s: [[80,20], [70,25], [60,30,5], [50,40], [45,50], [40,60], [35,70], [40,80], [50,85], [60,80]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,7], [7,8], [8,9]] } 
+                },
+                { 
+                    id: 'scl', icon: '🗿', title: 'Sculptor', 
+                    text: 'The Sculptor. Sculptor\'s workshop.', 
+                    visibility: { season: 'Autumn', hemisphere: 'Southern', lat: '50°N to 90°S', time: '9 PM (November)' },
+                    data: { s: [[30,50], [70,50], [50,80]], l: [[0,1], [1,2]] } 
+                },
+                { 
+                    id: 'sct', icon: '🛡️', title: 'Scutum', 
+                    text: 'The Shield. Shield of Sobieski.', 
+                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '80°N to 90°S', time: '9 PM (August)' },
+                    data: { s: [[30,40], [70,40], [50,70]], l: [[0,1], [1,2], [2,0]] } 
+                },
+                { 
+                    id: 'ser', icon: '🐍', title: 'Serpens', 
+                    text: 'The Serpent. Held by Ophiuchus.', 
+                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '80°N to 80°S', time: '9 PM (July)' },
+                    data: { s: [[20,50], [40,40], [60,60], [80,50]], l: [[0,1], [1,2], [2,3]] } 
+                },
+                { 
+                    id: 'sex', icon: '🔭', title: 'Sextans', 
+                    text: 'The Sextant. Astronomical instrument.', 
+                    visibility: { season: 'Spring', hemisphere: 'Southern', lat: '80°N to 90°S', time: '9 PM (April)' },
+                    data: { s: [[40,30], [60,50], [40,70]], l: [[0,1], [1,2]] } 
+                },
+                { 
+                    id: 'tau', icon: '♉', title: 'Taurus', 
+                    text: 'The Bull. Zeus in disguise carrying Europa.', 
+                    visibility: { season: 'Winter', hemisphere: 'Northern', lat: '90°N to 65°S', time: '9 PM (January)' },
+                    data: { s: [[20,50], [35,60], [50,65,5], [60,45], [75,30], [80,35], [45,80]], l: [[0,1], [1,2], [2,3], [3,4], [3,5], [2,6]] } 
+                },
+                { 
+                    id: 'tel', icon: '🔭', title: 'Telescopium', 
+                    text: 'The Telescope.', 
+                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '30°N to 90°S', time: '9 PM (August)' },
+                    data: { s: [[40,30], [40,80], [60,80]], l: [[0,1], [1,2]] } 
+                },
+                { 
+                    id: 'tri', icon: '📐', title: 'Triangulum', 
+                    text: 'The Triangle.', 
+                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '90°N to 60°S', time: '9 PM (December)' },
+                    data: { s: [[30,40], [70,50], [50,70]], l: [[0,1], [1,2], [2,0]] } 
+                },
+                { 
+                    id: 'tra', icon: '📐', title: 'Triangulum Australe', 
+                    text: 'The Southern Triangle.', 
+                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '25°N to 90°S', time: '9 PM (July)' },
+                    data: { s: [[50,20], [20,70], [80,70]], l: [[0,1], [1,2], [2,0]] } 
+                },
+                { 
+                    id: 'tuc', icon: '🦜', title: 'Tucana', 
+                    text: 'The Toucan. A tropical bird, home to the Small Magellanic Cloud.', 
+                    visibility: { season: 'Autumn', hemisphere: 'Southern', lat: '15°N to 90°S', time: '9 PM (November)' },
+                    data: { s: [[40,30], [60,50], [40,70]], l: [[0,1], [1,2]] } 
+                },
+                { 
+                    id: 'uma', icon: '🐻', title: 'Ursa Major', 
+                    text: 'The Great Bear. Callisto turned into a bear.', 
+                    visibility: { season: 'Spring', hemisphere: 'Northern', lat: '90°N to 30°S', time: '9 PM (April)' },
+                    data: { s: [[10,30], [25,25], [35,35], [50,45], [75,45], [75,70], [50,70]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,3]] } 
+                },
+                { 
+                    id: 'umi', icon: '🐻', title: 'Ursa Minor', 
+                    text: 'The Little Bear. Arcas, son of Callisto.', 
+                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 10°S', time: '9 PM (June)' },
+                    data: { s: [[80,20,5], [70,30], [60,40], [50,45], [30,45], [25,60], [45,60]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,3]] } 
+                },
+                { 
+                    id: 'vel', icon: '⛵', title: 'Vela', 
+                    text: 'The Sails. Sails of the Argo Navis.', 
+                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '30°N to 90°S', time: '9 PM (March)' },
+                    data: { s: [[30,30], [70,30], [50,60], [50,80]], l: [[0,1], [0,2], [1,2], [2,3]] } 
+                },
+                { 
+                    id: 'vir', icon: '♍', title: 'Virgo', 
+                    text: 'The Maiden. Associated with justice and harvest.', 
+                    visibility: { season: 'Spring', hemisphere: 'Northern', lat: '80°N to 80°S', time: '9 PM (May)' },
+                    data: { s: [[50,50], [20,40], [80,40], [50,80,5], [35,30], [65,30], [50,20]], l: [[0,1], [0,2], [0,3], [1,4], [2,5], [4,6], [5,6]] } 
+                },
+                { 
+                    id: 'vol', icon: '🐟', title: 'Volans', 
+                    text: 'The Flying Fish.', 
+                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '15°N to 90°S', time: '9 PM (March)' },
+                    data: { s: [[30,30], [70,30], [50,60]], l: [[0,1], [1,2], [2,0]] } 
+                },
+                { 
+                    id: 'vul', icon: '🦊', title: 'Vulpecula', 
+                    text: 'The Fox. The little fox with the goose.', 
+                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 55°S', time: '9 PM (September)' },
+                    data: { s: [[30,50], [70,50]], l: [[0,1]] } 
+                }
             ];
 
             const shuffleTracks = () => { const shuffled = [...MUSIC_POOL].sort(() => 0.5 - Math.random()); setCurrentTracks(shuffled.slice(0, 4)); };
