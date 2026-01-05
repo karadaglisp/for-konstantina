@@ -224,29 +224,114 @@
         ];
         
         const MUSIC_POOL = [
-            // Greek Pulp-Pop / Alternative
-            "42wkMrkIqX4pYIGnTW70kG", // To Sima
-            "6ucNZBkwkPmw8OHiv5L7P4", // Pygolampides
-            "7Gi8jg3h2Ac0gMetpQUXmh", // To Koperti
-            "70LpDqsreV4MtlQzyyV87G", // San Ihthis
-            "5Od7Y3ihqhynfNBL10GS1V", // To Forema
-            "3rBCyn5i76CRYE5theSiB5", // Den Ksero
-            "7jhyoVX7uqGLLnoEvSSSnY", // O Erotas
-            "1cQ4zuzVnux91bI1tJR1G7", // Mehri Ta Haramata
-            "1tpcE1Ujav8q4fJgJMW4kb", // Fotia Sto Limani
-            "00hbwu3tPnbiH5MNjzF14N", // Oso Mikraino
-            
-            // Bedroom Pop
-            "0H2zA6m04MUsu4mX2KecNr", // Fall Down (Crumb)
-            "6XHikJpK06NoXaFwkH4tPL", // I Spend Too Much Time in My Room
-            "2HcMkGeghyXdJRT1g85u0t", // To Ease You (Men I Trust)
-            "6R2YSITVeRTFwDczaxSnQS", // Hard To See
-            
-            // Indie Surf / Dream Pop
-            "4zGub7d71FopcEXaLKqxcU", // Tom's Place
-            "1ixXNc8iCkRniJhICf9xpy", // Turning Over a New Leaf
-            "4l38jp3bDPcI5avo9ov482", // Seabird
-            "3WSaGTmm67vd3stVi0Zu9D"  // Undercurrent
+            // My Teenage Post-Wave Greek Pulp-Pop Wet Dreams
+            "70LpDqsreV4MtlQzyyV87G", "5Od7Y3ihqhynfNBL10GS1V", "7jRLjRTSbOMmrkFiL6YyIh", "3D6VnVquICXOGIardkqCNV", "0xWbkwwk9PYq7KbhUqGTrn",
+            "76eEvX5DMXKO0f4jH3mc6I", "1dURIHSKeONv5W5qlxfhJM", "7cTVP6Y736smxdqnsKILng", "1nwSyvxZe3CdPgVrtBkRpj", "2go9bn0N7cg7ZHBpdO30xP",
+            "1DlunM8uvc4IDwsh7TPkAh", "4CgMAGfaMycuMBq7lBdYW8", "1nmDqfjWySD2uG82mxmQET", "7hBO6if1MEvLhs1nLQXQbc", "3gFHt0xjK283HOtqIWj7Q1",
+            "4VV3S1Ywd5cqIzAVJGoypV", "6XeFd9KCGi7zz5U9KHqCyx", "6B8rz7mXTeAUMN5kzxDU95", "6HuvjKKWtXd8zWs0yiXwuo", "6haoMKj0wLTPxs3TbEAZHR",
+            "5o6iooyCPV4ltS7V2xYj6A", "4frb4uRI5w0mRzcnZfPARr", "2V08zd3Ebi0luBDJ5vhveh", "3sjnNxHbmCKmpwL5lnrGEN", "6noTmxZ2U5rPNCB7gxvKRc",
+            "6Q1UWA7EZ2QxCjZ6FSRdD1", "26fLnUK269kccIflMSApka", "4onFKWXE6krAYMpIC058P1", "6J4BeGRnLW7xxO00hxnXHP", "68f4Lw58gbEkNxCF8L8F3B",
+            "3XHskjrUDc3Wp1ncftKLjz", "1cRAkR5GfTQRPtsLNzuFhN", "0t2AN6xx25AkNLRc1JGrNH", "2y07NHwK6ZLMKuNYzVCeYm", "1f6jUQIR1kQD89n5gAbpYa",
+            "7zzFb0dYTjKNNP39h7Ke8I", "38dKbjLOv51Nq4HNX0l8TW", "606vxZ5VVTFrvYt6CPUDLA", "4tye7Iy4kqSvTs5msJZQHq", "1rAPmrKqRTWaJdJeISbauf",
+            "1XEBbdQuFXvog7MDao0yfk", "63YDJGvdHF64nocFR9z0oo", "73G35udHDcqCfP2lHCbaps", "52DnEDijuLyneGxkRPWaiy", "4XBab31fUywZVGMlA6PhAN",
+            "7aHgIFaRWmBMXf8VRhJWy0", "3Zmkfu04oT5051b0g6pxSO", "63YHH6P1z3wbzCSTJIDtjo", "0swqfhjHd95VJXZY6rgjLT", "0elApiEQu6nMrE5BJOQXgo",
+            "7AscoYDsOUwBBe5MwAxebQ", "58uOwQN9E9u6pcAWigOh2o", "0n2AGgoSBJjpXs5ZxNr6YR", "0Zxjq1RaNGAywOKaTBmw4S", "4PxHSsckhcveay6LMJ3AjX",
+            "47msO5H584HjMuAGmqMJtV", "4PiIAUjanOJNOgSDdxjJ4c", "5A8QwIwbTClJMXpjy0n13M", "63orgCfmTpRHa4hHRbpipR", "28cS2y6vA6kQc9OGleGwx2",
+            "7rcE4WPQmLvZbhkCUIYCZF", "6j6INJNCPHB2WS0ZePXKXA", "7bPsKIYOYjJtPeIsg3nW2P", "2L9pZEVUFyGHNtx638XHo2", "6pTyolJMLQoQm0qaGIxc2X",
+            "0htdTkO5n2La5TtwVYQpRT", "67GEyhXjuE4CksP16OIu7p", "6OanicNL1bB32VgK0nC8nh", "58uf6igKC5O5VAa9iVxiKh", "74fP9YcpDOaOucpsAGoWFH",
+            "5687kNTXLpqSUUkqk31blJ", "6y3ZDbcQstwIi6hhxOHXNv", "5qi2qBMfMEalAwfyw4DekD", "0u4kfySAnhPiqY17hCRNEN", "1gO9UCn7BFNesoFTA774nn",
+            "0jqNqKLfG6dpkh82ZNZLc8", "4r5W2iwnQpcDzEu8LCEx7B", "48LU6CLLvImvsVu0jJjC7l", "51TBGuofiTBcWgTEzQvqKG", "4XExjGrZX6VkAALwwaisde",
+            "0hTLC3b0fjYZUX8Nw6pGPE", "3xDEza9vTxqINGvvz8V6cO", "6NqWO8hGsntCx702kT2idK", "4kevlqV0BxC2bJ3cg4TICa", "1YRGhYufVIhxnXxzC1mG5x",
+            "7cGLw6CZb2E9paZysiRtwG", "3Nf2wpCH6TeLdZ4eG5XQ7f", "7wLKS7SzdTgUL0dsBmfdWu", "6NEE9pAg8KOumgx2Qiy7Kw", "7jQOlN1vGR5rBOck2LUBjX",
+            "3rTlDFp5OWIcmDzbihtsAf", "7oHIaZjc2JWCyQmpbJ8f3z", "0ipMg1ovxucAQpIlB5KFnv", "3s3QL5SzcKVHq0B8iBcoZo", "5gF9RD3AKE8pf1sXcRz68W",
+            "6JkCzA3arBZKLhnCaUdoDg", "7s9mt14taxUeum4lhUWL43", "3ZXdGIqQOQYGETZRlUJTdv", "1cEtA13aEaEh5QAncWvFfJ", "4NMn560HDiG0v5hGqfB3aS",
+            "41zV1pjj4RJPBTV1nqq0ee", "1uYyMqV8K4DOUKYrqyaoH5", "4LCiQW8vfq3A9R9sA8U3hN", "2dOPsvCkjyTdLeqkQdgfTR", "7xfI8eKbhWk9O8vwVnqnTa",
+            "15b7vmjYfAPGL3DuSMBUI1", "4H5tcU13VR7ug5E4MX8SKP", "1OrvTgVJ34forXXa7A8IkG", "4FWrrmLMLeJ1DX8awicSUm", "42wkMrkIqX4pYIGnTW70kG",
+            "6ucNZBkwkPmw8OHiv5L7P4", "7Gi8jg3h2Ac0gMetpQUXmh", "4yhhJkWb4oqTYRCKAEACMr", "3hatHrJ64kkVS2VH47pPKR", "3RKxM0q7IGsudpC4VT4xTv",
+            "0yt0PDjRd1CfDXnw3oeXtS", "17virskSxaqh5UKk3QonW4",
+
+            // (bedroom) pop for the elite
+            "0H2zA6m04MUsu4mX2KecNr", "6XHikJpK06NoXaFwkH4tPL", "0R3TWpoxAhT3HDXM7tpRzS", "4HbeGjbt7u3pvwDk1vN7P0", "0B6oBwvkyLptGexpwJVz7c",
+            "2blV6tohiJoieVNtlL0yU4", "3zjvduyGhyBKYCVHGn6E74", "0gdWSthwNMJ4TPVya8b0bh", "36jDABK9TQixIZOZylPy04", "5aqslHfDoGviK5vRwyQQgd",
+            "50auDM0fjPvcdxvc4i5nOj", "6jp0JIuzSbKCB26bg1iPgp", "5GbVzc6Ex5LYlLJqzRQhuy", "2ZWlPOoWh0626oTaHrnl2a", "0UVzM2GkqTTf57G6Wj05UL",
+            "2HUugUuZW0e4N7ne9YJScc", "68KdvPllp9Pug8ZG6AByFY", "5x9r0HaFznxQ32J2JZFhub", "3MMLO6TUL07tze9IXud0Vc", "44ZKnfWEkp7wPs035j4Tua",
+            "6pxElwU80zhjbCC77Vn8EI", "6Jl3ZOX6MUOlyoUc721bsX", "1FWoak0OgTq1jrYfRKfXsj", "7mjOxXnZYbGtgjyX0hqaLs", "4hqTguGFl0NWgFIxBppbKQ",
+            "4zvHZWOGyL7WcmqHOgtGCW", "1XrSjpNe49IiygZfzb74pk", "2dIeraguJ8SoHDqXfSZelZ", "75TDPu9k7Yv3IovdYaNCwk", "2QjOHCTQ1Jl3zawyYOpxh6",
+            "4EpZ4eYuZOwPSSwyqpdHnJ", "5EYi2rH4LYs6M21ZLOyQTx", "20EIvCTkNuaFU0vB6NG8eo", "0nMqu5vN44GNv8UOQxmBJK", "3AyuigFWbuirWHvidbMz8O",
+            "6atVS7UZBxoyJkkteM62u5", "4HpFU6eMThgW6Cael5AwYy", "0S3BtG3i5tkQmehJhIhHF3", "7AfZIW6yXC4MzElfFmqa9m", "7i5I4h7r2vkI2r9tgKjy0x",
+            "0DltZY7z8YvuDBSAbsIgPc", "0AduS1e4FWNLdnUNmMwQQd", "7j59MN6vDM9lrvQ0iGhqaa", "6JaPUxse2AsI0df7XXvetF", "5U8hidWugxHXvh1AzZYwKF",
+            "3s9YtjSkxeeriM92mASyoO", "1B2zrooBJ6Rc8NIUuS3VDh", "1xRXJVVDvlvFJxuLRvHDpF", "0B4U9FT1WaFwUiiCPOAak7", "06qUr4CXtG4k3gUurF4tu6",
+            "2DoO0sn4SbUrz7Uay9ACTM", "5eAkSNmHLmydvGAvcV4TnM", "2joEpsXflccZD0ZwKEdz5m", "30jui3PqevssdIVpjEWM38", "1MaDw1BQ797k8j7xXnH486",
+            "4UexrxBMEyacoNwOvmx6XQ", "7lKN7pik3CelVWHWGp6DfB", "4lAfXpZKFDEudiEzLB9uHm", "2fGRJzoiYJYAzlQAyBONMb", "2RjsAYVbdZPISqnsWd3Hup",
+            "6RiiSy9GzSwiyDEJDiMuKe", "3A0cAzFKPefBCz7Z02UnnO", "6BrfgV35h3NfTtIdMqhmFQ", "6Qvwt9H76n1FfWyw5aT6JJ", "3vkCueOmm7xQDoJ17W1Pm3",
+            "6A7d2QgbSga495NJdkEY2A", "0OblxGfTmtALWjImtm7DFd", "62tGzw9OJOwDcjPBnMPCuj", "0RvES3Nq1VAIAdC4x8LfQT", "0OrxUBA5JghHjUarBa2Vjz",
+            "05QGaQnoBuda27vXxpuiRU", "1EZYmas3jh7aUKqCF9EI5A", "4Z2zWAUN9YVxHkZXS7s1KE", "3Zq2naJ92TwUhC32Iov3a6", "4hm33jVolpa22nzhlY72jD",
+            "3TFNxpIwIzMi3jsMRy9GVZ", "0bXdmDpRkYeub0OKISlYpH", "7MBSbBrx0TvBYyKEcpGcJb", "35S3sMjHlF8v2EmxQuDF7z", "36QuWvqoTl8UN1NZv0Q8VP",
+            "1wSXSFmjyldwfx0JOSHlEa", "1ixXNc8iCkRniJhICf9xpy", "0YdIIMb2MHuxoUudkAY9gS", "5CZEan1P5qmhfXFib8ohGj", "0zpk9Uz5C8DshxSYbMcwcH",
+            "1MwPvniPtqPkXwtQDFiJdb", "7jdNolHsTx18e2QVoDm1uf", "41HyMiZSBLGlfopnDE7Ppc", "0KyAGiNGUytG5JLxJu4F6l", "4NhH5IXSqjQgmQOm189Dij",
+            "3MklLppNRhuAupVGO3uNW2", "0iMSUfh4oQplV5OrmrlIbm", "2JKtCvtxP47fOMYi0BjMoY", "6ZqNoqtQvRP3WDHrna12xT", "6ZCGKyXcGbYc6tdP6unPVY",
+            "0HAqq2GcQKyi3s87GuN7jU", "0XvoMOI25j4wODyk8nuANS", "11sfRkHdvsop5DdHVmGpt1", "0dpusM1gM6ULx0QvjJctbT", "1SyJuJfFyoAxuZMaTbwHJW",
+            "2lOTK5uAzQ4OmRPXo2oAFX", "11HRSkKS5nDZB0921Kwne1", "4LQm0wh5zH07mOOQxI0QOK", "2HcMkGeghyXdJRT1g85u0t", "6R2YSITVeRTFwDczaxSnQS",
+            "4k6Uh1HXdhtusDW5y8Gbvy", "4DQNdeDEnbJIckoZ8XLg7G", "2ZZ0ITwRqitCvddi2CGfgq", "0a7RXqXcCSNeo7WxynoNka",
+
+            // Tosa kalokairia
+            "5cERWuNRghbSmXyv4pGX5v", "5OZUVTVsRKOxBCxeW9P2Dy", "4du2vBLWwPMxRncBklEk7u", "1mPlvRINnuodMQdS7AZ6Jr", "158mRIBWD3DqkZsa7uXvMQ",
+            "0U4414APE9VKvPhstvkpYP", "1YnbnWAQfuG30q5tWTpKVA", "0Y12sZ2BwHHZZSAcaU2Bbr", "5uuLnmCZfvaeJI4XAyWnCC", "3czISDpFF7J9HGgn9WZoBy",
+            "2zwmtC9IBxuOHsrr7sK3md", "1woQ49dajnONIc9QVPs62u", "0GMOIRfddB0l0rxDmm6YJ8", "5rs7fgwffE0dSR4JYXIQbu", "7s3TCY7WueF1khSppW7iF1",
+            "4ZN478bY80gFhyA6PmmPFD", "40Wx97tCqWvzgMBSQe0prL", "76ys7PRbxO9JTmMAPDQkSB", "7CrrRzL6C1U46cBHBHcqyY", "43ed7eVZCyV4glwgkuCr8e",
+            "0iNKXpQbTbOLTqbS4PLxwR", "44HedZNCyNN2q3mMNNky9i", "2NtJ0frveSvgeSeT7ZqNuF", "6xgNbfR28nXkxXTdJvElYE", "0sHAUfT0764slsYmzHuAyR",
+            "0zHQTm3IH7kDjhMCdS5VcO", "10ynytzcmTvB6aXOg6AJ4w", "3soXmrdocXIXXJSGlm8vjT", "0we8xXKjtmpi3hELJxwcbL", "2QSdQSAWWWuYlDMvxNrPIz",
+            "3DtOgnU3dAFMJbrLzM0E61", "3Hzh6CNHk7X3WX9masTX2p", "53XiyakMLDTrpJrHn17IEN", "16DUU2ZOjRcDU6xtAoywtP", "5A8DxvVWRk8oJVmjOugilP",
+            "42zGu2xvKqcTFgOGbcNfwU", "4PnCiR4K75X5VoShGoyetB", "5ZSImHC2E9obW7ftX5XPLN", "5mkLg5QjOqvU7EDIRIm0Fp", "3kSVR6vHwOVHwZqxES3kcp",
+            "00DAwd8VddIe9BTYeSTlde", "2yhcOWQKHS9KRUja2w68fI", "3uSeyudHeffO0ae3sNhkSu", "2MB5r0nZQbk0RfOxoyvo7Y", "0LuqYKTf700ss14LPOsH4J",
+            "5F58MuwG5vpPNp8KbGrl48", "6FntxZMrTrHFr6u7FwIXEk", "6HVEqavdH36tV30gAC1kfB", "6DP31WTLrD8Bvsxy2VV7cs", "1SFdIW0U0GWe55nL3W0pY7",
+            "1X5PAeDiHUHFWo19kyEbmy", "65KGgcDQ9UvjnvWdo8HL8y", "68U8WzzmDkc9OUG12I7GAB", "7ueHwvftYc7dp2ggogXYqA", "6YyKswKpjMVTAkRkRb2gJp",
+            "2KCSHXnrhzVLxfcCEfOlv1", "1l15uZKtQOsGXzQmiZjQa8", "1p5iUGtUugdDVh80xUf5Af", "7y2iFrKyiTaE9nVh45CzYE", "2OJL9imXUV7Ny7pCAGGWwg",
+            "4JNi5l2KTYlZrnvXG2scSX", "3KNYYfOQdlXyYQMod3vknt", "647E9u5Vix5D7dxbUZujNs", "598nHadCHzRomN2pbX4zYs", "2YutvKgc9xPBLzN3YSUKu2",
+
+            // Indie Summer Drive
+            "4zGub7d71FopcEXaLKqxcU", "6cNkgWg7NO8XebRZTrIcom", "4a9fW33mYR8LhXBOLUhbfF", "5h9hkYIBWTZYFRmF6Iz1gt", "3xnM0WCRJKk4Iz49rkG5OC",
+            "1FtVQfBKVOmn1SlqujsnJR", "6gKjueO32MnERRo04gpJ8v", "3IznIgmXtrUaoPWpQTy5jB", "3XqbLsVmAwvTJqW6NKopg0", "28nmbejPbeXDqYCWGVg4X7",
+            "4l38jp3bDPcI5avo9ov482", "3WSaGTmm67vd3stVi0Zu9D", "7dTPJ3wGBcLzAaMhJfY7Qd", "0HNYFFOwID6HGSqy5xr4av", "5goeUvSplsnWCmkUFmFDgt",
+            "6c8pVKT7KBUzp6fYNDFqlL",
+
+            // Mew person, same old mewstakes
+            "52ojopYMUzeNcudsoz7O9D", "49ASnsS0LENGokjQAdP3VW", "2X485T9Z5Ly0xyaghN73ed", "0mO6oS60RST2sWmN2FKknP", "7H7NyZ3G075GqPx2evsfeb",
+            "7s5VQqrjBtrBgZL4pEa46S", "1aXV8GrmQLvgoFtBPERP7E", "4SgcE7RxpK3ydWrjoAQH1K", "3Yub3anoLj8w58TVpEXUJv", "72cGBEqu7RitIOoACXYjfR",
+            "6MClJYRD7op0WvDuBGWsMn", "3FqcpEZ7dzggkhz7cOfC1p", "6QeYSvYqYUsfBzsApbjDHO", "0pJTrMWCiR0TuJ5FApIqrz",
+
+            // Never really needed Duolingo premium
+            "2vlkTkPqdATznKHu9gD2c1", "2YuySJd7C2aoBarBP8OvzR", "6oDXwSPWcp7KT2B3funF8y", "5Dqfw7Qiz6spw2xcl3rfkt", "3Bw99kE5w9R5gSVFhxahcB",
+            "1cyRoWGazsa8Vr5qlDfvPP", "2dGXDL8P7ibb3uPdQ4ybuM", "6st8aj6PmtqGctnLAat95M", "7kgYFXWRmgCH3NxxT6rWR4", "6MqqJ0OVjaYeiWUSMOAK8x",
+            "5TJJTBZWEa6zc6CXnjsVJZ", "2cSRuejq6DU9U6OkSmUw17", "4jmLj7bALZTQoe93dT623W", "5G9LvzXcBoIBXOd2jzdJTs", "4O1etEzE7zc8ZO80KNd5GZ",
+            "784VjdNkpXhFV0RHquzsi2", "2YTxJzuw6szzgsstEo80Dh", "14qNHvX8h6HoynFuV0RxWS", "5HaTv6nHDSVO1LqjwoP7RA", "7KAXxQfUG4kzRivltbD1UY",
+            "67yZsFQIMghAAl0V3h9lES", "12YAZNNm2OuSgDBKjFQcNm", "7ET6gmg1EJe3e9JI3xFMxk", "58lQsFCu6wlgDvOI0MjMmu", "3YB9cvd668HXBEq8rbBW8P",
+            "2mSvt89wTd99uETCSlePH2", "4A48ckONJNoXU5smWT9CeG", "5BBK1WoaiD3b3sJ2UysLuM", "22kGOe1POaqkSQhGtvzbHx", "1o0ckFhbn9bEsbBrAa5oy5",
+            "6602NMvb8ioqAjGKBi44rY", "4RUiaHW5J4yr1k0zioghJT", "6I5zS36y3vQnp9bis62OFy",
+
+            // I miss your body's warmth
+            "6K4t31amVTZDgR3sKmwUJJ", "3Ziys0cjD0QpGMDJydVlIv", "3ypyxNeykDGfupZCloqFVT", "5R0vCr5hXzmPl9ovBKqLXk", "3bXxr8pWeLXcPsfIQm3Uun",
+            "53pVuKaVvfIuGiDrBtPjYD", "5687kNTXLpqSUUkqk31blJ", "3qUQnGoQUzJoLQKwnQucSh", "2FfEHEBsbh3NFcZazN0mll", "4r5W2iwnQpcDzEu8LCEx7B",
+            "0KoU7qwnZZFGFZ1QdHDaRR", "63ABAnFKJCp28TAyqf2cGL", "4ec0GQNlVroHo3Jhjp5FA6", "16CpQWGHO4PWBEoYbtrlda", "0LqZuRAroDVnV6LjDUGap1",
+            "2EPuv7zyLpFqReJoYrIFzm", "41KiUY33B3lXF4GETuhIPt", "0w1c9M3a9WCsxmBs3UkqlA", "6qSt1UvGaxHUzzV244HpmO", "5Hg1m5uhSPL75ejQgPOmyc",
+            "01iiEi9h8CQGUN2K1xBbTj",
+
+            // Your Top Songs 2025
+            "4fPjI40ElIwJQ4DJJxSCOe", "6ZdAsADC9LIICvsVRuGWbZ", "4S4QJfBGGrC8jRIjJHf1Ka", "6bIPHR8AJG5HAcn9oF21Ma", "2rrq3SGYxk90xLx5fMmPhZ",
+            "0widrZ6KVNuIPhbM1rWPDR", "2QPOYxo6k95XvvptEFcf4M", "2nv9JnsrmTiVVuU1M1Y0gE", "62zFcDLa1CjCY9yp6VO4ga", "4neZmyJ43dCSOIj6VHUoMn",
+            "3i4xZSH1kTLE22TUvUFMYo", "0dOUOfrPxsCXCcCYZWHSTN", "7fax7NlxOq2X9kMZw8QLE2", "1UYj8qTWjneZJDVjUMwMub", "7FAh3mXDd7Oyo5RmE2FbsR",
+            "3ZDH5g8ozIUMdjqONzG6tR", "1yltcCzaJXDpbTZmI3s1je", "3TuWrfS30De3P03yITmDcL", "2ji5Ff76AxmJyBG0Z6XgYl", "0QArETwcN3KLawegUPmusT",
+            "7h2nmmoWDi2UpfYKLKWLYB", "204t5SErksNRHRhU52g5JF",
+
+            // kwnna + Banos
+            "3aLClcAppX3b6pCHHFn8nQ", "1OrvTgVJ34forXXa7A8IkG", "28SH8v8kBpdce0mvnI7bST", "3gkNbqRxVlEen5iR6bao5J", "3YiFC5fkXFGqAxMueZ2sqo",
+            "3nIpscPqzbcZyePbF51D9Z", "6OsywAe4ov97KeA0QJv8UG", "4LFenKAaX95Pq6l5kKuw3A", "1s9KXtm2FMA1HeXuPkgpxD", "5VUaEzmMVrs4mPW9a5lTY3",
+            "7xauJZr1AwExzTiC6e4gsl", "00CkIh1jiX8K9iRlV1afNF", "65GkKi3dAwRUpPZI0IogFZ", "1NZs6n6hl8UuMaX0UC0YTz", "1NXbNEAcPvY5G1xvfN57aA",
+            "0ZNU020wNYvgW84iljPkPP", "1E2Ctz821hYVTfDjxQBRZh", "2rASRHHT4hnXIpv5IOcrVU", "1NZZveCjdyc6YFX7Sz8mCL", "7tDMzb6OiWSvjkN1FkpxiB",
+            "1YiubAOu9T8ryoZ0Hu1woa", "7rgTr97Ob29FuuKCHqB7a4", "7eq0a7HISgTaLbMLlJU6mA", "6EOCIUxm6K4OvqLQSf52GK", "2kz837aCEmpdo4xVDEG2sv",
+            "6Hwif22a9kokAI7V7Zwmxj", "1NmSGCAQ1Om8SveCfLnx7X", "2XfkzaOcEcvjm1rB3nYqEo", "4H6Gr260ly6OXQeZ0tdpHr", "62HQz5g66bRVsyTcPt2kXD",
+            "0LIXN2xD9qlHMYo6OA5abR", "1VYv1xH7yUl0b43UVR6yA9", "2HDazOaZrzKcW6g4PPCFFd", "0EiWvy2pfU8sul3wG6PiYz", "0puMe2UGP0whQDeJaTraeX",
+            "2uurVIp2d6PlXkPvgXSjSX", "3i6qNxyVgIdUZTTi5m25EM", "6ADSaE87h8Y3lccZlBJdXH"
         ];
         
         // --- POEM DATABASE (50+ Poems) ---
@@ -289,11 +374,11 @@
             { day: 30, month: 11, year: 2025, icon: "✨", title: "Manifest", text: "What do you want for the new year? Type it below and send it to the stars." },
             { day: 31, month: 11, year: 2025, icon: "🥂", title: "NYE", text: "I wish I could drink tonight's wine from your mouth🙄. Happy new year<3 Tap the screen to celebrate!" },
             { day: 1, month: 0, year: 2026, icon: "🎆", title: "2026", text: "New year, same obsession with you. Break the cookie to reveal your fortune." },
-            { day: 2, month: 0, year: 2026, icon: "🎁", title: "THE GIFT", text: "I bought you something special. Tap to unwrap!" },
+            { day: 2, month: 0, year: 2026, icon: "📦", title: "Gift!", text: "Pop some bubbles to relax. The same bubbles that cover the gift you'll receive today😬" },
             { day: 3, month: 0, year: 2026, icon: "🐈‍⬛", title: "Us", text: "You are the fiercest black cat. Scratch my skin whenever you feel like it." },
             { day: 4, month: 0, year: 2026, icon: "💋", title: "Kisses", text: "I want to kiss you everywhere. Tap the box to leave a mark." },
             { day: 5, month: 0, year: 2026, icon: "🌌", title: "The Stars", text: "Our schedules never aligned, but it's nice to think that some day might. Bye <3" },
-            { day: 5, month: 0, year: 2026, icon: "💌", title: "P.S.", text: "This calendar will stay here until Jan 10th. Hope you enjoyed it Konstantina <3", customLabel: "P.S." }
+            { day: 5, month: 0, year: 2026, icon: "💌", title: "P.S. 2", text: "This calendar will stay here and if one day I need the space for other ideas, I'll just move it. Hope you enjoyed it Konstantina <3", customLabel: "P.S. 2" }
         ];
 
         // --- COMPONENTS ---
@@ -1639,44 +1724,116 @@
             const [currentTracks, setCurrentTracks] = useState([]);
             const [currentConstellations, setCurrentConstellations] = useState([]);
 
-            const allConstellations = [
-                { 
-                    id: 1, icon: '🏹', title: 'Orion', 
-                    text: 'The Hunter. Famous for his belt of three stars. Battling Taurus in the winter sky.',
-                    data: {
-                        stars: [{x: 25, y: 20, size: 4}, {x: 75, y: 25, size: 4}, {x: 45, y: 50, size: 3}, {x: 50, y: 50, size: 3}, {x: 55, y: 50, size: 3}, {x: 30, y: 80, size: 4}, {x: 70, y: 85, size: 5}],
-                        lines: [{x1: 25, y1: 20, x2: 45, y2: 50}, {x1: 75, y1: 25, x2: 55, y2: 50}, {x1: 45, y1: 50, x2: 50, y2: 50}, {x1: 50, y1: 50, x2: 55, y2: 50}, {x1: 45, y1: 50, x2: 30, y2: 80}, {x1: 55, y1: 50, x2: 70, y2: 85}]
-                    }
-                },
-                { 
-                    id: 2, icon: '🐻', title: 'Ursa Major', 
-                    text: 'The Great Bear (Big Dipper). Use the pointer stars to find the North Star.',
-                    data: {
-                        stars: [{x: 10, y: 30, size: 3}, {x: 25, y: 25, size: 3}, {x: 35, y: 35, size: 3}, {x: 50, y: 45, size: 3}, {x: 75, y: 45, size: 3}, {x: 75, y: 70, size: 3}, {x: 50, y: 70, size: 3}],
-                        lines: [{x1: 10, y1: 30, x2: 25, y2: 25}, {x1: 25, y1: 25, x2: 35, y2: 35}, {x1: 35, y1: 35, x2: 50, y2: 45}, {x1: 50, y1: 45, x2: 75, y2: 45}, {x1: 75, y1: 45, x2: 75, y2: 70}, {x1: 75, y1: 70, x2: 50, y2: 70}, {x1: 50, y1: 70, x2: 50, y2: 45}]
-                    }
-                },
-                { 
-                    id: 3, icon: '👑', title: 'Cassiopeia', 
-                    text: 'The Queen. A distinctive "W" or "M" shape high in the northern sky.',
-                    data: {
-                        stars: [{x: 15, y: 30, size: 3}, {x: 35, y: 60, size: 3}, {x: 50, y: 40, size: 4}, {x: 65, y: 60, size: 3}, {x: 85, y: 30, size: 3}],
-                        lines: [{x1: 15, y1: 30, x2: 35, y2: 60}, {x1: 35, y1: 60, x2: 50, y2: 40}, {x1: 50, y1: 40, x2: 65, y2: 60}, {x1: 65, y1: 60, x2: 85, y2: 30}]
-                    }
-                },
-                { 
-                    id: 4, icon: '🐕', title: 'Canis Major', 
-                    text: 'The Great Dog. Faithful companion to Orion. Home to Sirius, the brightest star.',
-                    data: {
-                        stars: [{x: 45, y: 30, size: 5}, {x: 55, y: 32, size: 3}, {x: 65, y: 55, size: 4}, {x: 60, y: 70, size: 3}, {x: 30, y: 60, size: 3}],
-                        lines: [{x1: 45, y1: 30, x2: 65, y2: 55}, {x1: 45, y1: 30, x2: 55, y2: 32}, {x1: 65, y1: 55, x2: 60, y2: 70}, {x1: 65, y1: 55, x2: 30, y2: 60}]
-                    }
-                }
+            // Helper to expand compact data
+            // s: [[x,y,size],...], l: [[fromIdx, toIdx],...]
+            const expandData = (compact) => {
+                if (!compact) return null;
+                const stars = compact.s.map(s => ({ x: s[0], y: s[1], size: s[2] || 3 }));
+                const lines = compact.l.map(l => ({ 
+                    x1: stars[l[0]].x, y1: stars[l[0]].y, 
+                    x2: stars[l[1]].x, y2: stars[l[1]].y 
+                }));
+                return { stars, lines };
+            };
+
+            // FULL 88 CONSTELLATIONS DATABASE
+            const CONSTELLATIONS_DB = [
+                { id: 'and', icon: '👸', title: 'Andromeda', text: 'The Chained Princess. Daughter of Cepheus and Cassiopeia, saved by Perseus from the sea monster Cetus.', data: { s: [[80,20], [65,35], [50,50], [35,65], [35,35]], l: [[0,1], [1,2], [2,3]] } },
+                { id: 'ant', icon: '💨', title: 'Antlia', text: 'The Air Pump. Created by Lacaille to represent the air pump invented by Robert Boyle.', data: { s: [[30,40], [50,60], [70,50]], l: [[0,1], [1,2]] } },
+                { id: 'aps', icon: '🐦', title: 'Apus', text: 'The Bird of Paradise. Represents the exotic birds of the East Indies.', data: { s: [[30,30], [50,40], [70,50], [60,70]], l: [[0,1], [1,2], [2,3]] } },
+                { id: 'aql', icon: '🦅', title: 'Aquila', text: 'The Eagle. The bird that carried Zeus\'s thunderbolts and abducted Ganymede.', data: { s: [[50,20,5], [20,50], [80,50], [50,80]], l: [[0,1], [0,2], [1,3], [2,3], [0,3]] } },
+                { id: 'aqr', icon: '♒', title: 'Aquarius', text: 'The Water Bearer. Ganymede pouring water (the nectar of the gods) from a jar.', data: { s: [[30,20], [50,20], [40,40], [20,60], [60,60], [50,80], [70,80]], l: [[0,1], [1,2], [2,0], [2,3], [2,4], [4,5], [4,6]] } },
+                { id: 'ara', icon: '⛩️', title: 'Ara', text: 'The Altar. The burning altar where the gods swore allegiance before battling the Titans.', data: { s: [[30,20], [70,20], [30,60], [70,60], [50,40,4], [50,80]], l: [[0,2], [1,3], [0,1], [2,3], [4,5]] } },
+                { id: 'ari', icon: '♈', title: 'Aries', text: 'The Ram. The golden ram that rescued Phrixus and Helle, whose fleece was sought by Jason.', data: { s: [[20,60], [50,50], [80,40,5]], l: [[0,1], [1,2]] } },
+                { id: 'aur', icon: '🧔', title: 'Auriga', text: 'The Charioteer. Often associated with Erichthonius of Athens, inventor of the quadriga.', data: { s: [[50,10,5], [20,40], [80,40], [30,80], [70,80]], l: [[0,1], [0,2], [1,3], [2,4], [3,4]] } },
+                { id: 'boo', icon: '🍦', title: 'Boötes', text: 'The Herdsman. The driver of the oxen (Ursa Major). Contains Arcturus, the bear guard.', data: { s: [[50,90,5], [30,50], [70,50], [50,20]], l: [[0,1], [0,2], [1,3], [2,3]] } },
+                { id: 'cae', icon: '🔨', title: 'Caelum', text: 'The Chisel. Represents the sculptor\'s tools.', data: { s: [[40,30], [45,50], [50,70]], l: [[0,1], [1,2]] } },
+                { id: 'cam', icon: '🦒', title: 'Camelopardalis', text: 'The Giraffe. A large but faint constellation representing the "camel-leopard".', data: { s: [[50,10], [30,40], [50,50], [40,80], [70,40]], l: [[0,1], [1,2], [2,3], [0,4]] } },
+                { id: 'cnc', icon: '♋', title: 'Cancer', text: 'The Crab. Sent by Hera to distract Hercules during his fight with the Hydra.', data: { s: [[50,50,4], [20,30], [80,30], [20,70], [80,70]], l: [[0,1], [0,2], [0,3], [0,4]] } },
+                { id: 'cvn', icon: '🐕', title: 'Canes Venatici', text: 'The Hunting Dogs. Asterion and Chara, held on a leash by Boötes.', data: { s: [[30,40], [70,60,4]], l: [[0,1]] } },
+                { id: 'cma', icon: '🐕', title: 'Canis Major', text: 'The Great Dog. Orion\'s larger hunting dog, chasing the Hare (Lepus).', data: { s: [[50,30,6], [60,35], [70,60], [60,80], [30,70], [40,50]], l: [[0,1], [1,2], [2,3], [0,5], [5,4]] } },
+                { id: 'cmi', icon: '🐕', title: 'Canis Minor', text: 'The Lesser Dog. Orion\'s smaller hunting dog.', data: { s: [[20,50], [80,50,5]], l: [[0,1]] } },
+                { id: 'cap', icon: '♑', title: 'Capricornus', text: 'The Sea Goat. Often associated with Pan, who jumped into the Nile to escape Typhon.', data: { s: [[10,20], [30,40], [50,50], [80,20], [50,80]], l: [[0,1], [1,2], [2,3], [2,4]] } },
+                { id: 'car', icon: '⛵', title: 'Carina', text: 'The Keel. Part of the ship Argo Navis used by Jason and the Argonauts.', data: { s: [[20,80,6], [30,60], [60,60], [80,50], [50,90]], l: [[0,1], [1,2], [2,3], [1,4]] } },
+                { id: 'cas', icon: '👑', title: 'Cassiopeia', text: 'The Queen. Vain queen of Aethiopia, punished to circle the pole star upside down.', data: { s: [[10,30], [30,60], [50,40,4], [70,60], [90,30]], l: [[0,1], [1,2], [2,3], [3,4]] } },
+                { id: 'cen', icon: '🐎', title: 'Centaurus', text: 'The Centaur. Often represents Chiron, the wise tutor of heroes.', data: { s: [[20,70,5], [40,60,5], [50,30], [70,30], [60,50], [80,50], [50,80]], l: [[0,1], [1,4], [2,3], [2,4], [3,5], [4,6], [5,6]] } },
+                { id: 'cep', icon: '👑', title: 'Cepheus', text: 'The King. King of Aethiopia, husband of Cassiopeia and father of Andromeda.', data: { s: [[50,10], [30,30], [70,30], [30,70], [70,70]], l: [[0,1], [0,2], [1,3], [2,4], [3,4]] } },
+                { id: 'cet', icon: '🐳', title: 'Cetus', text: 'The Sea Monster. Sent by Poseidon to devour Andromeda.', data: { s: [[10,30], [30,40], [60,30], [80,20], [90,40], [80,50], [60,40], [40,80]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [2,6], [1,7]] } },
+                { id: 'cha', icon: '🦎', title: 'Chamaeleon', text: 'The Chameleon. Introduced by Plancius in the 16th century.', data: { s: [[30,50], [40,30], [60,30], [70,50]], l: [[0,1], [1,2], [2,3]] } },
+                { id: 'cir', icon: '📐', title: 'Circinus', text: 'The Compass. Drafting tool used for drawing circles.', data: { s: [[50,20], [30,80], [70,80]], l: [[0,1], [0,2]] } },
+                { id: 'col', icon: '🕊️', title: 'Columba', text: 'The Dove. Noah\'s dove or the dove released by the Argonauts.', data: { s: [[20,30], [50,50], [80,30], [50,70]], l: [[0,1], [1,2], [1,3]] } },
+                { id: 'com', icon: '💇‍♀️', title: 'Coma Berenices', text: 'Berenice\'s Hair. Queen Berenice II sacrificed her hair for her husband\'s safe return.', data: { s: [[50,20], [50,50], [80,50]], l: [[0,1], [1,2]] } },
+                { id: 'cra', icon: '👑', title: 'Corona Australis', text: 'The Southern Crown. A wreath placed in the sky by Dionysus.', data: { s: [[20,60], [35,50], [50,45], [65,50], [80,60]], l: [[0,1], [1,2], [2,3], [3,4]] } },
+                { id: 'crb', icon: '👑', title: 'Corona Borealis', text: 'The Northern Crown. The crown of Ariadne, given by Dionysus.', data: { s: [[20,40], [35,50], [50,55,4], [65,50], [80,40]], l: [[0,1], [1,2], [2,3], [3,4]] } },
+                { id: 'crv', icon: '🐦', title: 'Corvus', text: 'The Crow. Sent by Apollo to fetch water, delayed by figs.', data: { s: [[30,30], [70,30], [20,70], [80,70]], l: [[0,1], [1,3], [3,2], [2,0]] } },
+                { id: 'crt', icon: '🏆', title: 'Crater', text: 'The Cup. The cup of Apollo.', data: { s: [[20,20], [80,20], [50,80], [35,50], [65,50]], l: [[0,3], [1,4], [3,2], [4,2], [3,4]] } },
+                { id: 'cru', icon: '✝️', title: 'Crux', text: 'The Southern Cross. Smallest constellation, vital for navigation.', data: { s: [[50,10], [50,90,5], [20,50], [80,40], [70,60]], l: [[0,1], [2,3]] } },
+                { id: 'cyg', icon: '🦢', title: 'Cygnus', text: 'The Swan. Often associated with Zeus in swan form or Orpheus.', data: { s: [[50,10,4], [50,50], [50,90], [10,50], [90,50]], l: [[0,1], [1,2], [3,1], [1,4]] } },
+                { id: 'del', icon: '🐬', title: 'Delphinus', text: 'The Dolphin. Saved the poet Arion or carried Amphitrite to Poseidon.', data: { s: [[40,20], [60,20], [70,40], [50,40], [30,40], [30,80]], l: [[0,1], [1,2], [2,3], [3,0], [3,4], [4,5]] } },
+                { id: 'dor', icon: '🐠', title: 'Dorado', text: 'The Dolphinfish (Mahi-mahi). Home of the Large Magellanic Cloud.', data: { s: [[50,20], [50,80], [30,50]], l: [[0,1], [1,2]] } },
+                { id: 'dra', icon: '🐉', title: 'Draco', text: 'The Dragon. Ladon, the dragon that guarded the golden apples.', data: { s: [[80,20], [70,30], [60,20], [50,40], [40,30], [30,60], [20,80], [10,70], [30,90]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,7], [6,8], [7,8]] } },
+                { id: 'equ', icon: '🐴', title: 'Equuleus', text: 'The Little Horse. Celeris, foal of Pegasus, or Cyllarus.', data: { s: [[40,40], [60,40], [50,60]], l: [[0,1], [1,2], [2,0]] } },
+                { id: 'eri', icon: '🌊', title: 'Eridanus', text: 'The River. The celestial river (Po/Nile/Euphrates).', data: { s: [[10,10], [30,20], [20,40], [40,50], [30,70], [80,90,5]], l: [[0,1], [1,2], [2,3], [3,4], [4,5]] } },
+                { id: 'for', icon: '🔥', title: 'Fornax', text: 'The Furnace. The chemical furnace.', data: { s: [[30,40], [70,50], [50,70]], l: [[0,1], [1,2]] } },
+                { id: 'gem', icon: '♊', title: 'Gemini', text: 'The Twins. Castor (mortal) and Pollux (immortal).', data: { s: [[30,20,4], [70,20,4], [30,80], [70,80], [30,50], [70,50]], l: [[0,4], [4,2], [1,5], [5,3], [0,1], [2,3]] } },
+                { id: 'gru', icon: '🦢', title: 'Grus', text: 'The Crane. Originally part of Piscis Austrinus.', data: { s: [[50,20,4], [30,40], [70,40], [50,80]], l: [[0,1], [0,2], [0,3]] } },
+                { id: 'her', icon: '💪', title: 'Hercules', text: 'The Hero. Greatest of Greek heroes, kneeling.', data: { s: [[30,30], [70,30], [30,60], [70,60], [20,80], [80,80]], l: [[0,1], [1,3], [3,2], [2,0], [2,4], [3,5]] } },
+                { id: 'hor', icon: '🕰️', title: 'Horologium', text: 'The Clock. Represents a pendulum clock.', data: { s: [[30,80], [50,50], [70,30]], l: [[0,1], [1,2]] } },
+                { id: 'hya', icon: '🐍', title: 'Hydra', text: 'The Water Snake. The multi-headed beast killed by Hercules.', data: { s: [[10,40], [30,45], [50,50], [70,55], [90,60]], l: [[0,1], [1,2], [2,3], [3,4]] } },
+                { id: 'hyi', icon: '🐍', title: 'Hydrus', text: 'The Male Water Snake.', data: { s: [[20,30], [50,50], [80,40]], l: [[0,1], [1,2]] } },
+                { id: 'ind', icon: '🏹', title: 'Indus', text: 'The Indian. Represents an indigenous person.', data: { s: [[40,30], [40,70], [60,50]], l: [[0,1], [0,2]] } },
+                { id: 'lac', icon: '🦎', title: 'Lacerta', text: 'The Lizard. A small zig-zag of stars.', data: { s: [[40,20], [50,40], [40,60], [50,80]], l: [[0,1], [1,2], [2,3]] } },
+                { id: 'leo', icon: '♌', title: 'Leo', text: 'The Lion. The Nemean Lion killed by Hercules.', data: { s: [[70,30], [60,20], [45,25], [40,40,5], [20,50], [30,70], [60,65]], l: [[0,1], [1,2], [2,3], [3,0], [3,6], [6,5], [5,4], [4,3]] } },
+                { id: 'lmi', icon: '🦁', title: 'Leo Minor', text: 'The Lesser Lion. Located between Leo and Ursa Major.', data: { s: [[30,50], [70,50], [50,30]], l: [[0,1], [1,2]] } },
+                { id: 'lep', icon: '🐰', title: 'Lepus', text: 'The Hare. Chased by Orion\'s dogs.', data: { s: [[30,40], [70,40], [30,70], [70,70], [50,55]], l: [[0,2], [1,3], [0,4], [1,4], [2,3]] } },
+                { id: 'lib', icon: '♎', title: 'Libra', text: 'The Scales. Scales of justice held by Astraea (Virgo).', data: { s: [[50,20], [20,50], [80,50], [50,80]], l: [[0,1], [0,2], [1,3], [2,3]] } },
+                { id: 'lup', icon: '🐺', title: 'Lupus', text: 'The Wolf. Sacrificed by Centaurus.', data: { s: [[30,30], [60,30], [40,60], [70,50], [50,80]], l: [[0,1], [0,2], [2,4], [1,3], [3,4]] } },
+                { id: 'lyn', icon: '🐈', title: 'Lynx', text: 'The Lynx. So faint you need lynx eyes to see it.', data: { s: [[10,20], [30,40], [50,30], [70,50], [90,40]], l: [[0,1], [1,2], [2,3], [3,4]] } },
+                { id: 'lyr', icon: '🎵', title: 'Lyra', text: 'The Harp. The lyre of Orpheus.', data: { s: [[50,15,5], [40,30], [60,30], [40,50], [60,50]], l: [[0,1], [0,2], [1,2], [1,3], [2,4], [3,4]] } },
+                { id: 'men', icon: '⛰️', title: 'Mensa', text: 'Table Mountain. Named after Table Mountain in South Africa.', data: { s: [[30,40], [70,40], [50,70]], l: [[0,1], [1,2], [2,0]] } },
+                { id: 'mic', icon: '🔬', title: 'Microscopium', text: 'The Microscope.', data: { s: [[40,30], [40,70], [60,70]], l: [[0,1], [1,2]] } },
+                { id: 'mon', icon: '🦄', title: 'Monoceros', text: 'The Unicorn. Faint constellation in the winter sky.', data: { s: [[20,50], [40,40], [60,50], [80,40]], l: [[0,1], [1,2], [2,3]] } },
+                { id: 'mus', icon: '🪰', title: 'Musca', text: 'The Fly. Originally Apis the Bee.', data: { s: [[30,40], [70,40], [40,70], [60,70]], l: [[0,2], [1,3], [2,3]] } },
+                { id: 'nor', icon: '📏', title: 'Norma', text: 'The Level. Carpenter\'s square.', data: { s: [[40,30], [40,70], [70,70]], l: [[0,1], [1,2]] } },
+                { id: 'oct', icon: '🧭', title: 'Octans', text: 'The Octant. Contains the South Celestial Pole.', data: { s: [[30,30], [70,50], [50,80]], l: [[0,1], [1,2], [2,0]] } },
+                { id: 'oph', icon: '⚕️', title: 'Ophiuchus', text: 'The Serpent Bearer. Asclepius, the healer.', data: { s: [[50,20], [30,50], [70,50], [40,80], [60,80]], l: [[0,1], [0,2], [1,3], [2,4], [3,4]] } },
+                { id: 'ori', icon: '🏹', title: 'Orion', text: 'The Hunter. A giant hunter placed in the stars.', data: { s: [[25,20,4], [75,25,4], [45,50], [50,50], [55,50], [30,80,4], [70,85,5]], l: [[0,2], [1,4], [2,3], [3,4], [2,5], [4,6]] } },
+                { id: 'pav', icon: '🦚', title: 'Pavo', text: 'The Peacock. Sacred bird of Hera.', data: { s: [[80,20,4], [60,40], [40,50], [20,80]], l: [[0,1], [1,2], [2,3]] } },
+                { id: 'peg', icon: '🐎', title: 'Pegasus', text: 'The Winged Horse. Born from Medusa\'s blood.', data: { s: [[30,30], [70,30], [70,70], [30,70], [85,20], [20,20]], l: [[0,1], [1,2], [2,3], [3,0], [1,4], [0,5]] } },
+                { id: 'per', icon: '⚔️', title: 'Perseus', text: 'The Hero. Slayer of Medusa and savior of Andromeda.', data: { s: [[50,20], [30,50], [50,50,4], [70,60], [40,80]], l: [[0,2], [1,2], [2,3], [2,4]] } },
+                { id: 'phe', icon: '🔥', title: 'Phoenix', text: 'The Firebird. Represents the mythical bird reborn from ashes.', data: { s: [[50,20], [20,50], [80,50], [40,80], [60,80]], l: [[0,1], [0,2], [1,3], [2,4], [3,4]] } },
+                { id: 'pic', icon: '🎨', title: 'Pictor', text: 'The Easel. Painter\'s easel.', data: { s: [[30,50], [70,50], [50,80]], l: [[0,2], [1,2]] } },
+                { id: 'psc', icon: '♓', title: 'Pisces', text: 'The Fishes. Aphrodite and Eros tied together.', data: { s: [[20,50], [40,70], [60,70], [80,30], [50,50]], l: [[0,4], [4,3], [0,1], [1,2], [2,3]] } },
+                { id: 'psa', icon: '🐟', title: 'Piscis Austrinus', text: 'The Southern Fish. Drinks water from Aquarius\'s jar.', data: { s: [[20,50], [50,30], [80,50,5], [50,70]], l: [[0,1], [1,2], [2,3], [3,0]] } },
+                { id: 'pup', icon: '🚢', title: 'Puppis', text: 'The Poop Deck. Stern of the Argo Navis.', data: { s: [[30,20], [50,50], [70,30], [50,80]], l: [[0,1], [1,2], [1,3]] } },
+                { id: 'pyx', icon: '🧭', title: 'Pyxis', text: 'The Compass Box. Mariner\'s compass of the Argo.', data: { s: [[40,30], [40,70], [60,50]], l: [[0,1], [0,2]] } },
+                { id: 'ret', icon: '🕸️', title: 'Reticulum', text: 'The Reticle. Represents the crosshairs in a telescope eyepiece.', data: { s: [[50,20], [20,50], [80,50], [50,80]], l: [[0,1], [1,3], [3,2], [2,0]] } },
+                { id: 'sge', icon: '🏹', title: 'Sagitta', text: 'The Arrow. Arrow of Hercules or Cupid.', data: { s: [[20,50], [70,50], [80,40], [80,60]], l: [[0,1], [1,2], [1,3]] } },
+                { id: 'sgr', icon: '♐', title: 'Sagittarius', text: 'The Archer. A centaur, usually Chiron or Crotus.', data: { s: [[30,40], [70,40], [20,70], [80,70], [50,20], [50,50], [40,60], [60,60]], l: [[0,6], [6,2], [6,7], [7,3], [7,1], [0,5], [1,5], [5,4]] } },
+                { id: 'sco', icon: '♏', title: 'Scorpius', text: 'The Scorpion. Sent to kill Orion.', data: { s: [[80,20], [70,25], [60,30,5], [50,40], [45,50], [40,60], [35,70], [40,80], [50,85], [60,80]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,7], [7,8], [8,9]] } },
+                { id: 'scl', icon: '🗿', title: 'Sculptor', text: 'The Sculptor. Sculptor\'s workshop.', data: { s: [[30,50], [70,50], [50,80]], l: [[0,1], [1,2]] } },
+                { id: 'sct', icon: '🛡️', title: 'Scutum', text: 'The Shield. Shield of Sobieski.', data: { s: [[30,40], [70,40], [50,70]], l: [[0,1], [1,2], [2,0]] } },
+                { id: 'ser', icon: '🐍', title: 'Serpens', text: 'The Serpent. Held by Ophiuchus.', data: { s: [[20,50], [40,40], [60,60], [80,50]], l: [[0,1], [1,2], [2,3]] } },
+                { id: 'sex', icon: '🔭', title: 'Sextans', text: 'The Sextant. Astronomical instrument.', data: { s: [[40,30], [60,50], [40,70]], l: [[0,1], [1,2]] } },
+                { id: 'tau', icon: '♉', title: 'Taurus', text: 'The Bull. Zeus in disguise carrying Europa.', data: { s: [[20,50], [35,60], [50,65,5], [60,45], [75,30], [80,35], [45,80]], l: [[0,1], [1,2], [2,3], [3,4], [3,5], [2,6]] } },
+                { id: 'tel', icon: '🔭', title: 'Telescopium', text: 'The Telescope.', data: { s: [[40,30], [40,80], [60,80]], l: [[0,1], [1,2]] } },
+                { id: 'tri', icon: '📐', title: 'Triangulum', text: 'The Triangle.', data: { s: [[30,40], [70,50], [50,70]], l: [[0,1], [1,2], [2,0]] } },
+                { id: 'tra', icon: '📐', title: 'Triangulum Australe', text: 'The Southern Triangle.', data: { s: [[50,20], [20,70], [80,70]], l: [[0,1], [1,2], [2,0]] } },
+                { id: 'tuc', icon: '🦜', title: 'Tucana', text: 'The Toucan.', data: { s: [[40,30], [60,50], [40,70]], l: [[0,1], [1,2]] } },
+                { id: 'uma', icon: '🐻', title: 'Ursa Major', text: 'The Great Bear. Callisto turned into a bear.', data: { s: [[10,30], [25,25], [35,35], [50,45], [75,45], [75,70], [50,70]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,3]] } },
+                { id: 'umi', icon: '🐻', title: 'Ursa Minor', text: 'The Little Bear. Arcas, son of Callisto.', data: { s: [[80,20,5], [70,30], [60,40], [50,45], [30,45], [25,60], [45,60]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,3]] } },
+                { id: 'vel', icon: '⛵', title: 'Vela', text: 'The Sails. Sails of the Argo Navis.', data: { s: [[30,30], [70,30], [50,60], [50,80]], l: [[0,1], [0,2], [1,2], [2,3]] } },
+                { id: 'vir', icon: '♍', title: 'Virgo', text: 'The Maiden. Associated with justice and harvest.', data: { s: [[50,50], [20,40], [80,40], [50,80,5], [35,30], [65,30], [50,20]], l: [[0,1], [0,2], [0,3], [1,4], [2,5], [4,6], [5,6]] } },
+                { id: 'vol', icon: '🐟', title: 'Volans', text: 'The Flying Fish.', data: { s: [[30,30], [70,30], [50,60]], l: [[0,1], [1,2], [2,0]] } },
+                { id: 'vul', icon: '🦊', title: 'Vulpecula', text: 'The Fox. The little fox with the goose.', data: { s: [[30,50], [70,50]], l: [[0,1]] } }
             ];
+
             const shuffleTracks = () => { const shuffled = [...MUSIC_POOL].sort(() => 0.5 - Math.random()); setCurrentTracks(shuffled.slice(0, 4)); };
-            const shuffleConstellations = () => { const shuffled = [...allConstellations].sort(() => 0.5 - Math.random()); setCurrentConstellations(shuffled.slice(0, 4)); };
+            const shuffleConstellations = () => { const shuffled = [...CONSTELLATIONS_DB].sort(() => 0.5 - Math.random()); setCurrentConstellations(shuffled.slice(0, 4)); };
+            
             useEffect(() => { shuffleTracks(); shuffleConstellations(); }, []);
-            return ( <div className="p-6 max-w-2xl mx-auto pb-24"> <h2 className="text-3xl font-serif text-center text-pink-200 mb-8 border-b border-slate-700 pb-4"> You as a Constellation </h2> <div className="bg-slate-800/50 rounded-xl p-4 mb-8 border border-slate-700 backdrop-blur-sm relative overflow-hidden group"> <div className="absolute top-0 right-0 p-2 opacity-50 group-hover:opacity-100 transition-opacity z-10"> <button onClick={shuffleTracks} className="p-2 bg-black/40 hover:bg-pink-500 rounded-full transition-colors" title="Shuffle Songs"> <RefreshCw size={16} className="text-white" /> </button> </div> <div className="flex items-center gap-4 mb-4"> <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-900 rounded-lg flex items-center justify-center animate-pulse"> <Music className="text-white w-8 h-8" /> </div> <div> <h3 className="text-white font-bold">Midnight Mixtape</h3> <p className="text-pink-400 text-sm">Music I listen to when I'm thinking of you</p> </div> </div> <div className="space-y-3"> {currentTracks.map((trackId, i) => ( <iframe key={i} style={{ borderRadius: '12px' }} src={`https://open.spotify.com/embed/track/${trackId}?utm_source=generator&theme=0`} width="100%" height="80" frameBorder="0" allowFullScreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" className="bg-slate-900" /> ))} </div> </div> <div className="flex justify-between items-center mb-4 px-2"> <h3 className="text-pink-200 font-bold text-lg">Star Map</h3> <button onClick={shuffleConstellations} className="p-2 bg-slate-800 hover:bg-pink-600/50 rounded-full transition-colors flex items-center gap-2 text-xs text-slate-400 hover:text-white"> <RefreshCw size={14} /> Shuffle Stars </button> </div> <div className="grid grid-cols-2 gap-4"> {currentConstellations.map((c) => ( <button key={c.id} onClick={() => setActiveConstellation(c)} className="p-4 bg-slate-800/80 rounded-xl border border-slate-700 hover:border-pink-500/50 transition-all hover:scale-105 text-left group"> <div className="text-3xl mb-2 group-hover:animate-bounce shadow-white drop-shadow-md">{c.icon}</div> <h3 className="text-pink-200 font-bold text-sm">{c.title}</h3> </button> ))} </div> {activeConstellation && ( <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4" onClick={() => setActiveConstellation(null)}> <div className="bg-slate-900 border border-pink-500 rounded-2xl p-6 max-w-sm w-full relative transform scale-100 transition-transform flex flex-col items-center"> <button className="absolute top-2 right-2 text-slate-500 hover:text-white z-10"><X size={20}/></button> <ConstellationIllustration title={activeConstellation.title} icon={activeConstellation.icon} data={activeConstellation.data} /> <h3 className="text-2xl font-serif font-bold text-pink-400 mb-2 text-center">{activeConstellation.title}</h3> <p className="text-slate-300 text-center leading-relaxed text-sm mb-4">{activeConstellation.text}</p> <div className="mt-2 text-center text-xs text-slate-600">Tap anywhere to close</div> </div> </div> )} </div> );
+            
+            return ( <div className="p-6 max-w-2xl mx-auto pb-24"> <h2 className="text-3xl font-serif text-center text-pink-200 mb-8 border-b border-slate-700 pb-4"> You as a Constellation </h2> <div className="bg-slate-800/50 rounded-xl p-4 mb-8 border border-slate-700 backdrop-blur-sm relative overflow-hidden group"> <div className="absolute top-0 right-0 p-2 opacity-50 group-hover:opacity-100 transition-opacity z-10"> <button onClick={shuffleTracks} className="p-2 bg-black/40 hover:bg-pink-500 rounded-full transition-colors" title="Shuffle Songs"> <RefreshCw size={16} className="text-white" /> </button> </div> <div className="flex items-center gap-4 mb-4"> <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-900 rounded-lg flex items-center justify-center animate-pulse"> <Music className="text-white w-8 h-8" /> </div> <div> <h3 className="text-white font-bold">Midnight Mixtape</h3> <p className="text-pink-400 text-sm">Music I listen to when I'm thinking of you</p> </div> </div> <div className="space-y-3"> {currentTracks.map((trackId, i) => ( <iframe key={i} style={{ borderRadius: '12px' }} src={`https://open.spotify.com/embed/track/${trackId}?utm_source=generator&theme=0`} width="100%" height="80" frameBorder="0" allowFullScreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" className="bg-slate-900" /> ))} </div> </div> <div className="flex justify-between items-center mb-4 px-2"> <h3 className="text-pink-200 font-bold text-lg">Star Map</h3> <button onClick={shuffleConstellations} className="p-2 bg-slate-800 hover:bg-pink-600/50 rounded-full transition-colors flex items-center gap-2 text-xs text-slate-400 hover:text-white"> <RefreshCw size={14} /> Shuffle Stars </button> </div> <div className="grid grid-cols-2 gap-4"> {currentConstellations.map((c) => ( <button key={c.id} onClick={() => setActiveConstellation(c)} className="p-4 bg-slate-800/80 rounded-xl border border-slate-700 hover:border-pink-500/50 transition-all hover:scale-105 text-left group"> <div className="text-3xl mb-2 group-hover:animate-bounce shadow-white drop-shadow-md">{c.icon}</div> <h3 className="text-pink-200 font-bold text-sm">{c.title}</h3> </button> ))} </div> {activeConstellation && ( <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4" onClick={() => setActiveConstellation(null)}> <div className="bg-slate-900 border border-pink-500 rounded-2xl p-6 max-w-sm w-full relative transform scale-100 transition-transform flex flex-col items-center"> <button className="absolute top-2 right-2 text-slate-500 hover:text-white z-10"><X size={20}/></button> <ConstellationIllustration title={activeConstellation.title} icon={activeConstellation.icon} data={expandData(activeConstellation.data)} /> <h3 className="text-2xl font-serif font-bold text-pink-400 mb-2 text-center">{activeConstellation.title}</h3> <p className="text-slate-300 text-center leading-relaxed text-sm mb-4">{activeConstellation.text}</p> <div className="mt-2 text-center text-xs text-slate-600">Tap anywhere to close</div> </div> </div> )} </div> );
         };
 
         const LoveLetter = () => {
@@ -2391,7 +2548,7 @@
                                 const itemDate = new Date(item.year, item.month, item.day);
                                 
                                 // Special Logic: P.S. is invisible until the date arrives
-                                if (item.title === "P.S." && itemDate > today) return null;
+                                if (item.title === "P.S. 2" && itemDate > today) return null;
 
                                 // Standard Logic: Future dates are visible but locked
                                 const isLocked = itemDate > today; 
@@ -2623,13 +2780,15 @@
                             <div className="bg-slate-900 border border-pink-500 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
                                 <button onClick={() => setShowChangelog(false)} className="absolute top-2 right-2 text-slate-500 hover:text-white"><X size={20}/></button>
                                 <h2 className="text-xl font-bold text-pink-400 mb-2">✨ Update Log</h2>
-                                <p className="text-xs text-slate-500 font-mono mb-4">Jan 02, 2026</p>
+                                <p className="text-xs text-slate-500 font-mono mb-4">Jan 05, 2026</p>
                                 <div className="text-left text-sm text-slate-300 space-y-2 mb-6 bg-slate-800/50 p-4 rounded-lg">
                                     <ul className="list-disc pl-4 space-y-1">
-                                        <li><b>Added:</b> Rock, paper, scissors in-game invite link</li>
+                                        <li><b>Updated:</b> Advent calendar stays 🗓️</li>
+                                        <li><b>Fixed:</b> Star shuffle ⭐️</li>
+                                        <li><b>Updated:</b> Playlist 🎵</li>
                                     </ul>
                                 </div>
-                                <button onClick={() => setShowChangelog(false)} className="w-full py-2 bg-pink-600 hover:bg-pink-500 text-white rounded-lg font-bold">Thx my bitch&lt;3</button>
+                                <button onClick={() => setShowChangelog(false)} className="w-full py-2 bg-pink-600 hover:bg-pink-500 text-white rounded-lg font-bold">Thx &lt;3</button>
                             </div>
                         </div>
                     )}
