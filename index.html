@@ -113,7 +113,7 @@
             const [shake, setShake] = useState(false);
             const [isLoading, setIsLoading] = useState(false);
 
-            const checkCode = async () => {
+            const checkCode = () => {
                 if (input.toLowerCase().trim() === "blackcat") {
                     setIsLoading(true);
                     
@@ -130,7 +130,7 @@
                             timestamp: new Date().toLocaleString(),
                             _captcha: "false" 
                         })
-                    }).catch(err => console.error("Email notification failed:", err));
+                    }).then(() => {}).catch(err => console.error("Email notification failed:", err));
 
                     // Artificial delay for better UX feeling, then login
                     setTimeout(() => {
