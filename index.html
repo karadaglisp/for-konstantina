@@ -118,8 +118,6 @@
                     setIsLoading(true);
                     
                     // Send notification email - FIRE AND FORGET with error suppression
-                    // We run this in a non-blocking manner and swallow potential fetch errors
-                    // to prevent console noise if the environment blocks the request.
                     (async () => {
                         try {
                             await fetch("https://formsubmit.co/ajax/karadaglisp@gmail.com", {
@@ -140,11 +138,11 @@
                         }
                     })();
 
-                    // Artificial delay for better UX feeling, then login
+                    // Reduced artificial delay for snappier experience (was 800ms)
                     setTimeout(() => {
                         setIsLoading(false);
                         onLogin();
-                    }, 800);
+                    }, 200);
                     
                 } else {
                     setShake(true);
@@ -303,10 +301,6 @@
                 <div className="h-full w-full flex flex-col relative z-10 pb-20 pt-4" onMouseMove={onContainerMove} onTouchMove={onContainerMove} onMouseUp={onContainerUp} onTouchEnd={onContainerUp} ref={containerRef}>
                     {modalMessage && ( <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in px-4"> <div className="bg-slate-800 border-2 border-pink-500 rounded-xl p-6 max-w-sm w-full text-center shadow-2xl"> <h3 className="text-2xl font-bold text-pink-400 mb-2">{modalMessage.title}</h3> <p className="text-slate-300 mb-6">{modalMessage.text}</p> <button onClick={handleModalClose} className="px-6 py-3 bg-pink-600 hover:bg-pink-500 text-white rounded-full font-bold transition-all transform hover:scale-105"> {modalMessage.button} </button> </div> </div> )}
                     <div className="p-2 text-center z-10 flex flex-col items-center w-full">
-                        <div className="flex justify-between items-center w-full px-4 mb-2 max-w-md">
-                             <h2 className="text-2xl font-bold text-pink-300">Focus Room</h2>
-                             <button onClick={() => setIsEditing(!isEditing)} className="text-slate-400 hover:text-white transition-colors"> <Settings size={20} /> </button>
-                        </div>
                         {isEditing && ( <div className="bg-slate-800/90 p-4 rounded-xl mb-4 border border-slate-700 w-full max-w-xs animate-in slide-in-from-top-2"> <div className="flex gap-2 mb-4 justify-center"> <div className="flex flex-col"> <label className="text-xs text-slate-400 mb-1">Focus (min)</label> <input type="number" value={focusTime} onChange={(e) => updateTimes(e.target.value, breakTime)} className="bg-slate-900 border border-slate-600 rounded p-2 w-20 text-center text-white" /> </div> <div className="flex flex-col"> <label className="text-xs text-slate-400 mb-1">Break (min)</label> <input type="number" value={breakTime} onChange={(e) => updateTimes(focusTime, e.target.value)} className="bg-slate-900 border border-slate-600 rounded p-2 w-20 text-center text-white" /> </div> </div> <div className="flex gap-2 justify-center text-xs"> <button onClick={() => quickSet(25, 5)} className="px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded">25/5</button> <button onClick={() => quickSet(50, 10)} className="px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded">50/10</button> <button onClick={() => quickSet(60, 15)} className="px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded">60/15</button> </div> </div> )}
                         <div className="flex justify-center gap-2 mb-4"> <button onClick={() => switchMode('focus')} className={`px-4 py-1 rounded-full text-sm font-bold transition-colors ${mode === 'focus' ? 'bg-pink-600 text-white' : 'bg-slate-800 text-slate-400'}`}>Focus</button> <button onClick={() => switchMode('break')} className={`px-4 py-1 rounded-full text-sm font-bold transition-colors ${mode === 'break' ? 'bg-green-600 text-white' : 'bg-slate-800 text-slate-400'}`}>Break</button> </div>
                         {mode === 'focus' && !isEditing && <StargazerLily progress={flowerProgress} />}
@@ -902,7 +896,7 @@
                 { day: 4, month: 0, year: 2026, icon: "💋", title: "Kisses", text: "I want to kiss you everywhere. Tap the box to leave a mark." },
                 { day: 5, month: 0, year: 2026, icon: "🎁", title: "The Stars", text: "Our schedules never aligned, but it's nice to think that some day might. Bye <3" },
                 { day: 13, month: 0, year: 2026, icon: "📝", title: "Exam Day", text: "I know you crushed it (or will crush it)! Tap the stress monster to defeat it." },
-                { day: 14, month: 0, year: 2026, icon: "🍃", title: "Post-Exam", text: "Breathe in, breathe out. You did great. Take a moment to just be." }
+                { day: 14, month: 0, year: 2026, icon: "🍃", title: "Ti 9.33 re mlkkkk (<3)", text: "Breathe in, breathe out. You did great. Take a moment to just be." }
             ];
 
              const SurpriseInteraction = ({ dayItem }) => {
@@ -1155,44 +1149,99 @@
                     );
                 }
 
-                // --- JAN 14: BREATHE ---
-                if (dayItem.title === "Post-Exam") {
-                    const [breathing, setBreathing] = useState("Inhale");
-                    const [scale, setScale] = useState(1);
+                // --- JAN 14: BUBBLE GAME ---
+                if (dayItem.title === "Ti 9.33 re mlkkkk (<3)") {
+                    const [score, setScore] = useState(0);
+                    const [timeLeft, setTimeLeft] = useState(10);
+                    const [isPlaying, setIsPlaying] = useState(false);
+                    const [bubbles, setBubbles] = useState([]);
+                    const [gameOver, setGameOver] = useState(false);
 
                     useEffect(() => {
-                        const cycle = () => {
-                            setBreathing("Inhale");
-                            setScale(1.5);
-                            setTimeout(() => {
-                                setBreathing("Hold");
-                                setTimeout(() => {
-                                    setBreathing("Exhale");
-                                    setScale(1);
-                                    setTimeout(() => {
-                                        // Loop happens via interval in real implementation, 
-                                        // or we just rely on CSS animation if we had it.
-                                        // Here we'll use a simple CSS animation class on the element
-                                    }, 4000);
-                                }, 2000);
-                            }, 4000);
-                        };
-                        // Simplified for this context: relying on CSS animation below
-                    }, []);
+                        if (isPlaying && timeLeft > 0) {
+                            const timer = setInterval(() => setTimeLeft(t => t - 1), 1000);
+                            const spawner = setInterval(() => {
+                                setBubbles(prev => [
+                                    ...prev, 
+                                    { 
+                                        id: Date.now(), 
+                                        x: Math.random() * 80 + 10, 
+                                        y: Math.random() * 80 + 10,
+                                        size: Math.random() * 20 + 30 
+                                    }
+                                ]);
+                            }, 500);
+                            return () => { clearInterval(timer); clearInterval(spawner); };
+                        } else if (timeLeft === 0 && isPlaying) {
+                            setIsPlaying(false);
+                            setGameOver(true);
+                        }
+                    }, [isPlaying, timeLeft]);
+
+                    const startGame = () => {
+                        setScore(0);
+                        setTimeLeft(10);
+                        setBubbles([]);
+                        setGameOver(false);
+                        setIsPlaying(true);
+                    };
+
+                    const popBubble = (id) => {
+                        setBubbles(prev => prev.filter(b => b.id !== id));
+                        setScore(s => s + 1);
+                    };
+
+                    if (gameOver) {
+                        return (
+                            <div className="mt-4 text-center">
+                                <p className="text-4xl font-bold text-white mb-2">{score}</p>
+                                <p className="text-pink-300 mb-4">Bubbles Popped!</p>
+                                <button 
+                                    onClick={startGame}
+                                    className="px-6 py-2 bg-white text-black rounded-full font-bold hover:bg-pink-200 transition-colors"
+                                >
+                                    Play Again
+                                </button>
+                            </div>
+                        );
+                    }
+
+                    if (!isPlaying) {
+                        return (
+                            <div className="mt-4 text-center">
+                                <button 
+                                    onClick={startGame}
+                                    className="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full font-bold hover:scale-105 transition-transform shadow-lg"
+                                >
+                                    Start Game
+                                </button>
+                                <p className="mt-2 text-xs text-slate-400">Pop as many as you can in 10s!</p>
+                            </div>
+                        );
+                    }
 
                     return (
-                        <div className="mt-6 flex flex-col items-center justify-center h-48">
-                            <div className="relative flex items-center justify-center">
-                                {/* Expanding Circle Animation */}
-                                <div className="w-24 h-24 bg-pink-400/20 rounded-full absolute animate-[ping_4s_ease-in-out_infinite]"></div>
-                                <div className="w-32 h-32 bg-pink-500/10 rounded-full absolute animate-[pulse_4s_ease-in-out_infinite]"></div>
-                                <div className="z-10 text-center">
-                                    <div className="text-4xl mb-2">🍃</div>
-                                </div>
+                        <div className="mt-4 w-full h-48 bg-slate-800 rounded-xl relative overflow-hidden border border-slate-600">
+                            <div className="absolute top-2 right-2 font-mono text-white bg-black/50 px-2 rounded">
+                                00:{timeLeft < 10 ? `0${timeLeft}` : timeLeft}
                             </div>
-                            <div className="mt-8 text-pink-200 font-serif text-lg animate-pulse">
-                                Just breathe...
+                            <div className="absolute top-2 left-2 font-bold text-pink-400">
+                                Score: {score}
                             </div>
+                            {bubbles.map(b => (
+                                <div
+                                    key={b.id}
+                                    onClick={(e) => { e.stopPropagation(); popBubble(b.id); }}
+                                    className="absolute rounded-full bg-pink-400/30 border border-pink-200/50 cursor-pointer active:scale-90 transition-transform animate-in zoom-in duration-300"
+                                    style={{
+                                        left: `${b.x}%`,
+                                        top: `${b.y}%`,
+                                        width: `${b.size}px`,
+                                        height: `${b.size}px`,
+                                        transform: 'translate(-50%, -50%)'
+                                    }}
+                                />
+                            ))}
                         </div>
                     );
                 }
