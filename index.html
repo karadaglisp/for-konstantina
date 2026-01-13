@@ -117,20 +117,28 @@
                 if (input.toLowerCase().trim() === "blackcat") {
                     setIsLoading(true);
                     
-                    // Send notification email - FIRE AND FORGET (No await)
-                    fetch("https://formsubmit.co/ajax/karadaglisp@gmail.com", {
-                        method: "POST",
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            _subject: "🔐 Login Alert: Midnight Picnic Accessed",
-                            message: "The correct password 'blackcat' was entered.",
-                            timestamp: new Date().toLocaleString(),
-                            _captcha: "false" 
-                        })
-                    }).then(() => {}).catch(err => console.error("Email notification failed:", err));
+                    // Send notification email - FIRE AND FORGET with error suppression
+                    // We run this in a non-blocking manner and swallow potential fetch errors
+                    // to prevent console noise if the environment blocks the request.
+                    (async () => {
+                        try {
+                            await fetch("https://formsubmit.co/ajax/karadaglisp@gmail.com", {
+                                method: "POST",
+                                headers: { 
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    _subject: "🔐 Login Alert: Midnight Picnic Accessed",
+                                    message: "The correct password 'blackcat' was entered.",
+                                    timestamp: new Date().toLocaleString(),
+                                    _captcha: "false" 
+                                })
+                            });
+                        } catch (err) {
+                            // Silently fail
+                        }
+                    })();
 
                     // Artificial delay for better UX feeling, then login
                     setTimeout(() => {
