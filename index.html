@@ -305,6 +305,7 @@
 
                  // Play song
                  if (audioRef.current) {
+                     audioRef.current.currentTime = 0; // Restart song from beginning
                      audioRef.current.play().catch(e => console.log("Audio play prevented:", e));
                  }
                  
@@ -376,10 +377,7 @@
                                  
                                  setTimeout(() => {
                                      // Reset State
-                                     if (audioRef.current) {
-                                         audioRef.current.pause();
-                                         audioRef.current.currentTime = 0;
-                                     }
+                                     // Audio keeps playing now
                                      setThought("");
                                      setIsReleased(false);
                                      setMessage("");
