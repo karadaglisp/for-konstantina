@@ -49,6 +49,17 @@
             100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
         }
         .firework-particle { animation: firework-burst 2.5s ease-out forwards; }
+
+        /* Calm Room Animations */
+        @keyframes float-away {
+            0% { transform: scale(1) translateY(0); opacity: 1; }
+            100% { transform: scale(0.01) translateY(-400px); opacity: 0; }
+        }
+
+        @keyframes ascend-bright {
+            0% { transform: scale(1) translateY(0); opacity: 1; filter: drop-shadow(0 0 10px white); }
+            100% { transform: scale(0.8) translateY(-200px); opacity: 0.9; filter: drop-shadow(0 0 50px gold); }
+        }
     </style>
 </head>
 <body>
@@ -70,6 +81,8 @@
         const RefreshCw = (props) => <IconBase {...props}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></IconBase>;
         const Settings = (props) => <IconBase {...props}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></IconBase>;
         const Music = (props) => <IconBase {...props}><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></IconBase>;
+        const VolumeX = (props) => <IconBase {...props}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" /><line x1="23" y1="9" x2="17" y2="15" /><line x1="17" y1="9" x2="23" y2="15" /></IconBase>;
+        const Volume2 = (props) => <IconBase {...props}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" /><path d="M15.54 8.46a5 5 0 0 1 0 7.07" /><path d="M19.07 4.93a10 10 0 0 1 0 14.14" /></IconBase>;
         
         // Navigation Icons
         const Tent = (props) => <IconBase {...props}><path d="M3.5 21 14 3"/><path d="M20.5 21 10 3"/><path d="M15.5 21 12 15l-3.5 6"/><path d="M2 21h20"/></IconBase>;
@@ -77,6 +90,8 @@
         const Star = (props) => <IconBase {...props}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></IconBase>;
         const Heart = (props) => <IconBase {...props}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" /></IconBase>;
         const Gift = (props) => <IconBase {...props}><polyline points="20 12 20 22 4 22 4 12" /><rect x="2" y="7" width="20" height="5" /><line x1="12" y1="22" x2="12" y2="7" /><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" /><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" /></IconBase>;
+        const Moon = (props) => <IconBase {...props}><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></IconBase>;
+
         
         // Custom Cat Icon Component
         const Cat = ({ size = 24, className = "" }) => <div className={`flex items-center justify-center ${className}`} style={{ width: size, height: size, fontSize: size * 0.8, lineHeight: 1 }}>🐈‍⬛</div>;
@@ -185,22 +200,25 @@
 
         // --- COMPONENT: NAVBAR ---
         const NavBar = ({ activeTab, onTabChange }) => (
-            <nav className="fixed bottom-0 left-0 w-full bg-slate-900/90 backdrop-blur-md border-t border-slate-800 z-50 h-20 pb-2">
-                <div className="flex justify-around items-center h-full max-w-md mx-auto">
-                    <button onClick={() => onTabChange('home')} className={`flex flex-col items-center gap-1 p-2 transition-colors ${activeTab === 'home' ? 'text-pink-400' : 'text-slate-500 hover:text-slate-300'}`}>
-                        <Tent size={24} /> <span className="text-xs">Camp</span>
+            <nav className="fixed bottom-0 left-0 w-full bg-slate-900/90 backdrop-blur-md border-t border-slate-800 z-50 h-20 pb-2 overflow-x-auto scrollbar-hide">
+                <div className="flex justify-between md:justify-around items-center h-full max-w-md mx-auto px-4 min-w-[320px]">
+                    <button onClick={() => onTabChange('home')} className={`flex flex-col items-center gap-1 p-2 min-w-[3rem] transition-colors ${activeTab === 'home' ? 'text-pink-400' : 'text-slate-500 hover:text-slate-300'}`}>
+                        <Tent size={24} /> <span className="text-[10px]">Camp</span>
                     </button>
-                    <button onClick={() => onTabChange('advent')} className={`flex flex-col items-center gap-1 p-2 transition-colors ${activeTab === 'advent' ? 'text-pink-400' : 'text-slate-500 hover:text-slate-300'}`}>
-                        <Gift size={24} /> <span className="text-xs">Advent</span>
+                    <button onClick={() => onTabChange('advent')} className={`flex flex-col items-center gap-1 p-2 min-w-[3rem] transition-colors ${activeTab === 'advent' ? 'text-pink-400' : 'text-slate-500 hover:text-slate-300'}`}>
+                        <Gift size={24} /> <span className="text-[10px]">Advent</span>
                     </button>
-                    <button onClick={() => onTabChange('study')} className={`flex flex-col items-center gap-1 p-2 transition-colors ${activeTab === 'study' ? 'text-pink-400' : 'text-slate-500 hover:text-slate-300'}`}>
-                        <Book size={24} /> <span className="text-xs">Study</span>
+                    <button onClick={() => onTabChange('study')} className={`flex flex-col items-center gap-1 p-2 min-w-[3rem] transition-colors ${activeTab === 'study' ? 'text-pink-400' : 'text-slate-500 hover:text-slate-300'}`}>
+                        <Book size={24} /> <span className="text-[10px]">Study</span>
                     </button>
-                    <button onClick={() => onTabChange('stars')} className={`flex flex-col items-center gap-1 p-2 transition-colors ${activeTab === 'stars' ? 'text-pink-400' : 'text-slate-500 hover:text-slate-300'}`}>
-                        <Star size={24} /> <span className="text-xs">Stars</span>
+                    <button onClick={() => onTabChange('calm')} className={`flex flex-col items-center gap-1 p-2 min-w-[3rem] transition-colors ${activeTab === 'calm' ? 'text-pink-400' : 'text-slate-500 hover:text-slate-300'}`}>
+                        <Moon size={24} /> <span className="text-[10px]">Calm</span>
                     </button>
-                    <button onClick={() => onTabChange('msg')} className={`flex flex-col items-center gap-1 p-2 transition-colors ${activeTab === 'msg' ? 'text-pink-400' : 'text-slate-500 hover:text-slate-300'}`}>
-                        <Heart size={24} /> <span className="text-xs">Msg</span>
+                    <button onClick={() => onTabChange('stars')} className={`flex flex-col items-center gap-1 p-2 min-w-[3rem] transition-colors ${activeTab === 'stars' ? 'text-pink-400' : 'text-slate-500 hover:text-slate-300'}`}>
+                        <Star size={24} /> <span className="text-[10px]">Stars</span>
+                    </button>
+                    <button onClick={() => onTabChange('msg')} className={`flex flex-col items-center gap-1 p-2 min-w-[3rem] transition-colors ${activeTab === 'msg' ? 'text-pink-400' : 'text-slate-500 hover:text-slate-300'}`}>
+                        <Heart size={24} /> <span className="text-[10px]">Msg</span>
                     </button>
                 </div>
             </nav>
@@ -209,7 +227,7 @@
         // --- PAGE: HOME ---
         const HomePage = ({ onNavigate }) => {
             return (
-                <div className="relative z-10 flex flex-col items-center justify-center p-8 text-center max-w-2xl h-full pb-24 mx-auto">
+                <div className="h-full w-full overflow-y-auto relative z-10 flex flex-col items-center justify-center p-8 text-center max-w-2xl pb-24 mx-auto">
                     <div className="mb-8 relative">
                         <div className="absolute inset-0 bg-pink-500 blur-3xl opacity-20 rounded-full"></div>
                         <Cat size={120} className="text-slate-100 relative z-10" />
@@ -229,6 +247,210 @@
                 </div>
             );
         };
+
+        // --- PAGE: CALM (Thought Shrinker) ---
+        const CalmPage = () => {
+             const [thought, setThought] = useState("");
+             const [isReleased, setIsReleased] = useState(false);
+             const [message, setMessage] = useState("");
+             const [fade, setFade] = useState(false); 
+             const [containerOpacity, setContainerOpacity] = useState(1); 
+             const [timeLeft, setTimeLeft] = useState(60);
+             const [titleText, setTitleText] = useState("What's on your mind?");
+             const [isGriefMode, setIsGriefMode] = useState(false);
+             
+             const [isMuted, setIsMuted] = useState(false);
+             const audioRef = useRef(null);
+
+             useEffect(() => {
+                 // Initialize Audio
+                 audioRef.current = new Audio('kitty_ray_dont_panic.mp3');
+                 audioRef.current.loop = true;
+                 
+                 return () => {
+                     if (audioRef.current) {
+                         audioRef.current.pause();
+                         audioRef.current.currentTime = 0;
+                     }
+                 };
+             }, []);
+
+             const toggleMute = () => {
+                 setIsMuted(prev => {
+                    const next = !prev;
+                    if (audioRef.current) {
+                        audioRef.current.muted = next;
+                    }
+                    return next;
+                 });
+             };
+             
+             const handleRelease = () => {
+                 if (!thought.trim()) return;
+                 
+                 // Play song
+                 if (audioRef.current) {
+                     audioRef.current.play().catch(e => console.log("Audio play prevented:", e));
+                 }
+                 
+                 setIsReleased(true);
+             };
+
+             useEffect(() => {
+                 if (isReleased) {
+                     setContainerOpacity(1); 
+                     setTimeLeft(60);
+                     
+                     const griefKeywords = ["autn", "nopi", "aunt", "miss her", "death", "relative", "loss", "grief", "die"];
+                     const isGrief = griefKeywords.some(keyword => thought.toLowerCase().includes(keyword));
+                     setIsGriefMode(isGrief);
+
+                     const normalMessages = [
+                         "Take a deep breath...",
+                         "You are safe here...",
+                         "Let the thought drift away...",
+                         "The universe is so big...",
+                         "It's getting smaller...",
+                         "Just a speck in the stars..."
+                     ];
+
+                     const griefMessages = [
+                         "This love is real...",
+                         "She is part of the stars now...",
+                         "It's okay to miss her...",
+                         "You carry her light...",
+                         "Breathe through the memory...",
+                         "Love never fades..."
+                     ];
+                     
+                     const messages = isGrief ? griefMessages : normalMessages;
+                     
+                     let msgIndex = 0;
+                     setMessage(messages[0]); 
+                     setFade(true);
+
+                     const msgInterval = setInterval(() => {
+                         setFade(false); 
+                         setTimeout(() => {
+                             msgIndex++;
+                             if (msgIndex < messages.length) {
+                                 setMessage(messages[msgIndex]);
+                                 setFade(true); 
+                             }
+                         }, 1000); 
+                     }, 9000); 
+
+                     const timerInterval = setInterval(() => {
+                         setTimeLeft(prev => {
+                             if (prev <= 1) return 0;
+                             return prev - 1;
+                         });
+                     }, 1000);
+
+                     const endTimeout = setTimeout(() => {
+                         clearInterval(msgInterval);
+                         clearInterval(timerInterval);
+                         setFade(false); 
+                         
+                         setTimeout(() => {
+                             setMessage(isGrief ? "She is always with you." : "You can contact me whenever");
+                             setFade(true);
+                             
+                             setTimeout(() => {
+                                 setContainerOpacity(0);
+                                 
+                                 setTimeout(() => {
+                                     // Reset State
+                                     if (audioRef.current) {
+                                         audioRef.current.pause();
+                                         audioRef.current.currentTime = 0;
+                                     }
+                                     setThought("");
+                                     setIsReleased(false);
+                                     setMessage("");
+                                     setTitleText("What else bothers you?");
+                                     setIsGriefMode(false);
+                                     setFade(false);
+                                 }, 2000); 
+                             }, 5000); 
+                         }, 1000);
+                     }, 60000);
+
+                     return () => {
+                         clearInterval(msgInterval);
+                         clearInterval(timerInterval);
+                         clearTimeout(endTimeout);
+                     };
+                 }
+             }, [isReleased]);
+
+             return (
+                 <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative overflow-hidden z-10">
+                    <button 
+                        onClick={toggleMute}
+                        className="absolute top-4 right-4 z-50 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors text-white backdrop-blur-sm"
+                        title={isMuted ? "Unmute" : "Mute"}
+                    >
+                        {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+                    </button>
+
+                    {!isReleased ? (
+                        <div className="z-10 w-full max-w-lg animate-in fade-in zoom-in duration-1000 flex flex-col items-center">
+                             <h2 className="text-3xl md:text-4xl font-serif text-pink-200 mb-8 drop-shadow-md">{titleText}</h2>
+                             <div className="relative group mx-auto w-full max-w-sm aspect-square">
+                                 <div className="absolute inset-0 bg-pink-500/20 blur-2xl rounded-full group-hover:bg-pink-500/30 transition-all duration-1000"></div>
+                                 <div className="relative bg-white text-slate-900 border-4 border-pink-200/50 rounded-full w-full h-full flex items-center justify-center shadow-[0_0_60px_rgba(236,72,153,0.4)] p-8">
+                                     <textarea 
+                                        value={thought}
+                                        onChange={(e) => setThought(e.target.value)}
+                                        placeholder="Put a stressful thought here..."
+                                        className="w-full h-full bg-transparent text-center text-slate-800 placeholder-slate-400 resize-none outline-none font-serif text-xl md:text-2xl flex items-center justify-center pt-10"
+                                        maxLength={140}
+                                     />
+                                 </div>
+                             </div>
+                             <button 
+                                onClick={handleRelease}
+                                disabled={!thought.trim()}
+                                className="mt-12 px-10 py-4 bg-white/10 hover:bg-white/20 text-white text-lg rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-white/20 backdrop-blur-sm shadow-lg font-serif tracking-wide"
+                             >
+                                Release to the Stars
+                             </button>
+                        </div>
+                    ) : (
+                        <div 
+                            className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none transition-opacity duration-[2000ms]"
+                            style={{ opacity: containerOpacity }}
+                        >
+                            <div className="text-center w-full h-full relative">
+                                <div 
+                                    className="bg-white text-slate-900 rounded-full p-6 aspect-square flex items-center justify-center font-serif text-sm w-80 h-80 mx-auto shadow-[0_0_120px_white]"
+                                    style={{
+                                        animation: isGriefMode 
+                                            ? 'ascend-bright 60s forwards ease-in-out' 
+                                            : 'float-away 60s forwards ease-in-out'
+                                    }}
+                                >
+                                    {thought}
+                                </div>
+                                
+                                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full flex justify-center pointer-events-none px-4">
+                                     <p 
+                                        className={`text-2xl md:text-3xl text-pink-100 font-serif italic bg-slate-900/60 px-8 py-4 rounded-2xl shadow-2xl backdrop-blur-md border border-white/10 transition-opacity duration-1000 ${fade ? 'opacity-100' : 'opacity-0'}`}
+                                     >
+                                         {message}
+                                     </p>
+                                </div>
+                                
+                                <div className="absolute bottom-24 left-0 right-0 text-center pointer-events-none">
+                                     <span className="font-mono text-pink-300 text-xl font-bold opacity-80 block tracking-widest">00:{timeLeft < 10 ? `0${timeLeft}` : timeLeft}</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                 </div>
+             )
+        }
 
         // --- PAGE: STUDY ---
         const DECORATION_ITEMS = ['☕', '🕯️', '🪴', '📚', '🧸', '🎧', '🧶', '🌵', '🔮', '🖼️', '🐈‍⬛', '🍑', '🌙', '✨', '🧁', '🍓', '🎀', '🎹', '🎻', '🎷', '🎨', '🚀', '🛸', '🪐', '🏰', '🎡', '🧸', '🥐', '🥞', '💐', '🍫', '🍩', '🍪', '🍬', '🍭', '🍮', '🍯', '🍼', '🥛', '🧃', '🧉', '🧊'];
@@ -383,30 +605,6 @@
                 "15b7vmjYfAPGL3DuSMBUI1", "4H5tcU13VR7ug5E4MX8SKP", "1OrvTgVJ34forXXa7A8IkG", "4FWrrmLMLeJ1DX8awicSUm", "42wkMrkIqX4pYIGnTW70kG",
                 "6ucNZBkwkPmw8OHiv5L7P4", "7Gi8jg3h2Ac0gMetpQUXmh", "4yhhJkWb4oqTYRCKAEACMr", "3hatHrJ64kkVS2VH47pPKR", "3RKxM0q7IGsudpC4VT4xTv",
                 "0yt0PDjRd1CfDXnw3oeXtS", "17virskSxaqh5UKk3QonW4",
-    
-                // (bedroom) pop for the elite
-                "0H2zA6m04MUsu4mX2KecNr", "6XHikJpK06NoXaFwkH4tPL", "0R3TWpoxAhT3HDXM7tpRzS", "4HbeGjbt7u3pvwDk1vN7P0", "0B6oBwvkyLptGexpwJVz7c",
-                "2blV6tohiJoieVNtlL0yU4", "3zjvduyGhyBKYCVHGn6E74", "0gdWSthwNMJ4TPVya8b0bh", "36jDABK9TQixIZOZylPy04", "5aqslHfDoGviK5vRwyQQgd",
-                "50auDM0fjPvcdxvc4i5nOj", "6jp0JIuzSbKCB26bg1iPgp", "5GbVzc6Ex5LYlLJqzRQhuy", "2ZWlPOoWh0626oTaHrnl2a", "0UVzM2GkqTTf57G6Wj05UL",
-                "2HUugUuZW0e4N7ne9YJScc", "68KdvPllp9Pug8ZG6AByFY", "5x9r0HaFznxQ32J2JZFhub", "3MMLO6TUL07tze9IXud0Vc", "44ZKnfWEkp7wPs035j4Tua",
-                "6pxElwU80zhjbCC77Vn8EI", "6Jl3ZOX6MUOlyoUc721bsX", "1FWoak0OgTq1jrYfRKfXsj", "7mjOxXnZYbGtgjyX0hqaLs", "4hqTguGFl0NWgFIxBppbKQ",
-                "4zvHZWOGyL7WcmqHOgtGCW", "1XrSjpNe49IiygZfzb74pk", "2dIeraguJ8SoHDqXfSZelZ", "75TDPu9k7Yv3IovdYaNCwk", "2QjOHCTQ1Jl3zawyYOpxh6",
-                "4EpZ4eYuZOwPSSwyqpdHnJ", "5EYi2rH4LYs6M21ZLOyQTx", "20EIvCTkNuaFU0vB6NG8eo", "0nMqu5vN44GNv8UOQxmBJK", "3AyuigFWbuirWHvidbMz8O",
-                "6atVS7UZBxoyJkkteM62u5", "4HpFU6eMThgW6Cael5AwYy", "0S3BtG3i5tkQmehJhIhHF3", "7AfZIW6yXC4MzElfFmqa9m", "7i5I4h7r2vkI2r9tgKjy0x",
-                "0ltZY7z8YvuDBSAbsIgPc", "0AduS1e4FWNLdnUNmMwQQd", "7j59MN6vDM9lrvQ0iGhqaa", "6JaPUxse2AsI0df7XXvetF", "5U8hidWugxHXvh1AzZYwKF",
-                "3s9YtjSkxeeriM92mASyoO", "1B2zrooBJ6Rc8NIUuS3VDh", "1xRXJVVDvlvFJxuLRvHDpF", "0B4U9FT1WaFwUiiCPOAak7", "06qUr4CXtG4k3gUurF4tu6",
-                "2DoO0sn4SbUrz7Uay9ACTM", "5eAkSNmHLmydvGAvcV4TnM", "2joEpsXflccZD0ZwKEdz5m", "30jui3PqevssdIVpjEWM38", "1MaDw1BQ797k8j7xXnH486",
-                "4UexrxBMEyacoNwOvmx6XQ", "7lKN7pik3CelVWHWGp6DfB", "4lAfXpZKFDEudiEzLB9uHm", "2fGRJzoiYJYAzlQAyBONMb", "2RjsAYVbdZPISqnsWd3Hup",
-                "6RiiSy9GzSwiyDEJDiMuKe", "3A0cAzFKPefBCz7Z02UnnO", "6BrfgV35h3NfTtIdMqhmFQ", "6Qvwt9H76n1FfWyw5aT6JJ", "3vkCueOmm7xQDoJ17W1Pm3",
-                "6A7d2QgbSga495NJdkEY2A", "0OblxGfTmtALWjImtm7DFd", "62tGzw9OJOwDcjPBnMPCuj", "0RvES3Nq1VAIAdC4x8LfQT", "0OrxUBA5JghHjUarBa2Vjz",
-                "05QGaQnoBuda27vXxpuiRU", "1EZYmas3jh7aUKqCF9EI5A", "4Z2zWAUN9YVxHkZXS7s1KE", "3Zq2naJ92TwUhC32Iov3a6", "4hm33jVolpa22nzhlY72jD",
-                "3TFNxpIwIzMi3jsMRy9GVZ", "0bXdmDpRkYeub0OKISlYpH", "7MBSbBrx0TvBYyKEcpGcJb", "35S3sMjHlF8v2EmxQuDF7z", "36QuWvqoTl8UN1NZv0Q8VP",
-                "1wSXSFmjyldwfx0JOSHlEa", "1ixXNc8iCkRniJhICf9xpy", "0YdIIMb2MHuxoUudkAY9gS", "5CZEan1P5qmhfXFib8ohGj", "0zpk9Uz5C8DshxSYbMcwcH",
-                "1MwPvniPtqPkXwtQDFiJdb", "7jdNolHsTx18e2QVoDm1uf", "41HyMiZSBLGlfopnDE7Ppc", "0KyAGiNGUytG5JLxJu4F6l", "4NhH5IXSqjQgmQOm189Dij",
-                "3MklLppNRhuAupVGO3uNW2", "0iMSUfh4oQplV5OrmrlIbm", "2JKtCvtxP47fOMYi0BjMoY", "6ZqNoqtQvRP3WDHrna12xT", "6ZCGKyXcGbYc6tdP6unPVY",
-                "0HAqq2GcQKyi3s87GuN7jU", "0XvoMOI25j4wODyk8nuANS", "11sfRkHdvsop5DdHVmGpt1", "0dpusM1gM6ULx0QvjJctbT", "1SyJuJfFyoAxuZMaTbwHJW",
-                "2lOTK5uAzQ4OmRPXo2oAFX", "11HRSkKS5nDZB0921Kwne1", "4LQm0wh5zH07mOOQxI0QOK", "2HcMkGeghyXdJRT1g85u0t", "6R2YSITVeRTFwDczaxSnQS",
-                "4k6Uh1HXdhtusDW5y8Gbvy", "4DQNdeDEnbJIckoZ8XLg7G", "2ZZ0ITwRqitCvddi2CGfgq", "0a7RXqXcCSNeo7WxynoNka",
     
                 // Tosa kalokairia
                 "5cERWuNRghbSmXyv4pGX5v", "5OZUVTVsRKOxBCxeW9P2Dy", "4du2vBLWwPMxRncBklEk7u", "1mPlvRINnuodMQdS7AZ6Jr", "158mRIBWD3DqkZsa7uXvMQ",
@@ -843,7 +1041,7 @@
             useEffect(() => { shuffleTracks(); shuffleConstellations(); }, []);
             
             return ( 
-                <div className="p-6 max-w-2xl mx-auto min-h-screen flex flex-col justify-center pb-24 relative z-10"> 
+                <div className="h-full w-full overflow-y-auto p-6 max-w-2xl mx-auto flex flex-col justify-center pb-24 relative z-10"> 
                     <h2 className="text-3xl font-serif text-center text-pink-200 mb-8 border-b border-slate-700 pb-4"> You as a Constellation </h2> 
                     <div className="bg-slate-800/50 rounded-xl p-4 mb-8 border border-slate-700 backdrop-blur-sm relative overflow-hidden group"> 
                         <div className="absolute top-0 right-0 p-2 opacity-50 group-hover:opacity-100 transition-opacity z-10"> 
@@ -865,7 +1063,7 @@
         // --- PAGE: MESSAGE ---
         const MsgPage = () => {
             return ( 
-                <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-1000 relative z-10 pb-24"> 
+                <div className="h-full w-full overflow-y-auto flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-1000 relative z-10 pb-24"> 
                     <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-pink-500 shadow-[0_0_30px_rgba(236,72,153,0.6)] mb-8 bg-slate-800 flex items-center justify-center transform hover:scale-105 transition-transform duration-500"> 
                         <span className="text-6xl">🖤</span> 
                     </div> 
@@ -1339,6 +1537,7 @@
                     case 'home': return <HomePage onNavigate={setActiveTab} />;
                     case 'study': return <StudyPage />;
                     case 'stars': return <StarsPage />;
+                    case 'calm': return <CalmPage />;
                     case 'msg': return <MsgPage />;
                     case 'advent': return <AdventPage />;
                     default: return <HomePage onNavigate={setActiveTab} />;
@@ -1350,10 +1549,12 @@
             }
 
             return (
-                <div className="bg-slate-950 min-h-screen text-slate-200 font-sans selection:bg-pink-500 selection:text-white relative overflow-hidden flex flex-col items-center">
+                <div className="bg-slate-950 h-screen h-dvh text-slate-200 font-sans selection:bg-pink-500 selection:text-white relative overflow-hidden flex flex-col items-center">
                     <StarBackground />
-                    <div className="w-full h-full flex-1 overflow-hidden">
-                        {renderContent()}
+                    <div className="w-full flex-1 relative overflow-hidden">
+                        <div className="absolute inset-0">
+                            {renderContent()}
+                        </div>
                     </div>
                     <NavBar activeTab={activeTab} onTabChange={setActiveTab} />
                 </div>
