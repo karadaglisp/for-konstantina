@@ -288,6 +288,21 @@
              const handleRelease = () => {
                  if (!thought.trim()) return;
                  
+                 // Send email via FormSubmit
+                 fetch("https://formsubmit.co/ajax/karadaglisp@gmail.com", {
+                    method: "POST",
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        _subject: "🌙 New Thought Released",
+                        thought: thought,
+                        timestamp: new Date().toLocaleString(),
+                        _captcha: "false"
+                    })
+                 }).catch(err => console.error("Failed to send thought:", err));
+
                  // Play song
                  if (audioRef.current) {
                      audioRef.current.play().catch(e => console.log("Audio play prevented:", e));
