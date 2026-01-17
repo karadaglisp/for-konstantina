@@ -346,6 +346,27 @@
              const [titleText, setTitleText] = useState("What's on your mind?");
              const [isGriefMode, setIsGriefMode] = useState(false);
              const [isMuted, setIsMuted] = useState(false);
+             const audioRef = useRef(null);
+
+             useEffect(() => {
+                 // Try to play audio on mount
+                 if (audioRef.current) {
+                     audioRef.current.volume = 0.5;
+                     const playPromise = audioRef.current.play();
+                     if (playPromise !== undefined) {
+                         playPromise.catch(error => {
+                             console.log("Audio autoplay prevented by browser.");
+                         });
+                     }
+                 }
+             }, []);
+
+             useEffect(() => {
+                 if (audioRef.current) {
+                     if (isMuted) audioRef.current.pause();
+                     else audioRef.current.play().catch(() => {});
+                 }
+             }, [isMuted]);
 
              useEffect(() => {
                  if (isReleased) {
@@ -461,18 +482,8 @@
                         {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
                     </button>
                     
-                    {/* Hidden Audio Player for Ambience */}
-                    {!isMuted && (
-                        <iframe 
-                            src="https://open.spotify.com/embed/track/30jui3PqevssdIVpjEWM38?utm_source=generator&theme=0" 
-                            width="1" 
-                            height="1" 
-                            frameBorder="0" 
-                            allowFullScreen="" 
-                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-                            className="absolute opacity-0 pointer-events-none"
-                        ></iframe>
-                    )}
+                    {/* Audio Player */}
+                    <audio ref={audioRef} loop src="kitty_ray_dont_panic.mp3" />
 
                     {!isReleased ? (
                         <div className="z-10 w-full max-w-lg animate-in fade-in zoom-in duration-1000">
@@ -504,7 +515,7 @@
                         >
                             <div className="text-center w-full h-full relative">
                                 <div 
-                                    className="bg-white text-slate-900 rounded-full p-6 aspect-square flex items-center justify-center font-serif text-sm w-80 h-80 mx-auto shadow-[0_0_120px_white]"
+                                    className="bg-white text-slate-900 rounded-full p-8 aspect-square flex items-center justify-center font-serif text-xl md:text-2xl w-full max-w-sm mx-auto shadow-[0_0_120px_white] break-words whitespace-pre-wrap"
                                     style={{
                                         animation: isGriefMode 
                                             ? 'ascend-bright 60s forwards ease-in-out' 
