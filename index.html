@@ -91,6 +91,7 @@
         const Heart = (props) => <IconBase {...props}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" /></IconBase>;
         const Gift = (props) => <IconBase {...props}><polyline points="20 12 20 22 4 22 4 12" /><rect x="2" y="7" width="20" height="5" /><line x1="12" y1="22" x2="12" y2="7" /><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" /><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" /></IconBase>;
         const Moon = (props) => <IconBase {...props}><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></IconBase>;
+        const PenTool = (props) => <IconBase {...props}><path d="m12 19 7-7 3 3-7 7-3-3z"/><path d="m18 13-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="m2 2 7.586 7.586"/><circle cx="11" cy="11" r="2"/></IconBase>;
 
         
         // Custom Cat Icon Component
@@ -216,6 +217,9 @@
                     </button>
                     <button onClick={() => onTabChange('stars')} className={`flex flex-col items-center gap-1 p-2 min-w-[3rem] transition-colors ${activeTab === 'stars' ? 'text-pink-400' : 'text-slate-500 hover:text-slate-300'}`}>
                         <Star size={24} /> <span className="text-[10px]">Stars</span>
+                    </button>
+                    <button onClick={() => onTabChange('feedback')} className={`flex flex-col items-center gap-1 p-2 min-w-[3rem] transition-colors ${activeTab === 'feedback' ? 'text-pink-400' : 'text-slate-500 hover:text-slate-300'}`}>
+                        <PenTool size={24} /> <span className="text-[10px]">Ideas</span>
                     </button>
                     <button onClick={() => onTabChange('msg')} className={`flex flex-col items-center gap-1 p-2 min-w-[3rem] transition-colors ${activeTab === 'msg' ? 'text-pink-400' : 'text-slate-500 hover:text-slate-300'}`}>
                         <Heart size={24} /> <span className="text-[10px]">Msg</span>
@@ -548,6 +552,113 @@
                         <div className="absolute bottom-2 left-0 right-0 text-center text-xs text-slate-500 pointer-events-none"> Drag items to decorate your space </div>
                         {decorations.map(deco => ( <div key={deco.id} className="absolute text-3xl cursor-grab active:cursor-grabbing hover:scale-125 transition-transform select-none" style={{ left: `${deco.x}%`, top: `${deco.y}%`, transform: 'translate(-50%, -50%)' }} onMouseDown={(e) => handlePointerDown(e, deco.id)} onTouchStart={(e) => handlePointerDown(e, deco.id)}> {deco.type === 'lily' ? ( <div style={{ width: '60px', height: '60px' }}> <StargazerLily progress={100} /> </div> ) : ( deco.content )} </div> ))}
                     </div>
+                </div>
+            );
+        };
+
+        // --- PAGE: FEEDBACK / IDEAS ---
+        const FeedbackPage = () => {
+            const [type, setType] = useState("feature");
+            const [text, setText] = useState("");
+            const [status, setStatus] = useState("idle"); // idle, sending, success, error
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                if (!text.trim()) return;
+
+                setStatus("sending");
+
+                try {
+                    await fetch("https://formsubmit.co/ajax/karadaglisp@gmail.com", {
+                        method: "POST",
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            _subject: `💡 New App Idea: ${type.toUpperCase()}`,
+                            category: type,
+                            message: text,
+                            timestamp: new Date().toLocaleString(),
+                            _captcha: "false"
+                        })
+                    });
+                    setStatus("success");
+                    setText("");
+                    setTimeout(() => setStatus("idle"), 3000);
+                } catch (err) {
+                    console.error(err);
+                    setStatus("error");
+                    setTimeout(() => setStatus("idle"), 3000);
+                }
+            };
+
+            const getTypeLabel = (t) => {
+                switch(t) {
+                    case 'feature': return 'New Feature';
+                    case 'improvement': return 'Bring back an old feature';
+                    case 'removal': return 'Remove This';
+                    case 'message': return 'Just a Msg';
+                    default: return t;
+                }
+            };
+
+            return (
+                <div className="h-full w-full overflow-y-auto p-6 flex flex-col items-center pt-10 pb-24 max-w-lg mx-auto relative z-10 animate-in fade-in">
+                    <div className="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center mb-6 shadow-inner border border-slate-700">
+                        <span className="text-4xl">💡</span>
+                    </div>
+                    <h2 className="text-3xl font-serif text-pink-200 mb-2 text-center">The Suggestion Box</h2>
+                    <p className="text-slate-400 text-sm mb-8 text-center max-w-xs">Tell me what you want, what you hate, or leave a note for the developer (me).</p>
+
+                    <form onSubmit={handleSubmit} className="w-full bg-slate-900/80 p-6 rounded-2xl border border-slate-700 backdrop-blur-sm shadow-xl">
+                        {/* Type Selection */}
+                        <label className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-3 block">Category</label>
+                        <div className="grid grid-cols-2 gap-2 mb-6">
+                            {['feature', 'improvement', 'removal', 'message'].map(t => (
+                                <button
+                                    key={t}
+                                    type="button"
+                                    onClick={() => setType(t)}
+                                    className={`p-3 rounded-lg text-xs font-bold uppercase tracking-wider border transition-all ${
+                                        type === t 
+                                        ? 'bg-pink-600 border-pink-500 text-white shadow-[0_0_15px_rgba(236,72,153,0.4)] scale-105' 
+                                        : 'bg-slate-800 border-slate-600 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
+                                    }`}
+                                >
+                                    {getTypeLabel(t)}
+                                </button>
+                            ))}
+                        </div>
+
+                        <label className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-2 block">Your Thoughts</label>
+                        <textarea
+                            value={text}
+                            onChange={e => setText(e.target.value)}
+                            placeholder="type here"
+                            className="w-full h-40 bg-slate-950 border border-slate-700 rounded-xl p-4 text-white placeholder-slate-600 outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-all mb-6 resize-none"
+                        />
+
+                        <button
+                            type="submit"
+                            disabled={status === 'sending' || !text.trim()}
+                            className={`w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all transform active:scale-95 shadow-lg ${
+                                status === 'success' ? 'bg-green-600 text-white' :
+                                status === 'error' ? 'bg-red-600 text-white' :
+                                'bg-gradient-to-r from-pink-600 to-purple-600 text-white hover:from-pink-500 hover:to-purple-500'
+                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                        >
+                            {status === 'sending' ? (
+                                <><span>Sending...</span></>
+                            ) : status === 'success' ? (
+                                <><span>Sent! 💌</span></>
+                            ) : status === 'error' ? (
+                                <><span>Error 😓 Try again</span></>
+                            ) : (
+                                <><span>Send Feedback</span><PenTool size={16} /></>
+                            )}
+                        </button>
+                    </form>
                 </div>
             );
         };
@@ -1551,6 +1662,7 @@
                     case 'study': return <StudyPage />;
                     case 'stars': return <StarsPage />;
                     case 'calm': return <CalmPage />;
+                    case 'feedback': return <FeedbackPage />;
                     case 'msg': return <MsgPage />;
                     case 'advent': return <AdventPage />;
                     default: return <HomePage onNavigate={setActiveTab} />;
