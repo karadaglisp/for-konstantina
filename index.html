@@ -1208,7 +1208,7 @@
 
         // --- PAGE: ADVENT ---
         const AdventPage = () => {
-             // Range: Dec 30, 2025 to Jan 14, 2026
+             // Range: Dec 30, 2025 to Jan 14, 2026 + Jan 19-24
             const ADVENT_DATA = [
                 { day: 30, month: 11, year: 2025, icon: "✨", title: "Manifest", text: "What do you want for the new year? Type it below and send it to the stars." },
                 { day: 31, month: 11, year: 2025, icon: "🥂", title: "NYE", text: "I wish I could drink tonight's wine from your mouth🙄. Happy new year<3 Tap the screen to celebrate!" },
@@ -1218,7 +1218,13 @@
                 { day: 4, month: 0, year: 2026, icon: "💋", title: "Kisses", text: "I want to kiss you everywhere. Tap the box to leave a mark." },
                 { day: 5, month: 0, year: 2026, icon: "🎁", title: "The Stars", text: "Our schedules never aligned, but it's nice to think that some day might. Bye <3" },
                 { day: 13, month: 0, year: 2026, icon: "📝", title: "Exam Day", text: "I know you crushed it (or will crush it)! Tap the stress monster to defeat it." },
-                { day: 14, month: 0, year: 2026, icon: "🍃", title: "Ti 9.33 re mlkkkk (<3)", text: "Breathe in, breathe out. You did great. Take a moment to just be." }
+                { day: 14, month: 0, year: 2026, icon: "🍃", title: "Ti 9.33 re mlkkkk (<3)", text: "Breathe in, breathe out. You did great. Take a moment to just be." },
+                { day: 19, month: 0, year: 2026, icon: "🔦", title: "Fireflies", text: "It's dark out. Catch the little lights." },
+                { day: 20, month: 0, year: 2026, icon: "🌌", title: "Stardust", text: "making something for you at the moment" },
+                { day: 21, month: 0, year: 2026, icon: "🌱", title: "Bloom", text: "Keep watering your mind like this seed. (nai, se eipa fyto)" },
+                { day: 22, month: 0, year: 2026, icon: "🎈", title: "Float", text: "Let things go. Pop the balloons before they fly away." },
+                { day: 23, month: 0, year: 2026, icon: "🎹", title: "Melody", text: "Make a little noise. It's okay to be loud." },
+                { day: 24, month: 0, year: 2026, icon: "🎨", title: "Pixels", text: "Draw something random. No rules." }
             ];
 
              const SurpriseInteraction = ({ dayItem }) => {
@@ -1437,8 +1443,6 @@
                     const hitMonster = () => {
                         if (health > 0) {
                             setHealth(h => h - 1);
-                            // Simple visual shake effect could be added here if we had more css, 
-                            // but react state update is enough for interactivity
                         }
                     };
 
@@ -1568,12 +1572,401 @@
                     );
                 }
 
+                // --- JAN 19: FIREFLIES ---
+                if (dayItem.title === "Fireflies") {
+                    const [fireflies, setFireflies] = useState([]);
+                    
+                    useEffect(() => {
+                        const count = 10;
+                        const initial = [];
+                        for(let i=0; i<count; i++) {
+                            initial.push({
+                                id: i,
+                                x: Math.random() * 100,
+                                y: Math.random() * 100,
+                                tx: Math.random() * 100,
+                                ty: Math.random() * 100,
+                                speed: 2 + Math.random() * 5
+                            });
+                        }
+                        setFireflies(initial);
+                        
+                        const interval = setInterval(() => {
+                            setFireflies(prev => prev.map(f => {
+                                // Simple drift movement logic towards target
+                                const dx = f.tx - f.x;
+                                const dy = f.ty - f.y;
+                                const dist = Math.sqrt(dx*dx + dy*dy);
+                                if (dist < 5) {
+                                    return { ...f, tx: Math.random() * 100, ty: Math.random() * 100 };
+                                }
+                                return {
+                                    ...f,
+                                    x: f.x + (dx / dist) * 0.5,
+                                    y: f.y + (dy / dist) * 0.5
+                                };
+                            }));
+                        }, 50);
+                        return () => clearInterval(interval);
+                    }, []);
+
+                    const catchFly = (id) => {
+                        setFireflies(prev => prev.filter(f => f.id !== id));
+                    };
+
+                    return (
+                        <div className="mt-4 w-full h-48 bg-slate-900 rounded-xl relative overflow-hidden border border-slate-700">
+                            {fireflies.length === 0 && <div className="absolute inset-0 flex items-center justify-center text-yellow-200 animate-pulse font-serif">All caught! ✨</div>}
+                            {fireflies.map(f => (
+                                <div 
+                                    key={f.id}
+                                    onClick={() => catchFly(f.id)}
+                                    className="absolute w-4 h-4 bg-yellow-300 rounded-full blur-[2px] cursor-pointer transition-transform duration-75 ease-linear shadow-[0_0_10px_gold]"
+                                    style={{ left: `${f.x}%`, top: `${f.y}%`, transform: 'translate(-50%, -50%)' }}
+                                />
+                            ))}
+                        </div>
+                    );
+                }
+
+                // --- JAN 20: STARDUST ---
+                if (dayItem.title === "Stardust") {
+                    // Ursa Major (0-6) and Bootes (7-12)
+                    const positions = [
+                        // Ursa Major
+                        {x: 15, y: 40}, {x: 23, y: 38}, {x: 30, y: 40}, // Handle
+                        {x: 38, y: 45}, {x: 38, y: 55}, {x: 50, y: 55}, {x: 50, y: 45}, // Bowl
+                        // Bootes
+                        {x: 70, y: 20}, {x: 62, y: 25}, {x: 78, y: 30}, // Top
+                        {x: 70, y: 50}, {x: 75, y: 75}, {x: 85, y: 70}  // Bottom (Arcturus is 75,75)
+                    ];
+                    
+                    const connections = [
+                        // Ursa Major
+                        [0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,3],
+                        // Bootes
+                        [7,8], [8,10], [10,11], [11,12], [10,9], [9,7]
+                    ];
+
+                    const [stars, setStars] = useState(Array(positions.length).fill(false));
+                    
+                    const toggleStar = (idx) => {
+                        const newStars = [...stars];
+                        newStars[idx] = !newStars[idx];
+                        setStars(newStars);
+                    };
+
+                    return (
+                        <div className="mt-4 w-full h-48 bg-slate-950 rounded-xl relative overflow-hidden border border-slate-700">
+                            <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                                {connections.map(([start, end], i) => (
+                                    <line 
+                                        key={i}
+                                        x1={`${positions[start].x}%`} 
+                                        y1={`${positions[start].y}%`} 
+                                        x2={`${positions[end].x}%`} 
+                                        y2={`${positions[end].y}%`} 
+                                        stroke="rgba(255,255,255,0.4)" 
+                                        strokeWidth="1.5" 
+                                        className="transition-opacity duration-500"
+                                        style={{ opacity: stars[start] && stars[end] ? 1 : 0 }}
+                                    />
+                                ))}
+                            </svg>
+                            {positions.map((p, i) => (
+                                <div 
+                                    key={i}
+                                    onClick={() => toggleStar(i)}
+                                    className={`absolute w-6 h-6 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 z-10`}
+                                    style={{ left: `${p.x}%`, top: `${p.y}%`, transform: 'translate(-50%, -50%)' }}
+                                >
+                                    <div className={`w-2 h-2 rounded-full transition-all duration-300 ${stars[i] ? 'bg-white shadow-[0_0_10px_white] scale-125' : 'bg-slate-600 hover:bg-slate-500'}`} />
+                                </div>
+                            ))}
+                        </div>
+                    );
+                }
+
+                // --- JAN 21: BLOOM ---
+                if (dayItem.title === "Bloom") {
+                    const [growth, setGrowth] = useState(0);
+                    const water = () => {
+                        setGrowth(g => Math.min(g + 10, 100));
+                    };
+
+                    return (
+                        <div className="mt-4 flex flex-col items-center">
+                            <div className="w-full h-40 relative flex items-end justify-center pb-4">
+                                <div className="absolute bottom-0 w-2 h-20 bg-green-800 rounded-full origin-bottom transition-all duration-1000" style={{ height: `${growth * 0.8}%`, opacity: growth > 0 ? 1 : 0 }}></div>
+                                {growth > 30 && <div className="absolute bottom-[30%] w-8 h-4 bg-green-600 rounded-full rounded-tr-none -translate-x-4"></div>}
+                                {growth > 60 && <div className="absolute bottom-[60%] w-8 h-4 bg-green-600 rounded-full rounded-tl-none translate-x-4"></div>}
+                                {growth === 100 && (
+                                    <div className="absolute bottom-[80%] text-6xl animate-in zoom-in duration-500">🌺</div>
+                                )}
+                                {growth < 100 && (
+                                    <button 
+                                        onClick={water}
+                                        className="absolute top-4 right-4 bg-blue-500/20 p-2 rounded-full hover:bg-blue-500/40 transition-colors"
+                                    >
+                                        💧
+                                    </button>
+                                )}
+                            </div>
+                            <div className="w-full bg-slate-800 h-2 rounded-full mt-2">
+                                <div className="bg-blue-500 h-full rounded-full transition-all duration-300" style={{ width: `${growth}%` }}></div>
+                            </div>
+                        </div>
+                    );
+                }
+
+                // --- JAN 22: FLOAT ---
+                if (dayItem.title === "Float") {
+                    const [balloons, setBalloons] = useState([]);
+                    const [popMessages, setPopMessages] = useState([]);
+                    const messages = ["You got this!", "So proud", "Breathe", "Doing great", "Keep going", "You're magic", "Stay cool", "Relax", "Stress free", "Good vibes", "You shine", "Keep floating"];
+                    
+                    useEffect(() => {
+                        const interval = setInterval(() => {
+                            if (Math.random() > 0.7) {
+                                setBalloons(prev => [
+                                    ...prev,
+                                    {
+                                        id: Date.now(),
+                                        x: Math.random() * 80 + 10,
+                                        bottom: -20,
+                                        color: ['#f472b6', '#c084fc', '#60a5fa'][Math.floor(Math.random() * 3)],
+                                        speed: 0.5 + Math.random() * 1
+                                    }
+                                ]);
+                            }
+                            setBalloons(prev => prev
+                                .map(b => ({ ...b, bottom: b.bottom + b.speed }))
+                                .filter(b => b.bottom < 120)
+                            );
+                        }, 50);
+                        return () => clearInterval(interval);
+                    }, []);
+
+                    const pop = (id, x, bottom) => {
+                        setBalloons(prev => prev.filter(b => b.id !== id));
+                        const text = messages[Math.floor(Math.random() * messages.length)];
+                        const msgId = Date.now();
+                        setPopMessages(prev => [...prev, { id: msgId, x, bottom, text }]);
+                        setTimeout(() => setPopMessages(prev => prev.filter(m => m.id !== msgId)), 1000);
+                    };
+
+                    return (
+                        <div className="mt-4 w-full h-48 bg-sky-900/30 rounded-xl relative overflow-hidden border border-slate-700">
+                            {balloons.map(b => (
+                                <div 
+                                    key={b.id}
+                                    onClick={() => pop(b.id, b.x, b.bottom)}
+                                    className="absolute w-8 h-10 rounded-full cursor-pointer opacity-90 hover:scale-110 transition-transform active:scale-90"
+                                    style={{ 
+                                        left: `${b.x}%`, 
+                                        bottom: `${b.bottom}%`,
+                                        backgroundColor: b.color,
+                                        boxShadow: 'inset -2px -2px 6px rgba(0,0,0,0.2)'
+                                    }}
+                                >
+                                    <div className="absolute bottom-[-10px] left-1/2 w-[1px] h-[10px] bg-white/50 -translate-x-1/2"></div>
+                                </div>
+                            ))}
+                            {popMessages.map(m => (
+                                <div 
+                                    key={m.id}
+                                    className="absolute text-xs font-bold text-white pointer-events-none animate-in zoom-in fade-out duration-1000 whitespace-nowrap"
+                                    style={{ 
+                                        left: `${m.x}%`, 
+                                        bottom: `${m.bottom}%`,
+                                        transform: 'translate(-50%, -50%)',
+                                        textShadow: '0 0 4px rgba(236, 72, 153, 0.8)'
+                                    }}
+                                >
+                                    {m.text}
+                                </div>
+                            ))}
+                        </div>
+                    );
+                }
+
+                // --- JAN 23: MELODY ---
+                if (dayItem.title === "Melody") {
+                    const [isSongMode, setIsSongMode] = useState(false);
+                    const songRef = useRef(null);
+
+                    const playNote = (freq) => {
+                        try {
+                            const AudioContext = window.AudioContext || window.webkitAudioContext;
+                            const ctx = new AudioContext();
+                            const osc = ctx.createOscillator();
+                            const gain = ctx.createGain();
+                            osc.connect(gain); gain.connect(ctx.destination);
+                            osc.type = 'sine'; 
+                            osc.frequency.setValueAtTime(freq, ctx.currentTime);
+                            gain.gain.setValueAtTime(0.2, ctx.currentTime); 
+                            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+                            osc.start(); osc.stop(ctx.currentTime + 0.5);
+                        } catch(e) {}
+                    };
+
+                    const playSong = (index) => {
+                        if (songRef.current) {
+                            songRef.current.pause();
+                            songRef.current.currentTime = 0;
+                        }
+                        const audio = new Audio(`${index + 1}.mp3`);
+                        songRef.current = audio;
+                        audio.play().catch(e => console.log("Audio play error", e));
+                    };
+
+                    const handlePress = (index, freq) => {
+                        if (isSongMode) {
+                            playSong(index);
+                        } else {
+                            playNote(freq);
+                        }
+                    };
+
+                    const notes = [
+                        { label: 'C', freq: 261.63, color: 'bg-red-500' },
+                        { label: 'D', freq: 293.66, color: 'bg-orange-500' },
+                        { label: 'E', freq: 329.63, color: 'bg-yellow-500' },
+                        { label: 'F', freq: 349.23, color: 'bg-green-500' },
+                        { label: 'G', freq: 392.00, color: 'bg-blue-500' },
+                    ];
+
+                    return (
+                        <div className="mt-4 flex flex-col items-center">
+                            <div className="flex bg-slate-800 p-1 rounded-full mb-4">
+                                <button 
+                                    onClick={() => setIsSongMode(false)}
+                                    className={`px-4 py-1 rounded-full text-xs font-bold transition-colors ${!isSongMode ? 'bg-pink-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+                                >
+                                    Notes
+                                </button>
+                                <button 
+                                    onClick={() => setIsSongMode(true)}
+                                    className={`px-4 py-1 rounded-full text-xs font-bold transition-colors ${isSongMode ? 'bg-purple-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+                                >
+                                    Songs
+                                </button>
+                            </div>
+
+                            <div className="flex gap-2 justify-center h-32 items-end">
+                                {notes.map((n, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => handlePress(i, n.freq)}
+                                        className={`w-10 rounded-t-xl transition-all active:h-24 hover:opacity-90 ${n.color}`}
+                                        style={{ height: `${40 + i * 10}%` }}
+                                    >
+                                        <span className="text-black/50 font-bold text-xs">{isSongMode ? i + 1 : n.label}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    );
+                }
+
+                // --- JAN 24: PIXELS ---
+                if (dayItem.title === "Pixels") {
+                    const [grid, setGrid] = useState(Array(64).fill('#1e293b')); // 8x8
+                    const colors = ['#1e293b', '#ef4444', '#f59e0b', '#22c55e', '#3b82f6', '#a855f7', '#ffffff'];
+                    const [activeColor, setActiveColor] = useState('#ffffff');
+                    const [isSending, setIsSending] = useState(false);
+                    const [isSent, setIsSent] = useState(false);
+
+                    const paint = (idx) => {
+                        const newGrid = [...grid];
+                        newGrid[idx] = activeColor;
+                        setGrid(newGrid);
+                    };
+
+                    const sendArt = async () => {
+                        setIsSending(true);
+                        try {
+                            // Convert colors to emojis for email preview
+                            const emojiMap = {
+                                '#1e293b': '⬛', 
+                                '#ef4444': '🟥', 
+                                '#f59e0b': '🟧', 
+                                '#22c55e': '🟩', 
+                                '#3b82f6': '🟦', 
+                                '#a855f7': '🟪', 
+                                '#ffffff': '⬜' 
+                            };
+                            
+                            let artString = "";
+                            for(let i=0; i<64; i++) {
+                                artString += emojiMap[grid[i]] || '❓';
+                                if ((i + 1) % 8 === 0) artString += "\n";
+                            }
+
+                            await fetch("https://formsubmit.co/ajax/karadaglisp@gmail.com", {
+                                method: "POST",
+                                headers: { 
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    _subject: "🎨 New Pixel Art from Midnight Picnic",
+                                    art_preview: artString,
+                                    timestamp: new Date().toLocaleString(),
+                                    _captcha: "false"
+                                })
+                            });
+                            setIsSent(true);
+                        } catch (e) {
+                            console.error(e);
+                        }
+                        setIsSending(false);
+                    };
+
+                    return (
+                        <div className="mt-4 flex flex-col items-center">
+                            <div className="grid grid-cols-8 gap-[1px] bg-slate-700 p-[1px] mb-4 shadow-xl">
+                                {grid.map((c, i) => (
+                                    <div 
+                                        key={i} 
+                                        onClick={() => paint(i)}
+                                        className="w-5 h-5 cursor-pointer hover:opacity-80"
+                                        style={{ backgroundColor: c }}
+                                    />
+                                ))}
+                            </div>
+                            <div className="flex gap-2 mb-6">
+                                {colors.map(c => (
+                                    <button 
+                                        key={c}
+                                        onClick={() => setActiveColor(c)}
+                                        className={`w-6 h-6 rounded-full border-2 shadow-sm ${activeColor === c ? 'border-white scale-110' : 'border-transparent'}`}
+                                        style={{ backgroundColor: c }}
+                                    />
+                                ))}
+                            </div>
+                            
+                            {isSent ? (
+                                <p className="text-green-400 font-bold text-sm animate-pulse">Art Sent! 🎨</p>
+                            ) : (
+                                <button 
+                                    onClick={sendArt}
+                                    disabled={isSending}
+                                    className="px-6 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-full transition-all flex items-center gap-2 border border-slate-600 shadow-lg disabled:opacity-50"
+                                >
+                                    {isSending ? "Sending..." : "Send Art"}
+                                </button>
+                            )}
+                        </div>
+                    );
+                }
+
                 return null;
             };
 
             const [selectedDay, setSelectedDay] = useState(null);
             
-            // Current date setup (Assuming app is viewed in 2026, all past dates are unlocked)
+            // Current date setup
             const now = new Date();
             const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
