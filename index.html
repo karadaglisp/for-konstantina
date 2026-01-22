@@ -1223,6 +1223,7 @@
                 { day: 20, month: 0, year: 2026, icon: "🌌", title: "Stardust", text: "making something for you at the moment" },
                 { day: 21, month: 0, year: 2026, icon: "🌱", title: "Bloom", text: "Keep watering your mind like this seed. (nai, se eipa fyto)" },
                 { day: 22, month: 0, year: 2026, icon: "🎈", title: "Float", text: "Let things go. Pop the balloons before they fly away." },
+                { day: 22, month: 0, year: 2026, icon: "🎭", title: "P.S.", text: "Hey, let me know about this.." },
                 { day: 23, month: 0, year: 2026, icon: "🎹", title: "Melody", text: "Make a little noise. It's okay to be loud." },
                 { day: 24, month: 0, year: 2026, icon: "🎨", title: "Pixels", text: "Draw something random. No rules." }
             ];
@@ -1233,6 +1234,93 @@
                 const [completed, setCompleted] = useState(false);
                 const [sending, setSending] = useState(false);
                 const [items, setItems] = useState([]);
+
+                // --- SPECIAL: P.S. INVITATION ---
+                if (dayItem.title === "P.S.") {
+                    const [status, setStatus] = useState('idle'); // idle, sending, sent
+                    const [noAttempts, setNoAttempts] = useState(0);
+                    const [responseMsg, setResponseMsg] = useState(null);
+
+                    const sendResponse = async (answer) => {
+                        setStatus('sending');
+                        try {
+                            await fetch("https://formsubmit.co/ajax/karadaglisp@gmail.com", {
+                                method: "POST",
+                                headers: { 
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    _subject: `🎭 Play Invitation Response: ${answer}`,
+                                    response: answer,
+                                    timestamp: new Date().toLocaleString(),
+                                    _captcha: "false"
+                                })
+                            });
+                            setStatus('sent');
+                            setResponseMsg(answer === "Yes" ? "Yay! <3 See you there!" : "Okay, some other time. Good luck with your test! <3");
+                        } catch (e) {
+                            console.error(e);
+                            setStatus('sent'); // Show success even if fetch fails to avoid awkwardness, or handle error better
+                            setResponseMsg(answer === "Yes" ? "Yay! <3 (Email might have failed but I know you said Yes)" : "Okay... Good luck!");
+                        }
+                    };
+
+                    const handleNo = () => {
+                        if (noAttempts === 0) {
+                            setNoAttempts(1);
+                        } else if (noAttempts === 1) {
+                            setNoAttempts(2);
+                        } else {
+                            sendResponse("No");
+                        }
+                    };
+
+                    if (status === 'sent') {
+                        return <div className="mt-8 text-pink-400 font-bold text-xl animate-bounce">{responseMsg}</div>;
+                    }
+
+                    if (status === 'sending') {
+                         return <div className="mt-8 text-slate-400 animate-pulse">Sending response... 🕊️</div>;
+                    }
+
+                    return (
+                        <div className="mt-4 flex flex-col gap-4 text-left bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                            <p className="text-sm text-slate-200 leading-relaxed font-sans">
+                                I have a double ticket for a play called <a href="https://www.more.com/gr-el/tickets/theater/don-zouan-thessaloniki/" target="_blank" className="text-pink-400 underline font-bold hover:text-pink-300">"Δον Ζουάν"</a> for tomorrow at 21:00 at Aristotelion.
+                            </p>
+                            <p className="text-sm text-slate-200 font-sans">
+                                Do you want to come with me? Let me know until tomorrow at 14:00.
+                            </p>
+                            <p className="text-center font-bold text-pink-300 mt-2 font-serif text-lg animate-pulse">
+                                GOOD LUCK WITH YOUR TEST
+                            </p>
+                            
+                            {noAttempts > 0 && (
+                                <div className="bg-red-500/20 border border-red-500/50 p-2 rounded text-center animate-bounce">
+                                    <p className="text-xs text-red-200 font-bold">
+                                        {noAttempts === 1 ? "I think you missclicked... 🤨" : "Are you suuure? The button on the left is nicer... 🥺"}
+                                    </p>
+                                </div>
+                            )}
+
+                            <div className="flex gap-4 justify-center mt-2">
+                                <button 
+                                    onClick={() => sendResponse("Yes")}
+                                    className="px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white rounded-xl font-bold shadow-lg transition-transform hover:scale-105 active:scale-95"
+                                >
+                                    Yes
+                                </button>
+                                <button 
+                                    onClick={handleNo}
+                                    className="px-8 py-3 bg-slate-700 hover:bg-red-500/80 text-white rounded-xl font-bold shadow-lg transition-transform hover:scale-105 active:scale-95"
+                                >
+                                    No
+                                </button>
+                            </div>
+                        </div>
+                    );
+                }
 
                 // --- DAY 30: MANIFEST ---
                 if (dayItem.title === "Manifest") {
