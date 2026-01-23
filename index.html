@@ -1288,10 +1288,9 @@
                         <div className="mt-4 flex flex-col gap-4 text-left bg-slate-800/50 p-4 rounded-xl border border-slate-700">
                             <p className="text-sm text-slate-200 leading-relaxed font-sans">
                                 I have a double ticket for a play called <a href="https://www.more.com/gr-el/tickets/theater/don-zouan-thessaloniki/" target="_blank" className="text-pink-400 underline font-bold hover:text-pink-300">"Δον Ζουάν"</a> for tomorrow at 21:00 at Aristotelion.
-
                             </p>
                             <p className="text-sm text-slate-200 font-sans">
-                                Do you want to come with me?
+                                Do you want to come with me? Let me know until tomorrow at 15:00.
                             </p>
                             <p className="text-center font-bold text-pink-300 mt-2 font-serif text-lg animate-pulse">
                                 GOOD LUCK WITH YOUR TEST
@@ -2074,7 +2073,10 @@
                                 const itemDate = new Date(item.year, item.month, item.day);
                                 const isLocked = itemDate > today; // Lock logic based on real date
                                 const isToday = itemDate.getTime() === today.getTime();
-                                const dateLabel = itemDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                                const isInvitation = item.title === "P.S.";
+                                
+                                let dateLabel = itemDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                                if (isInvitation) dateLabel = "💌 Invitation";
                                 
                                 return (
                                     <button
@@ -2085,7 +2087,7 @@
                                             aspect-square rounded-2xl flex flex-col items-center justify-center relative transition-all duration-300 border-2
                                             ${isLocked 
                                                 ? 'bg-slate-800/50 border-slate-700 text-slate-600' 
-                                                : isToday 
+                                                : (isToday || isInvitation)
                                                     ? 'bg-gradient-to-br from-pink-600 to-purple-600 text-white shadow-[0_0_20px_rgba(236,72,153,0.5)] scale-105 border-pink-400 animate-pulse' 
                                                     : 'bg-slate-700/80 border-slate-600 text-pink-200 hover:bg-slate-600 hover:border-pink-500/50 hover:scale-105'}
                                         `}
@@ -2132,11 +2134,112 @@
             const [isAuthenticated, setIsAuthenticated] = useState(false);
             const [activeTab, setActiveTab] = useState('home');
 
+            // --- ANALYTICS STATE ---
+            const sessionStartTime = useRef(Date.now());
+            const sessionLog = useRef([]);
+
             const handleLogin = () => {
-                // Removed session storage setting
-                // sessionStorage.setItem('midnight_auth', 'true');
+                // Reset timer on login
+                sessionStartTime.current = Date.now();
+                sessionLog.current = [`[${new Date().toLocaleTimeString()}] Session Started (Login)`];
                 setIsAuthenticated(true);
             };
+
+            // Helper to log activities
+            const logActivity = (activity) => {
+                const time = new Date().toLocaleTimeString();
+                sessionLog.current.push(`[${time}] ${activity}`);
+            };
+
+            // Track Navigation (Tabs)
+            useEffect(() => {
+                if (isAuthenticated) {
+                    logActivity(`Mapsd to: ${activeTab.toUpperCase()}`);
+                }
+            }, [activeTab, isAuthenticated]);
+
+            // Track Clicks (Global Listener)
+            useEffect(() => {
+                if (!isAuthenticated) return;
+
+                const handleClick = (e) => {
+                    // Try to identify what was clicked
+                    let target = e.target;
+                    let label = "";
+                    
+                    // Search up to 3 levels for a button or link
+                    for (let i = 0; i < 4; i++) {
+                        if (!target || target === document.body) break;
+                        
+                        // Check if it's a button, link, or has a click handler/aria-label
+                        if (target.tagName === 'BUTTON' || target.tagName === 'A' || target.getAttribute('role') === 'button') {
+                            // Prioritize specific text or labels
+                            label = target.innerText || target.getAttribute('aria-label') || target.getAttribute('title') || "Unknown Button";
+                            break;
+                        }
+                        target = target.parentElement;
+                    }
+                    
+                    if (label) {
+                        // Clean up label (remove newlines, shorten)
+                        const cleanLabel = label.replace(/\s+/g, ' ').trim().substring(0, 30);
+                        if (cleanLabel) logActivity(`Clicked: "${cleanLabel}"`);
+                    }
+                };
+
+                window.addEventListener('click', handleClick);
+                return () => window.removeEventListener('click', handleClick);
+            }, [isAuthenticated]);
+
+            // Send Report on Exit/Hide
+            useEffect(() => {
+                if (!isAuthenticated) return;
+
+                const sendReport = () => {
+                    // Don't send empty reports
+                    if (sessionLog.current.length === 0) return;
+
+                    const durationMins = ((Date.now() - sessionStartTime.current) / 1000 / 60).toFixed(2);
+                    
+                    const reportData = {
+                        _subject: `📊 User Activity Report (${durationMins}m)`,
+                        duration: `${durationMins} minutes`,
+                        activity_log: sessionLog.current.join('\n'),
+                        timestamp: new Date().toLocaleString(),
+                        _captcha: "false"
+                    };
+
+                    // Use keepalive: true to ensure the request is sent even if the page closes
+                    fetch("https://formsubmit.co/ajax/karadaglisp@gmail.com", {
+                        method: "POST",
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(reportData),
+                        keepalive: true
+                    }).catch(err => console.log("Report logging skipped:", err));
+                    
+                    // Clear log to avoid duplicates if she comes back to the same tab
+                    sessionLog.current = [];
+                };
+
+                const handleVisibilityChange = () => {
+                    // Sends report when switching tabs or minimizing browser (mobile)
+                    if (document.visibilityState === 'hidden') {
+                        sendReport();
+                    }
+                };
+
+                // Listeners for leaving the page
+                document.addEventListener('visibilitychange', handleVisibilityChange);
+                window.addEventListener('beforeunload', sendReport); // Desktop close
+
+                return () => {
+                    document.removeEventListener('visibilitychange', handleVisibilityChange);
+                    window.removeEventListener('beforeunload', sendReport);
+                };
+            }, [isAuthenticated]);
 
             const renderContent = () => {
                 switch(activeTab) {
