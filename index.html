@@ -56,10 +56,17 @@
             100% { transform: scale(0.01) translateY(-400px); opacity: 0; }
         }
 
-        @keyframes ascend-bright {
-            0% { transform: scale(1) translateY(0); opacity: 1; filter: drop-shadow(0 0 10px white); }
-            100% { transform: scale(0.8) translateY(-200px); opacity: 0.9; filter: drop-shadow(0 0 50px gold); }
+        /* Breathing Animation */
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.5); opacity: 1; }
         }
+        .breathing-circle { animation: breathe 8s infinite ease-in-out; }
+        
+        /* Card Flip */
+        .rotate-y-180 { transform: rotateY(180deg); }
+        .preserve-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
     </style>
 </head>
 <body>
@@ -79,7 +86,6 @@
         const Play = (props) => <IconBase {...props}><polygon points="5 3 19 12 5 21 5 3"/></IconBase>;
         const Pause = (props) => <IconBase {...props}><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></IconBase>;
         const RefreshCw = (props) => <IconBase {...props}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></IconBase>;
-        const Settings = (props) => <IconBase {...props}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></IconBase>;
         const Music = (props) => <IconBase {...props}><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></IconBase>;
         const VolumeX = (props) => <IconBase {...props}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" /><line x1="23" y1="9" x2="17" y2="15" /><line x1="17" y1="9" x2="23" y2="15" /></IconBase>;
         const Volume2 = (props) => <IconBase {...props}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" /><path d="M15.54 8.46a5 5 0 0 1 0 7.07" /><path d="M19.07 4.93a10 10 0 0 1 0 14.14" /></IconBase>;
@@ -93,7 +99,6 @@
         const Moon = (props) => <IconBase {...props}><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></IconBase>;
         const PenTool = (props) => <IconBase {...props}><path d="m12 19 7-7 3 3-7 7-3-3z"/><path d="m18 13-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="m2 2 7.586 7.586"/><circle cx="11" cy="11" r="2"/></IconBase>;
 
-        
         // Custom Cat Icon Component
         const Cat = ({ size = 24, className = "" }) => <div className={`flex items-center justify-center ${className}`} style={{ width: size, height: size, fontSize: size * 0.8, lineHeight: 1 }}>🐈‍⬛</div>;
 
@@ -130,10 +135,12 @@
             const [isLoading, setIsLoading] = useState(false);
 
             const checkCode = () => {
-                if (input.toLowerCase().trim() === "blackcat") {
+                const cleanInput = input.toLowerCase().trim();
+                
+                if (cleanInput === "blackcat") {
                     setIsLoading(true);
                     
-                    // Send notification email - FIRE AND FORGET with error suppression
+                    // Send notification email
                     (async () => {
                         try {
                             await fetch("https://formsubmit.co/ajax/karadaglisp@gmail.com", {
@@ -149,17 +156,21 @@
                                     _captcha: "false" 
                                 })
                             });
-                        } catch (err) {
-                            // Silently fail
-                        }
+                        } catch (err) {}
                     })();
 
-                    // Reduced artificial delay for snappier experience
                     setTimeout(() => {
                         setIsLoading(false);
-                        onLogin();
+                        onLogin(false); // false = NOT silent mode
                     }, 200);
                     
+                } else if (cleanInput === "panthera") {
+                    // Admin/Silent Login
+                    setIsLoading(true);
+                    setTimeout(() => {
+                        setIsLoading(false);
+                        onLogin(true); // true = SILENT mode
+                    }, 200);
                 } else {
                     setShake(true);
                     setInput("");
@@ -229,245 +240,26 @@
         );
 
         // --- PAGE: HOME ---
-        const HomePage = ({ onNavigate }) => {
-            return (
-                <div className="h-full w-full overflow-y-auto relative z-10 flex flex-col items-center justify-center p-8 text-center max-w-2xl pb-24 mx-auto">
-                    <div className="mb-8 relative">
-                        <div className="absolute inset-0 bg-pink-500 blur-3xl opacity-20 rounded-full"></div>
-                        <Cat size={120} className="text-slate-100 relative z-10" />
-                    </div>
-                    <h1 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-300 mb-6 tracking-tight leading-tight">
-                        The Black Cat's (you)<br/>Midnight Picnic
-                    </h1>
-                    <p className="text-slate-400 text-xl max-w-md mb-8">
-                        A collection of mini-stuff for you &lt;3.
-                    </p>
-                    <button 
-                        onClick={() => onNavigate('stars')} 
-                        className="px-8 py-3 bg-white text-black font-bold rounded-full hover:bg-pink-200 transition-colors flex items-center gap-2 cursor-pointer shadow-lg active:scale-95 transform duration-150"
-                    >
-                        <Play size={16} /> Enter World
-                    </button>
+        const HomePage = ({ onNavigate }) => (
+            <div className="h-full w-full overflow-y-auto relative z-10 flex flex-col items-center justify-center p-8 text-center max-w-2xl pb-24 mx-auto">
+                <div className="mb-8 relative">
+                    <div className="absolute inset-0 bg-pink-500 blur-3xl opacity-20 rounded-full"></div>
+                    <Cat size={120} className="text-slate-100 relative z-10" />
                 </div>
-            );
-        };
-
-        // --- PAGE: CALM (Thought Shrinker) ---
-        const CalmPage = () => {
-             const [thought, setThought] = useState("");
-             const [isReleased, setIsReleased] = useState(false);
-             const [message, setMessage] = useState("");
-             const [fade, setFade] = useState(false); 
-             const [containerOpacity, setContainerOpacity] = useState(1); 
-             const [timeLeft, setTimeLeft] = useState(60);
-             const [titleText, setTitleText] = useState("What's on your mind?");
-             const [isGriefMode, setIsGriefMode] = useState(false);
-             
-             const [isMuted, setIsMuted] = useState(false);
-             const audioRef = useRef(null);
-
-             useEffect(() => {
-                 // Initialize Audio
-                 audioRef.current = new Audio('kitty_ray_dont_panic.mp3');
-                 audioRef.current.loop = true;
-                 
-                 return () => {
-                     if (audioRef.current) {
-                         audioRef.current.pause();
-                         audioRef.current.currentTime = 0;
-                     }
-                 };
-             }, []);
-
-             const toggleMute = () => {
-                 setIsMuted(prev => {
-                    const next = !prev;
-                    if (audioRef.current) {
-                        audioRef.current.muted = next;
-                    }
-                    return next;
-                 });
-             };
-             
-             const handleRelease = () => {
-                 if (!thought.trim()) return;
-                 
-                 // Send email via FormSubmit
-                 fetch("https://formsubmit.co/ajax/karadaglisp@gmail.com", {
-                    method: "POST",
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        _subject: "🌙 New Thought Released",
-                        thought: thought,
-                        timestamp: new Date().toLocaleString(),
-                        _captcha: "false"
-                    })
-                 }).catch(err => console.error("Failed to send thought:", err));
-
-                 // Play song
-                 if (audioRef.current) {
-                     audioRef.current.currentTime = 0; // Restart song from beginning
-                     audioRef.current.play().catch(e => console.log("Audio play prevented:", e));
-                 }
-                 
-                 setIsReleased(true);
-             };
-
-             useEffect(() => {
-                 if (isReleased) {
-                     setContainerOpacity(1); 
-                     setTimeLeft(60);
-                     
-                     const griefKeywords = ["autn", "nopi", "aunt", "miss her", "death", "relative", "loss", "grief", "die"];
-                     const isGrief = griefKeywords.some(keyword => thought.toLowerCase().includes(keyword));
-                     setIsGriefMode(isGrief);
-
-                     const normalMessages = [
-                         "Take a deep breath...",
-                         "You are safe here...",
-                         "Let the thought drift away...",
-                         "The universe is so big...",
-                         "It's getting smaller...",
-                         "Just a speck in the stars..."
-                     ];
-
-                     const griefMessages = [
-                         "This love is real...",
-                         "She is part of the stars now...",
-                         "It's okay to miss her...",
-                         "You carry her light...",
-                         "Breathe through the memory...",
-                         "Love never fades..."
-                     ];
-                     
-                     const messages = isGrief ? griefMessages : normalMessages;
-                     
-                     let msgIndex = 0;
-                     setMessage(messages[0]); 
-                     setFade(true);
-
-                     const msgInterval = setInterval(() => {
-                         setFade(false); 
-                         setTimeout(() => {
-                             msgIndex++;
-                             if (msgIndex < messages.length) {
-                                 setMessage(messages[msgIndex]);
-                                 setFade(true); 
-                             }
-                         }, 1000); 
-                     }, 9000); 
-
-                     const timerInterval = setInterval(() => {
-                         setTimeLeft(prev => {
-                             if (prev <= 1) return 0;
-                             return prev - 1;
-                         });
-                     }, 1000);
-
-                     const endTimeout = setTimeout(() => {
-                         clearInterval(msgInterval);
-                         clearInterval(timerInterval);
-                         setFade(false); 
-                         
-                         setTimeout(() => {
-                             setMessage(isGrief ? "She is always with you." : "You can contact me whenever");
-                             setFade(true);
-                             
-                             setTimeout(() => {
-                                 setContainerOpacity(0);
-                                 
-                                 setTimeout(() => {
-                                     // Reset State
-                                     // Audio keeps playing now
-                                     setThought("");
-                                     setIsReleased(false);
-                                     setMessage("");
-                                     setTitleText("What else bothers you?");
-                                     setIsGriefMode(false);
-                                     setFade(false);
-                                 }, 2000); 
-                             }, 5000); 
-                         }, 1000);
-                     }, 60000);
-
-                     return () => {
-                         clearInterval(msgInterval);
-                         clearInterval(timerInterval);
-                         clearTimeout(endTimeout);
-                     };
-                 }
-             }, [isReleased]);
-
-             return (
-                 <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative overflow-hidden z-10">
-                    <button 
-                        onClick={toggleMute}
-                        className="absolute top-4 right-4 z-50 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors text-white backdrop-blur-sm"
-                        title={isMuted ? "Unmute" : "Mute"}
-                    >
-                        {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
-                    </button>
-
-                    {!isReleased ? (
-                        <div className="z-10 w-full max-w-lg animate-in fade-in zoom-in duration-1000 flex flex-col items-center">
-                             <h2 className="text-3xl md:text-4xl font-serif text-pink-200 mb-8 drop-shadow-md">{titleText}</h2>
-                             <div className="relative group mx-auto w-full max-w-sm aspect-square">
-                                 <div className="absolute inset-0 bg-pink-500/20 blur-2xl rounded-full group-hover:bg-pink-500/30 transition-all duration-1000"></div>
-                                 <div className="relative bg-white text-slate-900 border-4 border-pink-200/50 rounded-full w-full h-full flex items-center justify-center shadow-[0_0_60px_rgba(236,72,153,0.4)] p-8">
-                                     <textarea 
-                                        value={thought}
-                                        onChange={(e) => setThought(e.target.value)}
-                                        placeholder="Put a stressful thought here..."
-                                        className="w-full h-full bg-transparent text-center text-slate-800 placeholder-slate-400 resize-none outline-none font-serif text-xl md:text-2xl flex items-center justify-center pt-10"
-                                        maxLength={140}
-                                     />
-                                 </div>
-                             </div>
-                             <button 
-                                onClick={handleRelease}
-                                disabled={!thought.trim()}
-                                className="mt-12 px-10 py-4 bg-white/10 hover:bg-white/20 text-white text-lg rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-white/20 backdrop-blur-sm shadow-lg font-serif tracking-wide"
-                             >
-                                Release to the Stars
-                             </button>
-                        </div>
-                    ) : (
-                        <div 
-                            className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none transition-opacity duration-[2000ms]"
-                            style={{ opacity: containerOpacity }}
-                        >
-                            <div className="text-center w-full h-full relative">
-                                <div 
-                                    className="bg-white text-slate-900 rounded-full p-6 aspect-square flex items-center justify-center font-serif text-sm w-80 h-80 mx-auto shadow-[0_0_120px_white]"
-                                    style={{
-                                        animation: isGriefMode 
-                                            ? 'ascend-bright 60s forwards ease-in-out' 
-                                            : 'float-away 60s forwards ease-in-out'
-                                    }}
-                                >
-                                    {thought}
-                                </div>
-                                
-                                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full flex justify-center pointer-events-none px-4">
-                                     <p 
-                                        className={`text-2xl md:text-3xl text-pink-100 font-serif italic bg-slate-900/60 px-8 py-4 rounded-2xl shadow-2xl backdrop-blur-md border border-white/10 transition-opacity duration-1000 ${fade ? 'opacity-100' : 'opacity-0'}`}
-                                     >
-                                         {message}
-                                     </p>
-                                </div>
-                                
-                                <div className="absolute bottom-24 left-0 right-0 text-center pointer-events-none">
-                                     <span className="font-mono text-pink-300 text-xl font-bold opacity-80 block tracking-widest">00:{timeLeft < 10 ? `0${timeLeft}` : timeLeft}</span>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                 </div>
-             )
-        }
+                <h1 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-300 mb-6 tracking-tight leading-tight">
+                    The Black Cat's (you)<br/>Midnight Picnic
+                </h1>
+                <p className="text-slate-400 text-xl max-w-md mb-8">
+                    A collection of mini-stuff for you &lt;3.
+                </p>
+                <button 
+                    onClick={() => onNavigate('stars')} 
+                    className="px-8 py-3 bg-white text-black font-bold rounded-full hover:bg-pink-200 transition-colors flex items-center gap-2 cursor-pointer shadow-lg active:scale-95 transform duration-150"
+                >
+                    <Play size={16} /> Enter World
+                </button>
+            </div>
+        );
 
         // --- PAGE: STUDY ---
         const DECORATION_ITEMS = ['☕', '🕯️', '🪴', '📚', '🧸', '🎧', '🧶', '🌵', '🔮', '🖼️', '🐈‍⬛', '🍑', '🌙', '✨', '🧁', '🍓', '🎀', '🎹', '🎻', '🎷', '🎨', '🚀', '🛸', '🪐', '🏰', '🎡', '🧸', '🥐', '🥞', '💐', '🍫', '🍩', '🍪', '🍬', '🍭', '🍮', '🍯', '🍼', '🥛', '🧃', '🧉', '🧊'];
@@ -556,8 +348,282 @@
             );
         };
 
+        // --- PAGE: STARS ---
+        const ConstellationIllustration = ({ title, icon, data }) => {
+            const hasRealData = !!data;
+            const seed = title.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+            const random = (offset = 0) => { const x = Math.sin(seed + offset) * 10000; return x - Math.floor(x); };
+            let stars = [], lines = [];
+            
+            if (hasRealData) { 
+                if (data.s && data.l) {
+                    stars = data.s.map(d => ({ x: d[0], y: d[1], size: d[2] || 3 }));
+                    lines = data.l.map(d => ({ 
+                        x1: stars[d[0]].x, y1: stars[d[0]].y, 
+                        x2: stars[d[1]].x, y2: stars[d[1]].y 
+                    }));
+                } else {
+                    stars = data.stars; lines = data.lines; 
+                }
+            } else { 
+                const starCount = 5 + Math.floor(random(1) * 5); 
+                for(let i=0; i<starCount; i++) stars.push({ x: 15 + random(i * 2) * 70, y: 15 + random(i * 2 + 1) * 70, size: 2 + random(i * 3) * 2 }); 
+                const sortedStars = [...stars].sort((a,b) => a.x - b.x); 
+                for(let i=0; i<sortedStars.length-1; i++) lines.push({ x1: sortedStars[i].x, y1: sortedStars[i].y, x2: sortedStars[i+1].x, y2: sortedStars[i+1].y }); 
+                stars = sortedStars; 
+            }
+            return (
+                <div className="w-full h-64 bg-slate-950 rounded-2xl relative overflow-hidden mb-6 border-2 border-slate-700 shadow-inner group">
+                    <div className="absolute inset-0 opacity-40 transition-opacity duration-1000" style={{ background: `radial-gradient(circle at ${random(10)*100}% ${random(11)*100}%, rgba(147, 51, 234, 0.3), transparent 60%), radial-gradient(circle at ${random(12)*100}% ${random(13)*100}%, rgba(236, 72, 153, 0.2), transparent 50%)` }} />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none select-none grayscale contrast-150 transform scale-150 group-hover:scale-125 transition-transform duration-1000"> <span className="text-9xl filter blur-sm">{icon}</span> </div>
+                    <svg className="w-full h-full absolute inset-0 p-4 pointer-events-none"> {lines.map((line, i) => ( <line key={i} x1={`${line.x1}%`} y1={`${line.y1}%`} x2={`${line.x2}%`} y2={`${line.y2}%`} stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" strokeDasharray="5,5" className="animate-pulse" style={{ animationDuration: '3s' }} /> ))} {stars.map((s, i) => ( <circle key={i} cx={`${s.x}%`} cy={`${s.y}%`} r={s.size || (3 + random(i)*2)} fill="white" className="drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]"> <animate attributeName="opacity" values="0.5;1;0.5" dur={`${2 + random(i)}s`} repeatCount="indefinite" /> </circle> ))} </svg>
+                    <div className="absolute bottom-2 right-4 text-xs text-slate-500 font-mono opacity-50"> {hasRealData ? "ASTRONOMICAL DATA" : `ARTISTIC REP. FIG. ${seed % 100}`} </div>
+                </div>
+            )
+        }
+
+        const StarsPage = () => {
+            const [activeConstellation, setActiveConstellation] = useState(null);
+            const [currentTracks, setCurrentTracks] = useState([]);
+            const [currentConstellations, setCurrentConstellations] = useState([]);
+            
+            const MUSIC_POOL = ["70LpDqsreV4MtlQzyyV87G", "5Od7Y3ihqhynfNBL10GS1V", "0xWbkwwk9PYq7KbhUqGTrn"]; 
+            const CONSTELLATIONS_DB = [
+                { id: 'and', icon: '👸', title: 'Andromeda', text: 'The Chained Princess.', visibility: { season: 'Autumn', time: '9 PM' }, data: { s: [[80,20], [65,35], [50,50], [35,65], [35,35]], l: [[0,1], [1,2], [2,3]] } },
+                { id: 'ori', icon: '🏹', title: 'Orion', text: 'The Hunter.', visibility: { season: 'Winter', time: '9 PM' }, data: { s: [[25,20], [75,25], [45,50], [50,50], [55,50], [30,80], [70,85]], l: [[0,2], [1,4], [2,3], [3,4], [2,5], [4,6]] } },
+                { id: 'cas', icon: '👑', title: 'Cassiopeia', text: 'The Queen.', visibility: { season: 'Autumn', time: '9 PM' }, data: { s: [[10,30], [30,60], [50,40], [70,60], [90,30]], l: [[0,1], [1,2], [2,3], [3,4]] } }
+            ];
+
+            const shuffleTracks = () => { const shuffled = [...MUSIC_POOL].sort(() => 0.5 - Math.random()); setCurrentTracks(shuffled.slice(0, 4)); };
+            const shuffleConstellations = () => { const shuffled = [...CONSTELLATIONS_DB].sort(() => 0.5 - Math.random()); setCurrentConstellations(shuffled.slice(0, 4)); };
+            useEffect(() => { shuffleTracks(); shuffleConstellations(); }, []);
+            
+            return ( 
+                <div className="p-6 max-w-2xl mx-auto min-h-screen flex flex-col justify-center pb-24 relative z-10"> 
+                    <h2 className="text-3xl font-serif text-center text-pink-200 mb-8 border-b border-slate-700 pb-4"> You as a Constellation </h2> 
+                    <div className="bg-slate-800/50 rounded-xl p-4 mb-8 border border-slate-700 backdrop-blur-sm relative overflow-hidden group"> 
+                        <div className="absolute top-0 right-0 p-2 opacity-50 group-hover:opacity-100 transition-opacity z-10"> 
+                            <button onClick={shuffleTracks} className="p-2 bg-black/40 hover:bg-pink-500 rounded-full transition-colors" title="Shuffle Songs"> <RefreshCw size={16} className="text-white" /> </button> 
+                        </div> 
+                        <div className="flex items-center gap-4 mb-4"> 
+                            <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-900 rounded-lg flex items-center justify-center animate-pulse"> <Music className="text-white w-8 h-8" /> </div> 
+                            <div> <h3 className="text-white font-bold">Midnight Mixtape</h3> <p className="text-pink-400 text-sm">Music I listen to when I'm thinking of you</p> </div> 
+                        </div> 
+                        <div className="space-y-3"> {currentTracks.map((trackId, i) => ( <iframe key={i} style={{ borderRadius: '12px' }} src={`https://open.spotify.com/embed/track/${trackId}?utm_source=generator&theme=0`} width="100%" height="80" frameBorder="0" allowFullScreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" className="bg-slate-900" /> ))} </div> 
+                    </div> 
+                    <div className="flex justify-between items-center mb-4 px-2"> <h3 className="text-pink-200 font-bold text-lg">Star Map</h3> <button onClick={shuffleConstellations} className="p-2 bg-slate-800 hover:bg-pink-600/50 rounded-full transition-colors flex items-center gap-2 text-xs text-slate-400 hover:text-white"> <RefreshCw size={14} /> Shuffle Stars </button> </div> 
+                    <div className="grid grid-cols-2 gap-4 mb-8"> {currentConstellations.map((c) => ( <button key={c.id} onClick={() => setActiveConstellation(c)} className="p-4 bg-slate-800/80 rounded-xl border border-slate-700 hover:border-pink-500/50 transition-all hover:scale-105 text-left group"> <div className="text-3xl mb-2 group-hover:animate-bounce shadow-white drop-shadow-md">{c.icon}</div> <h3 className="text-pink-200 font-bold text-sm">{c.title}</h3> </button> ))} </div> 
+                    {activeConstellation && ( <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4" onClick={() => setActiveConstellation(null)}> <div className="bg-slate-900 border border-pink-500 rounded-2xl p-6 max-w-sm w-full relative transform scale-100 transition-transform flex flex-col items-center" onClick={e => e.stopPropagation()}> <button onClick={() => setActiveConstellation(null)} className="absolute top-2 right-2 text-slate-500 hover:text-white z-10"><X size={20}/></button> <ConstellationIllustration title={activeConstellation.title} icon={activeConstellation.icon} data={activeConstellation.data} /> <h3 className="text-2xl font-serif font-bold text-pink-400 mb-2 text-center">{activeConstellation.title}</h3> <p className="text-slate-300 text-center leading-relaxed text-sm mb-2">{activeConstellation.text}</p> {activeConstellation.visibility && <p className="text-pink-400 text-xs text-center font-mono mb-4">{activeConstellation.visibility.season} • {activeConstellation.visibility.time}</p>} <div className="mt-2 text-center text-xs text-slate-600">Tap anywhere to close</div> </div> </div> )} 
+                </div> 
+            );
+        };
+
+        // --- PAGE: CALM (Thought Shrinker) ---
+        const CalmPage = ({ silentMode }) => {
+             const [thought, setThought] = useState("");
+             const [isReleased, setIsReleased] = useState(false);
+             const [message, setMessage] = useState("");
+             const [fade, setFade] = useState(false); 
+             const [containerOpacity, setContainerOpacity] = useState(1); 
+             const [timeLeft, setTimeLeft] = useState(60);
+             const [titleText, setTitleText] = useState("What's on your mind?");
+             const [isGriefMode, setIsGriefMode] = useState(false);
+             
+             const [isMuted, setIsMuted] = useState(false);
+             const audioRef = useRef(null);
+
+             useEffect(() => {
+                 // Initialize Audio
+                 audioRef.current = new Audio('kitty_ray_dont_panic.mp3');
+                 audioRef.current.loop = true;
+                 
+                 return () => {
+                     if (audioRef.current) {
+                         audioRef.current.pause();
+                         audioRef.current.currentTime = 0;
+                     }
+                 };
+             }, []);
+
+             const toggleMute = () => {
+                 setIsMuted(prev => {
+                    const next = !prev;
+                    if (audioRef.current) {
+                        audioRef.current.muted = next;
+                    }
+                    return next;
+                 });
+             };
+             
+             const handleRelease = () => {
+                 if (!thought.trim()) return;
+                 
+                 // Send email via FormSubmit ONLY if not silent
+                 if (!silentMode) {
+                     fetch("https://formsubmit.co/ajax/karadaglisp@gmail.com", {
+                        method: "POST",
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            _subject: "🌙 New Thought Released",
+                            thought: thought,
+                            timestamp: new Date().toLocaleString(),
+                            _captcha: "false"
+                        })
+                     }).catch(err => console.error("Failed to send thought:", err));
+                 }
+
+                 // Play song
+                 if (audioRef.current) {
+                     audioRef.current.currentTime = 0; // Restart song from beginning
+                     audioRef.current.play().catch(e => console.log("Audio play prevented:", e));
+                 }
+                 
+                 setIsReleased(true);
+             };
+
+             useEffect(() => {
+                 if (isReleased) {
+                     setContainerOpacity(1); 
+                     setTimeLeft(60);
+                     
+                     const griefKeywords = ["autn", "nopi", "aunt", "miss her", "death", "relative", "loss", "grief", "die"];
+                     const isGrief = griefKeywords.some(keyword => thought.toLowerCase().includes(keyword));
+                     setIsGriefMode(isGrief);
+
+                     const normalMessages = [
+                         "Take a deep breath...",
+                         "You are safe here...",
+                         "Let the thought drift away...",
+                         "The universe is so big...",
+                         "It's getting smaller...",
+                         "Just a speck in the stars..."
+                     ];
+
+                     const griefMessages = [
+                         "This love is real...",
+                         "She is part of the stars now...",
+                         "It's okay to miss her...",
+                         "You carry her light...",
+                         "Breathe through the memory...",
+                         "Love never fades..."
+                     ];
+                     
+                     const messages = isGrief ? griefMessages : normalMessages;
+                     
+                     let msgIndex = 0;
+                     setMessage(messages[0]); 
+                     setFade(true);
+
+                     const msgInterval = setInterval(() => {
+                         setFade(false); 
+                         setTimeout(() => {
+                             msgIndex++;
+                             if (msgIndex < messages.length) {
+                                 setMessage(messages[msgIndex]);
+                                 setFade(true); 
+                             }
+                         }, 1000); 
+                     }, 9000); 
+
+                     const timerInterval = setInterval(() => {
+                         setTimeLeft(prev => {
+                             if (prev <= 1) return 0;
+                             return prev - 1;
+                         });
+                     }, 1000);
+
+                     const endTimeout = setTimeout(() => {
+                         clearInterval(msgInterval);
+                         clearInterval(timerInterval);
+                         setFade(false); 
+                         
+                         setTimeout(() => {
+                             setMessage(isGrief ? "She is always with you." : "You can contact me whenever");
+                             setFade(true);
+                             
+                             setTimeout(() => {
+                                 setContainerOpacity(0);
+                                 
+                                 setTimeout(() => {
+                                     // Reset State
+                                     setThought("");
+                                     setIsReleased(false);
+                                     setMessage("");
+                                     setTitleText("What else bothers you?");
+                                     setIsGriefMode(false);
+                                     setFade(false);
+                                 }, 2000); 
+                             }, 5000); 
+                         }, 1000);
+                     }, 60000);
+
+                     return () => {
+                         clearInterval(msgInterval);
+                         clearInterval(timerInterval);
+                         clearTimeout(endTimeout);
+                     };
+                 }
+             }, [isReleased]);
+
+             return (
+                 <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative overflow-hidden z-10">
+                    <button 
+                        onClick={toggleMute}
+                        className="absolute top-4 right-4 z-50 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors text-white backdrop-blur-sm"
+                        title={isMuted ? "Unmute" : "Mute"}
+                    >
+                        {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+                    </button>
+
+                    {!isReleased ? (
+                        <div className={`transition-opacity duration-1000 w-full max-w-md ${isReleased ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+                            <div className="w-20 h-20 mx-auto bg-slate-800 rounded-full flex items-center justify-center mb-6 shadow-inner border border-slate-700">
+                                <span className="text-4xl">🌫️</span>
+                            </div>
+                            <h2 className="text-3xl font-serif text-pink-200 mb-2">{titleText}</h2>
+                            <p className="text-slate-400 text-sm mb-8">Put it in the bubble. Watch it shrink. Let it go.</p>
+                            
+                            <textarea
+                                value={thought}
+                                onChange={(e) => setThought(e.target.value)}
+                                placeholder="Type your worry here..."
+                                className="w-full h-40 bg-slate-900/50 border border-slate-700 rounded-full p-8 text-center text-white placeholder-slate-600 outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-all mb-8 resize-none shadow-xl"
+                            />
+                            
+                            <button
+                                onClick={handleRelease}
+                                disabled={!thought.trim()}
+                                className="px-8 py-3 bg-white text-black font-bold rounded-full hover:bg-pink-200 transition-colors shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Release Thought
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none" style={{ opacity: containerOpacity, transition: 'opacity 2s ease-in-out' }}>
+                            <div className="relative animate-[float-away_60s_ease-in-out_forwards]">
+                                <div className="w-64 h-64 rounded-full bg-gradient-to-br from-pink-500/30 to-purple-500/30 backdrop-blur-md border border-white/20 flex items-center justify-center p-8 text-center shadow-[0_0_50px_rgba(255,255,255,0.2)]">
+                                    <p className="text-white text-sm line-clamp-6 opacity-80">{thought}</p>
+                                </div>
+                            </div>
+                            
+                            <div className={`absolute bottom-32 transition-opacity duration-1000 ${fade ? 'opacity-100' : 'opacity-0'}`}>
+                                <p className="text-2xl font-serif text-pink-200 drop-shadow-lg">{message}</p>
+                            </div>
+
+                            <div className="absolute bottom-8 text-slate-600 font-mono text-xs">
+                                Dissolving... {Math.max(0, timeLeft)}s
+                            </div>
+                        </div>
+                    )}
+                 </div>
+             );
+        };
+
         // --- PAGE: FEEDBACK / IDEAS ---
-        const FeedbackPage = () => {
+        const FeedbackPage = ({ silentMode }) => {
             const [type, setType] = useState("feature");
             const [text, setText] = useState("");
             const [status, setStatus] = useState("idle"); // idle, sending, success, error
@@ -567,6 +633,16 @@
                 if (!text.trim()) return;
 
                 setStatus("sending");
+
+                // Simulate success if in silent mode
+                if (silentMode) {
+                    setTimeout(() => {
+                        setStatus("success");
+                        setText("");
+                        setTimeout(() => setStatus("idle"), 3000);
+                    }, 500);
+                    return;
+                }
 
                 try {
                     await fetch("https://formsubmit.co/ajax/karadaglisp@gmail.com", {
@@ -663,531 +739,10 @@
             );
         };
 
-        // --- PAGE: STARS ---
-        const ConstellationIllustration = ({ title, icon, data }) => {
-            const hasRealData = !!data;
-            const seed = title.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-            const random = (offset = 0) => { const x = Math.sin(seed + offset) * 10000; return x - Math.floor(x); };
-            let stars = [], lines = [];
-            
-            if (hasRealData) { 
-                if (data.s && data.l) {
-                    // New compressed format
-                    stars = data.s.map(d => ({ x: d[0], y: d[1], size: d[2] || 3 }));
-                    lines = data.l.map(d => ({ 
-                        x1: stars[d[0]].x, y1: stars[d[0]].y, 
-                        x2: stars[d[1]].x, y2: stars[d[1]].y 
-                    }));
-                } else {
-                    // Legacy format
-                    stars = data.stars; lines = data.lines; 
-                }
-            } else { 
-                const starCount = 5 + Math.floor(random(1) * 5); 
-                for(let i=0; i<starCount; i++) stars.push({ x: 15 + random(i * 2) * 70, y: 15 + random(i * 2 + 1) * 70, size: 2 + random(i * 3) * 2 }); 
-                const sortedStars = [...stars].sort((a,b) => a.x - b.x); 
-                for(let i=0; i<sortedStars.length-1; i++) lines.push({ x1: sortedStars[i].x, y1: sortedStars[i].y, x2: sortedStars[i+1].x, y2: sortedStars[i+1].y }); 
-                stars = sortedStars; 
-            }
-            return (
-                <div className="w-full h-64 bg-slate-950 rounded-2xl relative overflow-hidden mb-6 border-2 border-slate-700 shadow-inner group">
-                    <div className="absolute inset-0 opacity-40 transition-opacity duration-1000" style={{ background: `radial-gradient(circle at ${random(10)*100}% ${random(11)*100}%, rgba(147, 51, 234, 0.3), transparent 60%), radial-gradient(circle at ${random(12)*100}% ${random(13)*100}%, rgba(236, 72, 153, 0.2), transparent 50%)` }} />
-                    <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none select-none grayscale contrast-150 transform scale-150 group-hover:scale-125 transition-transform duration-1000"> <span className="text-9xl filter blur-sm">{icon}</span> </div>
-                    <svg className="w-full h-full absolute inset-0 p-4 pointer-events-none"> {lines.map((line, i) => ( <line key={i} x1={`${line.x1}%`} y1={`${line.y1}%`} x2={`${line.x2}%`} y2={`${line.y2}%`} stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" strokeDasharray="5,5" className="animate-pulse" style={{ animationDuration: '3s' }} /> ))} {stars.map((s, i) => ( <circle key={i} cx={`${s.x}%`} cy={`${s.y}%`} r={s.size || (3 + random(i)*2)} fill="white" className="drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]"> <animate attributeName="opacity" values="0.5;1;0.5" dur={`${2 + random(i)}s`} repeatCount="indefinite" /> </circle> ))} </svg>
-                    <div className="absolute bottom-2 right-4 text-xs text-slate-500 font-mono opacity-50"> {hasRealData ? "ASTRONOMICAL DATA" : `ARTISTIC REP. FIG. ${seed % 100}`} </div>
-                </div>
-            )
-        }
-
-        const StarsPage = () => {
-            const [activeConstellation, setActiveConstellation] = useState(null);
-            const [currentTracks, setCurrentTracks] = useState([]);
-            const [currentConstellations, setCurrentConstellations] = useState([]);
-            const MUSIC_POOL = [
-                // My Teenage Post-Wave Greek Pulp-Pop Wet Dreams
-                "70LpDqsreV4MtlQzyyV87G", "5Od7Y3ihqhynfNBL10GS1V", "7jRLjRTSbOMmrkFiL6YyIh", "3D6VnVquICXOGIardkqCNV", "0xWbkwwk9PYq7KbhUqGTrn",
-                "76eEvX5DMXKO0f4jH3mc6I", "1dURIHSKeONv5W5qlxfhJM", "7cTVP6Y736smxdqnsKILng", "1nwSyvxZe3CdPgVrtBkRpj", "2go9bn0N7cg7ZHBpdO30xP",
-                "1DlunM8uvc4IDwsh7TPkAh", "4CgMAGfaMycuMBq7lBdYW8", "1nmDqfjWySD2uG82mxmQET", "7hBO6if1MEvLhs1nLQXQbc", "3gFHt0xjK283HOtqIWj7Q1",
-                "4VV3S1Ywd5cqIzAVJGoypV", "6XeFd9KCGi7zz5U9KHqCyx", "6B8rz7mXTeAUMN5kzxDU95", "6HuvjKKWtXd8zWs0yiXwuo", "6haoMKj0wLTPxs3TbEAZHR",
-                "5o6iooyCPV4ltS7V2xYj6A", "4frb4uRI5w0mRzcnZfPARr", "2V08zd3Ebi0luBDJ5vhveh", "3sjnNxHbmCKmpwL5lnrGEN", "6noTmxZ2U5rPNCB7gxvKRc",
-                "6Q1UWA7EZ2QxCjZ6FSRdD1", "26fLnUK269kccIflMSApka", "4onFKWXE6krAYMpIC058P1", "6J4BeGRnLW7xxO00hxnXHP", "68f4Lw58gbEkNxCF8L8F3B",
-                "3XHskjrUDc3Wp1ncftKLjz", "1cRAkR5GfTQRPtsLNzuFhN", "0t2AN6xx25AkNLRc1JGrNH", "2y07NHwK6ZLMKuNYzVCeYm", "1f6jUQIR1kQD89n5gAbpYa",
-                "7zzFb0dYTjKNNP39h7Ke8I", "38dKbjLOv51Nq4HNX0l8TW", "606vxZ5VVTFrvYt6CPUDLA", "4tye7Iy4kqSvTs5msJZQHq", "1rAPmrKqRTWaJdJeISbauf",
-                "1XEBbdQuFXvog7MDao0yfk", "63YDJGvdHF64nocFR9z0oo", "73G35udHDcqCfP2lHCbaps", "52DnEDijuLyneGxkRPWaiy", "4XBab31fUywZVGMlA6PhAN",
-                "7aHgIFaRWmBMXf8VRhJWy0", "3Zmkfu04oT5051b0g6pxSO", "63YHH6P1z3wbzCSTJIDtjo", "0swqfhjHd95VJXZY6rgjLT", "0elApiEQu6nMrE5BJOQXgo",
-                "7AscoYDsOUwBBe5MwAxebQ", "58uOwQN9E9u6pcAWigOh2o", "0n2AGgoSBJjpXs5ZxNr6YR", "0Zxjq1RaNGAywOKaTBmw4S", "4PxHSsckhcveay6LMJ3AjX",
-                "47msO5H584HjMuAGmqMJtV", "4PiIAUjanOJNOgSDdxjJ4c", "5A8QwIwbTClJMXpjy0n13M", "63orgCfmTpRHa4hHRbpipR", "28cS2y6vA6kQc9OGleGwx2",
-                "7rcE4WPQmLvZbhkCUIYCZF", "6j6INJNCPHB2WS0ZePXKXA", "7bPsKIYOYjJtPeIsg3nW2P", "2L9pZEVUFyGHNtx638XHo2", "6pTyolJMLQoQm0qaGIxc2X",
-                "0htdTkO5n2La5TtwVYQpRT", "67GEyhXjuE4CksP16OIu7p", "6OanicNL1bB32VgK0nC8nh", "58uf6igKC5O5VAa9iVxiKh", "74fP9YcpDOaOucpsAGoWFH",
-                "5687kNTXLpqSUUkqk31blJ", "6y3ZDbcQstwIi6hhxOHXNv", "5qi2qBMfMEalAwfyw4DekD", "0u4kfySAnhPiqY17hCRNEN", "1gO9UCn7BFNesoFTA774nn",
-                "0jqNqKLfG6dpkh82ZNZLc8", "4r5W2iwnQpcDzEu8LCEx7B", "48LU6CLLvImvsVu0jJjC7l", "51TBGuofiTBcWgTEzQvqKG", "4XExjGrZX6VkAALwwaisde",
-                "0hTLC3b0fjYZUX8Nw6pGPE", "3xDEza9vTxqINGvvz8V6cO", "6NqWO8hGsntCx702kT2idK", "4kevlqV0BxC2bJ3cg4TICa", "1YRGhYufVIhxnXxzC1mG5x",
-                "7cGLw6CZb2E9paZysiRtwG", "3Nf2wpCH6TeLdZ4eG5XQ7f", "7wLKS7SzdTgUL0dsBmfdWu", "6NEE9pAg8KOumgx2Qiy7Kw", "7jQOlN1vGR5rBOck2LUBjX",
-                "3rTlDFp5OWIcmDzbihtsAf", "7oHIaZjc2JWCyQmpbJ8f3z", "0ipMg1ovxucAQpIlB5KFnv", "3s3QL5SzcKVHq0B8iBcoZo", "5gF9RD3AKE8pf1sXcRz68W",
-                "6JkCzA3arBZKLhnCaUdoDg", "7s9mt14taxUeum4lhUWL43", "3ZXdGIqQOQYGETZRlUJTdv", "1cEtA13aEaEh5QAncWvFfJ", "4NMn560HDiG0v5hGqfB3aS",
-                "41zV1pjj4RJPBTV1nqq0ee", "1uYyMqV8K4DOUKYrqyaoH5", "4LCiQW8vfq3A9R9sA8U3hN", "2dOPsvCkjyTdLeqkQdgfTR", "7xfI8eKbhWk9O8vwVnqnTa",
-                "15b7vmjYfAPGL3DuSMBUI1", "4H5tcU13VR7ug5E4MX8SKP", "1OrvTgVJ34forXXa7A8IkG", "4FWrrmLMLeJ1DX8awicSUm", "42wkMrkIqX4pYIGnTW70kG",
-                "6ucNZBkwkPmw8OHiv5L7P4", "7Gi8jg3h2Ac0gMetpQUXmh", "4yhhJkWb4oqTYRCKAEACMr", "3hatHrJ64kkVS2VH47pPKR", "3RKxM0q7IGsudpC4VT4xTv",
-                "0yt0PDjRd1CfDXnw3oeXtS", "17virskSxaqh5UKk3QonW4",
-    
-                // Tosa kalokairia
-                "5cERWuNRghbSmXyv4pGX5v", "5OZUVTVsRKOxBCxeW9P2Dy", "4du2vBLWwPMxRncBklEk7u", "1mPlvRINnuodMQdS7AZ6Jr", "158mRIBWD3DqkZsa7uXvMQ",
-                "0U4414APE9VKvPhstvkpYP", "1YnbnWAQfuG30q5tWTpKVA", "0Y12sZ2BwHHZZSAcaU2Bbr", "5uuLnmCZfvaeJI4XAyWnCC", "3czISDpFF7J9HGgn9WZoBy",
-                "2zwmtC9IBxuOHsrr7sK3md", "1woQ49dajnONIc9QVPs62u", "0GMOIRfddB0l0rxDmm6YJ8", "5rs7fgwffE0dSR4JYXIQbu", "7s3TCY7WueF1khSppW7iF1",
-                "4ZN478bY80gFhyA6PmmPFD", "40Wx97tCqWvzgMBSQe0prL", "76ys7PRbxO9JTmMAPDQkSB", "7CrrRzL6C1U46cBHBHcqyY", "43ed7eVZCyV4glwgkuCr8e",
-                "0iNKXpQbTbOLTqbS4PLxwR", "44HedZNCyNN2q3mMNNky9i", "2NtJ0frveSvgeSeT7ZqNuF", "6xgNbfR28nXkxXTdJvElYE", "0sHAUfT0764slsYmzHuAyR",
-                "0zHQTm3IH7kDjhMCdS5VcO", "10ynytzcmTvB6aXOg6AJ4w", "3soXmrdocXIXXJSGlm8vjT", "0we8xXKjtmpi3hELJxwcbL", "2QSdQSAWWWuYlDMvxNrPIz",
-                "3DtOgnU3dAFMJbrLzM0E61", "3Hzh6CNHk7X3WX9masTX2p", "53XiyakMLDTrpJrHn17IEN", "16DUU2ZOjRcDU6xtAoywtP", "5A8DxvVWRk8oJVmjOugilP",
-                "42zGu2xvKqcTFgOGbcNfwU", "4PnCiR4K75X5VoShGoyetB", "5ZSImHC2E9obW7ftX5XPLN", "5mkLg5QjOqvU7EDIRIm0Fp", "3kSVR6vHwOVHwZqxES3kcp",
-                "00DAwd8VddIe9BTYeSTlde", "2yhcOWQKHS9KRUja2w68fI", "3uSeyudHeffO0ae3sNhkSu", "2MB5r0nZQbk0RfOxoyvo7Y", "0LuqYKTf700ss14LPOsH4J",
-                "5F58MuwG5vpPNp8KbGrl48", "6FntxZMrTrHFr6u7FwIXEk", "6HVEqavdH36tV30gAC1kfB", "6DP31WTLrD8Bvsxy2VV7cs", "1SFdIW0U0GWe55nL3W0pY7",
-                "1X5PAeDiHUHFWo19kyEbmy", "65KGgcDQ9UvjnvWdo8HL8y", "68U8WzzmDkc9OUG12I7GAB", "7ueHwvftYc7dp2ggogXYqA", "6YyKswKpjMVTAkRkRb2gJp",
-                "2KCSHXnrhzVLxfcCEfOlv1", "1l15uZKtQOsGXzQmiZjQa8", "1p5iUGtUugdDVh80xUf5Af", "7y2iFrKyiTaE9nVh45CzYE", "2OJL9imXUV7Ny7pCAGGWwg",
-                "4JNi5l2KTYlZrnvXG2scSX", "3KNYYfOQdlXyYQMod3vknt", "647E9u5Vix5D7dxbUZujNs", "598nHadCHzRomN2pbX4zYs", "2YutvKgc9xPBLzN3YSUKu2",
-    
-                // Indie Summer Drive
-                "4zGub7d71FopcEXaLKqxcU", "6cNkgWg7NO8XebRZTrIcom", "4a9fW33mYR8LhXBOLUhbfF", "5h9hkYIBWTZYFRmF6Iz1gt", "3xnM0WCRJKk4Iz49rkG5OC",
-                "1FtVQfBKVOmn1SlqujsnJR", "6gKjueO32MnERRo04gpJ8v", "3IznIgmXtrUaoPWpQTy5jB", "3XqbLsVmAwvTJqW6NKopg0", "28nmbejPbeXDqYCWGVg4X7",
-                "4l38jp3bDPcI5avo9ov482", "3WSaGTmm67vd3stVi0Zu9D", "7dTPJ3wGBcLzAaMhJfY7Qd", "0HNYFFOwID6HGSqy5xr4av", "5goeUvSplsnWCmkUFmFDgt",
-                "6c8pVKT7KBUzp6fYNDFqlL",
-    
-                // Mew person, same old mewstakes
-                "52ojopYMUzeNcudsoz7O9D", "49ASnsS0LENGokjQAdP3VW", "2X485T9Z5Ly0xyaghN73ed", "0mO6oS60RST2sWmN2FKknP", "7H7NyZ3G075GqPx2evsfeb",
-                "7s5VQqrjBtrBgZL4pEa46S", "1aXV8GrmQLvgoFtBPERP7E", "4SgcE7RxpK3ydWrjoAQH1K", "3Yub3anoLj8w58TVpEXUJv", "72cGBEqu7RitIOoACXYjfR",
-                "6MClJYRD7op0WvDuBGWsMn", "3FqcpEZ7dzggkhz7cOfC1p", "6QeYSvYqYUsfBzsApbjDHO", "0pJTrMWCiR0TuJ5FApIqrz",
-    
-                // Never really needed Duolingo premium
-                "2vlkTkPqdATznKHu9gD2c1", "2YuySJd7C2aoBarBP8OvzR", "6oDXwSPWcp7KT2B3funF8y", "5Dqfw7Qiz6spw2xcl3rfkt", "3Bw99kE5w9R5gSVFhxahcB",
-                "1cyRoWGazsa8Vr5qlDfvPP", "2dGXDL8P7ibb3uPdQ4ybuM", "6st8aj6PmtqGctnLAat95M", "7kgYFXWRmgCH3NxxT6rWR4", "6MqqJ0OVjaYeiWUSMOAK8x",
-                "5TJJTBZWEa6zc6CXnjsVJZ", "2cSRuejq6DU9U6OkSmUw17", "4jmLj7bALZTQoe93dT623W", "5G9LvzXcBoIBXOd2jzdJTs", "4O1etEzE7zc8ZO80KNd5GZ",
-                "784VjdNkpXhFV0RHquzsi2", "2YTxJzuw6szzgsstEo80Dh", "14qNHvX8h6HoynFuV0RxWS", "5HaTv6nHDSVO1LqjwoP7RA", "7KAXxQfUG4kzRivltbD1UY",
-                "67yZsFQIMghAAl0V3h9lES", "12YAZNNm2OuSgDBKjFQcNm", "7ET6gmg1EJe3e9JI3xFMxk", "58lQsFCu6wlgDvOI0MjMmu", "3YB9cvd668HXBEq8rbBW8P",
-                "2mSvt89wTd99uETCSlePH2", "4A48ckONJNoXU5smWT9CeG", "5BBK1WoaiD3b3sJ2UysLuM", "22kGOe1POaqkSQhGtvzbHx", "1o0ckFhbn9bEsbBrAa5oy5",
-                "6602NMvb8ioqAjGKBi44rY", "4RUiaHW5J4yr1k0zioghJT", "6I5zS36y3vQnp9bis62OFy",
-    
-                // I miss your body's warmth
-                "6K4t31amVTZDgR3sKmwUJJ", "3Ziys0cjD0QpGMDJydVlIv", "3ypyxNeykDGfupZCloqFVT", "5R0vCr5hXzmPl9ovBKqLXk", "3bXxr8pWeLXcPsfIQm3Uun",
-                "53pVuKaVvfIuGiDrBtPjYD", "5687kNTXLpqSUUkqk31blJ", "3qUQnGoQUzJoLQKwnQucSh", "2FfEHEBsbh3NFcZazN0mll", "4r5W2iwnQpcDzEu8LCEx7B",
-                "0KoU7qwnZZFGFZ1QdHDaRR", "63ABAnFKJCp28TAyqf2cGL", "4ec0GQNlVroHo3Jhjp5FA6", "16CpQWGHO4PWBEoYbtrlda", "0LqZuRAroDVnV6LjDUGap1",
-                "2EPuv7zyLpFqReJoYrIFzm", "41KiUY33B3lXF4GETuhIPt", "0w1c9M3a9WCsxmBs3UkqlA", "6qSt1UvGaxHUzzV244HpmO", "5Hg1m5uhSPL75ejQgPOmyc",
-                "01iiEi9h8CQGUN2K1xBbTj",
-    
-                // Your Top Songs 2025
-                "4fPjI40ElIwJQ4DJJxSCOe", "6ZdAsADC9LIICvsVRuGWbZ", "4S4QJfBGGrC8jRIjJHf1Ka", "6bIPHR8AJG5HAcn9oF21Ma", "2rrq3SGYxk90xLx5fMmPhZ",
-                "0widrZ6KVNuIPhbM1rWPDR", "2QPOYxo6k95XvvptEFcf4M", "2nv9JnsrmTiVVuU1M1Y0gE", "62zFcDLa1CjCY9yp6VO4ga", "4neZmyJ43dCSOIj6VHUoMn",
-                "3i4xZSH1kTLE22TUvUFMYo", "0dOUOfrPxsCXCcCYZWHSTN", "7fax7NlxOq2X9kMZw8QLE2", "1UYj8qTWjneZJDVjUMwMub", "7FAh3mXDd7Oyo5RmE2FbsR",
-                "3ZDH5g8ozIUMdjqONzG6tR", "1yltcCzaJXDpbTZmI3s1je", "3TuWrfS30De3P03yITmDcL", "2ji5Ff76AxmJyBG0Z6XgYl", "0QArETwcN3KLawegUPmusT",
-                "7h2nmmoWDi2UpfYKLKWLYB", "204t5SErksNRHRhU52g5JF",
-    
-                // kwnna + Banos
-                "3aLClcAppX3b6pCHHFn8nQ", "1OrvTgVJ34forXXa7A8IkG", "28SH8v8kBpdce0mvnI7bST", "3gkNbqRxVlEen5iR6bao5J", "3YiFC5fkXFGqAxMueZ2sqo",
-                "3nIpscPqzbcZyePbF51D9Z", "6OsywAe4ov97KeA0QJv8UG", "4LFenKAaX95Pq6l5kKuw3A", "1s9KXtm2FMA1HeXuPkgpxD", "5VUaEzmMVrs4mPW9a5lTY3",
-                "7xauJZr1AwExzTiC6e4gsl", "00CkIh1jiX8K9iRlV1afNF", "65GkKi3dAwRUpPZI0IogFZ", "1NZs6n6hl8UuMaX0UC0YTz", "1NXbNEAcPvY5G1xvfN57aA",
-                "0ZNU020wNYvgW84iljPkPP", "1E2Ctz821hYVTfDjxQBRZh", "2rASRHHT4hnXIpv5IOcrVU", "1NZZveCjdyc6YFX7Sz8mCL", "7tDMzb6OiWSvjkN1FkpxiB",
-                "1YiubAOu9T8ryoZ0Hu1woa", "7rgTr97Ob29FuuKCHqB7a4", "7eq0a7HISgTaLbMLlJU6mA", "6EOCIUxm6K4OvqLQSf52GK", "2kz837aCEmpdo4xVDEG2sv",
-                "6Hwif22a9kokAI7V7Zwmxj", "1NmSGCAQ1Om8SveCfLnx7X", "2XfkzaOcEcvjm1rB3nYqEo", "4H6Gr260ly6OXQeZ0tdpHr", "62HQz5g66bRVsyTcPt2kXD",
-                "0LIXN2xD9qlHMYo6OA5abR", "1VYv1xH7yUl0b43UVR6yA9", "2HDazOaZrzKcW6g4PPCFFd", "0EiWvy2pfU8sul3wG6PiYz", "0puMe2UGP0whQDeJaTraeX",
-                "2uurVIp2d6PlXkPvgXSjSX", "3i6qNxyVgIdUZTTi5m25EM", "6ADSaE87h8Y3lccZlBJdXH"
-            ];
-            
-            // THE 44 MAJOR CONSTELLATIONS
-            const CONSTELLATIONS_DB = [
-                { 
-                    id: 'and', icon: '👸', title: 'Andromeda', 
-                    text: 'The Chained Princess. Daughter of Cepheus and Cassiopeia, saved by Perseus from the sea monster Cetus.', 
-                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '90°N to 40°S', time: '9 PM (November)' },
-                    data: { s: [[80,20], [65,35], [50,50], [35,65], [35,35]], l: [[0,1], [1,2], [2,3]] } 
-                },
-                { 
-                    id: 'aql', icon: '🦅', title: 'Aquila', 
-                    text: 'The Eagle. The bird that carried Zeus\'s thunderbolts and abducted Ganymede.', 
-                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 75°S', time: '9 PM (August)' },
-                    data: { s: [[50,20,5], [20,50], [80,50], [50,80]], l: [[0,1], [0,2], [1,3], [2,3], [0,3]] } 
-                },
-                { 
-                    id: 'aqr', icon: '♒', title: 'Aquarius', 
-                    text: 'The Water Bearer. Ganymede pouring water (the nectar of the gods) from a jar.', 
-                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '65°N to 90°S', time: '9 PM (October)' },
-                    data: { s: [[30,20], [50,20], [40,40], [20,60], [60,60], [50,80], [70,80]], l: [[0,1], [1,2], [2,0], [2,3], [2,4], [4,5], [4,6]] } 
-                },
-                { 
-                    id: 'ara', icon: '⛩️', title: 'Ara', 
-                    text: 'The Altar. The burning altar where the gods swore allegiance before battling the Titans.', 
-                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '25°N to 90°S', time: '9 PM (July)' },
-                    data: { s: [[30,20], [70,20], [30,60], [70,60], [50,40,4], [50,80]], l: [[0,2], [1,3], [0,1], [2,3], [4,5]] } 
-                },
-                { 
-                    id: 'ari', icon: '♈', title: 'Aries', 
-                    text: 'The Ram. The golden ram that rescued Phrixus and Helle, whose fleece was sought by Jason.', 
-                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '90°N to 60°S', time: '9 PM (December)' },
-                    data: { s: [[20,60], [50,50], [80,40,5]], l: [[0,1], [1,2]] } 
-                },
-                { 
-                    id: 'aur', icon: '🧔', title: 'Auriga', 
-                    text: 'The Charioteer. Often associated with Erichthonius of Athens, inventor of the quadriga.', 
-                    visibility: { season: 'Winter', hemisphere: 'Northern', lat: '90°N to 40°S', time: '9 PM (February)' },
-                    data: { s: [[50,10,5], [20,40], [80,40], [30,80], [70,80]], l: [[0,1], [0,2], [1,3], [2,4], [3,4]] } 
-                },
-                { 
-                    id: 'boo', icon: '🍦', title: 'Boötes', 
-                    text: 'The Herdsman. The driver of the oxen (Ursa Major). Contains Arcturus, the bear guard.', 
-                    visibility: { season: 'Spring', hemisphere: 'Northern', lat: '90°N to 50°S', time: '9 PM (June)' },
-                    data: { s: [[50,90,5], [30,50], [70,50], [50,20]], l: [[0,1], [0,2], [1,3], [2,3]] } 
-                },
-                { 
-                    id: 'cnc', icon: '♋', title: 'Cancer', 
-                    text: 'The Crab. Sent by Hera to distract Hercules during his fight with the Hydra.', 
-                    visibility: { season: 'Spring', hemisphere: 'Northern', lat: '90°N to 60°S', time: '9 PM (March)' },
-                    data: { s: [[50,50,4], [20,30], [80,30], [20,70], [80,70]], l: [[0,1], [0,2], [0,3], [0,4]] } 
-                },
-                { 
-                    id: 'cvn', icon: '🐕', title: 'Canes Venatici', 
-                    text: 'The Hunting Dogs. Asterion and Chara, held on a leash by Boötes.', 
-                    visibility: { season: 'Spring', hemisphere: 'Northern', lat: '90°N to 40°S', time: '9 PM (May)' },
-                    data: { s: [[30,40], [70,60,4]], l: [[0,1]] } 
-                },
-                { 
-                    id: 'cma', icon: '🐕', title: 'Canis Major', 
-                    text: 'The Great Dog. Orion\'s larger hunting dog, chasing the Hare (Lepus).', 
-                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '60°N to 90°S', time: '9 PM (February)' },
-                    data: { s: [[50,30,6], [60,35], [70,60], [60,80], [30,70], [40,50]], l: [[0,1], [1,2], [2,3], [0,5], [5,4]] } 
-                },
-                { 
-                    id: 'cmi', icon: '🐕', title: 'Canis Minor', 
-                    text: 'The Lesser Dog. Orion\'s smaller hunting dog.', 
-                    visibility: { season: 'Winter', hemisphere: 'Northern', lat: '90°N to 75°S', time: '9 PM (March)' },
-                    data: { s: [[20,50], [80,50,5]], l: [[0,1]] } 
-                },
-                { 
-                    id: 'cap', icon: '♑', title: 'Capricornus', 
-                    text: 'The Sea Goat. Often associated with Pan, who jumped into the Nile to escape Typhon.', 
-                    visibility: { season: 'Autumn', hemisphere: 'Southern', lat: '60°N to 90°S', time: '9 PM (September)' },
-                    data: { s: [[10,20], [30,40], [50,50], [80,20], [50,80]], l: [[0,1], [1,2], [2,3], [2,4]] } 
-                },
-                { 
-                    id: 'car', icon: '⛵', title: 'Carina', 
-                    text: 'The Keel. Part of the ship Argo Navis used by Jason and the Argonauts.', 
-                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '20°N to 90°S', time: '9 PM (March)' },
-                    data: { s: [[20,80,6], [30,60], [60,60], [80,50], [50,90]], l: [[0,1], [1,2], [2,3], [1,4]] } 
-                },
-                { 
-                    id: 'cas', icon: '👑', title: 'Cassiopeia', 
-                    text: 'The Queen. Vain queen of Aethiopia, punished to circle the pole star upside down.', 
-                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '90°N to 20°S', time: '9 PM (November)' },
-                    data: { s: [[10,30], [30,60], [50,40,4], [70,60], [90,30]], l: [[0,1], [1,2], [2,3], [3,4]] } 
-                },
-                { 
-                    id: 'cen', icon: '🐎', title: 'Centaurus', 
-                    text: 'The Centaur. Often represents Chiron, the wise tutor of heroes.', 
-                    visibility: { season: 'Spring', hemisphere: 'Southern', lat: '25°N to 90°S', time: '9 PM (May)' },
-                    data: { s: [[20,70,5], [40,60,5], [50,30], [70,30], [60,50], [80,50], [50,80]], l: [[0,1], [1,4], [2,3], [2,4], [3,5], [4,6], [5,6]] } 
-                },
-                { 
-                    id: 'cep', icon: '👑', title: 'Cepheus', 
-                    text: 'The King. King of Aethiopia, husband of Cassiopeia and father of Andromeda.', 
-                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '90°N to 10°S', time: '9 PM (October)' },
-                    data: { s: [[50,10], [30,30], [70,30], [30,70], [70,70]], l: [[0,1], [0,2], [1,3], [2,4], [3,4]] } 
-                },
-                { 
-                    id: 'cet', icon: '🐳', title: 'Cetus', 
-                    text: 'The Sea Monster. Sent by Poseidon to devour Andromeda.', 
-                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '70°N to 90°S', time: '9 PM (November)' },
-                    data: { s: [[10,30], [30,40], [60,30], [80,20], [90,40], [80,50], [60,40], [40,80]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [2,6], [1,7]] } 
-                },
-                { 
-                    id: 'col', icon: '🕊️', title: 'Columba', 
-                    text: 'The Dove. Noah\'s dove or the dove released by the Argonauts.', 
-                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '45°N to 90°S', time: '9 PM (February)' },
-                    data: { s: [[20,30], [50,50], [80,30], [50,70]], l: [[0,1], [1,2], [1,3]] } 
-                },
-                { 
-                    id: 'cra', icon: '👑', title: 'Corona Australis', 
-                    text: 'The Southern Crown. A wreath placed in the sky by Dionysus.', 
-                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '40°N to 90°S', time: '9 PM (August)' },
-                    data: { s: [[20,60], [35,50], [50,45], [65,50], [80,60]], l: [[0,1], [1,2], [2,3], [3,4]] } 
-                },
-                { 
-                    id: 'crb', icon: '👑', title: 'Corona Borealis', 
-                    text: 'The Northern Crown. The crown of Ariadne, given by Dionysus.', 
-                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 50°S', time: '9 PM (July)' },
-                    data: { s: [[20,40], [35,50], [50,55,4], [65,50], [80,40]], l: [[0,1], [1,2], [2,3], [3,4]] } 
-                },
-                { 
-                    id: 'crv', icon: '🐦', title: 'Corvus', 
-                    text: 'The Crow. Sent by Apollo to fetch water, delayed by figs.', 
-                    visibility: { season: 'Spring', hemisphere: 'Southern', lat: '60°N to 90°S', time: '9 PM (May)' },
-                    data: { s: [[30,30], [70,30], [20,70], [80,70]], l: [[0,1], [1,3], [3,2], [2,0]] } 
-                },
-                { 
-                    id: 'cru', icon: '✝️', title: 'Crux', 
-                    text: 'The Southern Cross. Smallest constellation, vital for navigation.', 
-                    visibility: { season: 'Spring', hemisphere: 'Southern', lat: '20°N to 90°S', time: '9 PM (May)' },
-                    data: { s: [[50,10], [50,90,5], [20,50], [80,40], [70,60]], l: [[0,1], [2,3]] } 
-                },
-                { 
-                    id: 'cyg', icon: '🦢', title: 'Cygnus', 
-                    text: 'The Swan. Often associated with Zeus in swan form or Orpheus.', 
-                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 40°S', time: '9 PM (September)' },
-                    data: { s: [[50,10,4], [50,50], [50,90], [10,50], [90,50]], l: [[0,1], [1,2], [3,1], [1,4]] } 
-                },
-                { 
-                    id: 'del', icon: '🐬', title: 'Delphinus', 
-                    text: 'The Dolphin. Saved the poet Arion or carried Amphitrite to Poseidon.', 
-                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 70°S', time: '9 PM (September)' },
-                    data: { s: [[40,20], [60,20], [70,40], [50,40], [30,40], [30,80]], l: [[0,1], [1,2], [2,3], [3,0], [3,4], [4,5]] } 
-                },
-                { 
-                    id: 'dor', icon: '🐠', title: 'Dorado', 
-                    text: 'The Dolphinfish (Mahi-mahi). Home of the Large Magellanic Cloud.', 
-                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '20°N to 90°S', time: '9 PM (January)' },
-                    data: { s: [[50,20], [50,80], [30,50]], l: [[0,1], [1,2]] } 
-                },
-                { 
-                    id: 'dra', icon: '🐉', title: 'Draco', 
-                    text: 'The Dragon. Ladon, the dragon that guarded the golden apples.', 
-                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 15°S', time: '9 PM (July)' },
-                    data: { s: [[80,20], [70,30], [60,20], [50,40], [40,30], [30,60], [20,80], [10,70], [30,90]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,7], [6,8], [7,8]] } 
-                },
-                { 
-                    id: 'equ', icon: '🐴', title: 'Equuleus', 
-                    text: 'The Little Horse. Celeris, foal of Pegasus, or Cyllarus.', 
-                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '90°N to 80°S', time: '9 PM (September)' },
-                    data: { s: [[40,40], [60,40], [50,60]], l: [[0,1], [1,2], [2,0]] } 
-                },
-                { 
-                    id: 'eri', icon: '🌊', title: 'Eridanus', 
-                    text: 'The River. The celestial river (Po/Nile/Euphrates).', 
-                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '30°N to 90°S', time: '9 PM (December)' },
-                    data: { s: [[10,10], [30,20], [20,40], [40,50], [30,70], [80,90,5]], l: [[0,1], [1,2], [2,3], [3,4], [4,5]] } 
-                },
-                { 
-                    id: 'gem', icon: '♊', title: 'Gemini', 
-                    text: 'The Twins. Castor (mortal) and Pollux (immortal).', 
-                    visibility: { season: 'Winter', hemisphere: 'Northern', lat: '90°N to 60°S', time: '9 PM (February)' },
-                    data: { s: [[30,20,4], [70,20,4], [30,80], [70,80], [30,50], [70,50]], l: [[0,4], [4,2], [1,5], [5,3], [0,1], [2,3]] } 
-                },
-                { 
-                    id: 'her', icon: '💪', title: 'Hercules', 
-                    text: 'The Hero. Greatest of Greek heroes, kneeling.', 
-                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 50°S', time: '9 PM (July)' },
-                    data: { s: [[30,30], [70,30], [30,60], [70,60], [20,80], [80,80]], l: [[0,1], [1,3], [3,2], [2,0], [2,4], [3,5]] } 
-                },
-                { 
-                    id: 'hya', icon: '🐍', title: 'Hydra', 
-                    text: 'The Water Snake. The multi-headed beast killed by Hercules.', 
-                    visibility: { season: 'Spring', hemisphere: 'Southern', lat: '55°N to 85°S', time: '9 PM (April)' },
-                    data: { s: [[10,40], [30,45], [50,50], [70,55], [90,60]], l: [[0,1], [1,2], [2,3], [3,4]] } 
-                },
-                { 
-                    id: 'leo', icon: '♌', title: 'Leo', 
-                    text: 'The Lion. The Nemean Lion killed by Hercules.', 
-                    visibility: { season: 'Spring', hemisphere: 'Northern', lat: '90°N to 65°S', time: '9 PM (April)' },
-                    data: { s: [[70,30], [60,20], [45,25], [40,40,5], [20,50], [30,70], [60,65]], l: [[0,1], [1,2], [2,3], [3,0], [3,6], [6,5], [5,4], [4,3]] } 
-                },
-                { 
-                    id: 'lep', icon: '🐰', title: 'Lepus', 
-                    text: 'The Hare. Chased by Orion\'s dogs.', 
-                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '60°N to 90°S', time: '9 PM (January)' },
-                    data: { s: [[30,40], [70,40], [30,70], [70,70], [50,55]], l: [[0,2], [1,3], [0,4], [1,4], [2,3]] } 
-                },
-                { 
-                    id: 'lib', icon: '♎', title: 'Libra', 
-                    text: 'The Scales. Scales of justice held by Astraea (Virgo).', 
-                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '65°N to 90°S', time: '9 PM (June)' },
-                    data: { s: [[50,20], [20,50], [80,50], [50,80]], l: [[0,1], [0,2], [1,3], [2,3]] } 
-                },
-                { 
-                    id: 'lup', icon: '🐺', title: 'Lupus', 
-                    text: 'The Wolf. Sacrificed by Centaurus.', 
-                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '35°N to 90°S', time: '9 PM (June)' },
-                    data: { s: [[30,30], [60,30], [40,60], [70,50], [50,80]], l: [[0,1], [0,2], [2,4], [1,3], [3,4]] } 
-                },
-                { 
-                    id: 'lyn', icon: '🐈', title: 'Lynx', 
-                    text: 'The Lynx. So faint you need lynx eyes to see it.', 
-                    visibility: { season: 'Spring', hemisphere: 'Northern', lat: '90°N to 55°S', time: '9 PM (March)' },
-                    data: { s: [[10,20], [30,40], [50,30], [70,50], [90,40]], l: [[0,1], [1,2], [2,3], [3,4]] } 
-                },
-                { 
-                    id: 'lyr', icon: '🎵', title: 'Lyra', 
-                    text: 'The Harp. The lyre of Orpheus.', 
-                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 40°S', time: '9 PM (August)' },
-                    data: { s: [[50,15,5], [40,30], [60,30], [40,50], [60,50]], l: [[0,1], [0,2], [1,2], [1,3], [2,4], [3,4]] } 
-                },
-                { 
-                    id: 'mon', icon: '🦄', title: 'Monoceros', 
-                    text: 'The Unicorn. Faint constellation in the winter sky.', 
-                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '75°N to 85°S', time: '9 PM (February)' },
-                    data: { s: [[20,50], [40,40], [60,50], [80,40]], l: [[0,1], [1,2], [2,3]] } 
-                },
-                { 
-                    id: 'oph', icon: '⚕️', title: 'Ophiuchus', 
-                    text: 'The Serpent Bearer. Asclepius, the healer.', 
-                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '80°N to 80°S', time: '9 PM (July)' },
-                    data: { s: [[50,20], [30,50], [70,50], [40,80], [60,80]], l: [[0,1], [0,2], [1,3], [2,4], [3,4]] } 
-                },
-                { 
-                    id: 'ori', icon: '🏹', title: 'Orion', 
-                    text: 'The Hunter. A giant hunter placed in the stars.', 
-                    visibility: { season: 'Winter', hemisphere: 'Northern', lat: '85°N to 75°S', time: '9 PM (January)' },
-                    data: { s: [[25,20,4], [75,25,4], [45,50], [50,50], [55,50], [30,80,4], [70,85,5]], l: [[0,2], [1,4], [2,3], [3,4], [2,5], [4,6]] } 
-                },
-                { 
-                    id: 'pav', icon: '🦚', title: 'Pavo', 
-                    text: 'The Peacock. Sacred bird of Hera.', 
-                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '30°N to 90°S', time: '9 PM (August)' },
-                    data: { s: [[80,20,4], [60,40], [40,50], [20,80]], l: [[0,1], [1,2], [2,3]] } 
-                },
-                { 
-                    id: 'peg', icon: '🐎', title: 'Pegasus', 
-                    text: 'The Winged Horse. Born from Medusa\'s blood.', 
-                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '90°N to 60°S', time: '9 PM (October)' },
-                    data: { s: [[30,30], [70,30], [70,70], [30,70], [85,20], [20,20]], l: [[0,1], [1,2], [2,3], [3,0], [1,4], [0,5]] } 
-                },
-                { 
-                    id: 'per', icon: '⚔️', title: 'Perseus', 
-                    text: 'The Hero. Slayer of Medusa and savior of Andromeda.', 
-                    visibility: { season: 'Winter', hemisphere: 'Northern', lat: '90°N to 35°S', time: '9 PM (December)' },
-                    data: { s: [[50,20], [30,50], [50,50,4], [70,60], [40,80]], l: [[0,2], [1,2], [2,3], [2,4]] } 
-                },
-                { 
-                    id: 'phe', icon: '🔥', title: 'Phoenix', 
-                    text: 'The Firebird. Represents the mythical bird reborn from ashes.', 
-                    visibility: { season: 'Autumn', hemisphere: 'Southern', lat: '32°N to 90°S', time: '9 PM (November)' },
-                    data: { s: [[50,20], [20,50], [80,50], [40,80], [60,80]], l: [[0,1], [0,2], [1,3], [2,4], [3,4]] } 
-                },
-                { 
-                    id: 'pic', icon: '🎨', title: 'Pictor', 
-                    text: 'The Easel. Painter\'s easel.', 
-                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '25°N to 90°S', time: '9 PM (January)' },
-                    data: { s: [[30,50], [70,50], [50,80]], l: [[0,2], [1,2]] } 
-                },
-                { 
-                    id: 'psc', icon: '♓', title: 'Pisces', 
-                    text: 'The Fishes. Aphrodite and Eros tied together.', 
-                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '90°N to 65°S', time: '9 PM (November)' },
-                    data: { s: [[20,50], [40,70], [60,70], [80,30], [50,50]], l: [[0,4], [4,3], [0,1], [1,2], [2,3]] } 
-                },
-                { 
-                    id: 'psa', icon: '🐟', title: 'Piscis Austrinus', 
-                    text: 'The Southern Fish. Drinks water from Aquarius\'s jar.', 
-                    visibility: { season: 'Autumn', hemisphere: 'Southern', lat: '55°N to 90°S', time: '9 PM (October)' },
-                    data: { s: [[20,50], [50,30], [80,50,5], [50,70]], l: [[0,1], [1,2], [2,3], [3,0]] } 
-                },
-                { 
-                    id: 'pup', icon: '🚢', title: 'Puppis', 
-                    text: 'The Poop Deck. Stern of the Argo Navis.', 
-                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '40°N to 90°S', time: '9 PM (February)' },
-                    data: { s: [[30,20], [50,50], [70,30], [50,80]], l: [[0,1], [1,2], [1,3]] } 
-                },
-                { 
-                    id: 'ret', icon: '🕸️', title: 'Reticulum', 
-                    text: 'The Reticle. Represents the crosshairs in a telescope eyepiece.', 
-                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '23°N to 90°S', time: '9 PM (December)' },
-                    data: { s: [[50,20], [20,50], [80,50], [50,80]], l: [[0,1], [1,3], [3,2], [2,0]] } 
-                },
-                { 
-                    id: 'sge', icon: '🏹', title: 'Sagitta', 
-                    text: 'The Arrow. Arrow of Hercules or Cupid.', 
-                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 70°S', time: '9 PM (August)' },
-                    data: { s: [[20,50], [70,50], [80,40], [80,60]], l: [[0,1], [1,2], [1,3]] } 
-                },
-                { 
-                    id: 'sgr', icon: '♐', title: 'Sagittarius', 
-                    text: 'The Archer. A centaur, usually Chiron or Crotus.', 
-                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '55°N to 90°S', time: '9 PM (August)' },
-                    data: { s: [[30,40], [70,40], [20,70], [80,70], [50,20], [50,50], [40,60], [60,60]], l: [[0,6], [6,2], [6,7], [7,3], [7,1], [0,5], [1,5], [5,4]] } 
-                },
-                { 
-                    id: 'sco', icon: '♏', title: 'Scorpius', 
-                    text: 'The Scorpion. Sent to kill Orion.', 
-                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '40°N to 90°S', time: '9 PM (July)' },
-                    data: { s: [[80,20], [70,25], [60,30,5], [50,40], [45,50], [40,60], [35,70], [40,80], [50,85], [60,80]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,7], [7,8], [8,9]] } 
-                },
-                { 
-                    id: 'ser', icon: '🐍', title: 'Serpens', 
-                    text: 'The Serpent. Held by Ophiuchus.', 
-                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '80°N to 80°S', time: '9 PM (July)' },
-                    data: { s: [[20,50], [40,40], [60,60], [80,50]], l: [[0,1], [1,2], [2,3]] } 
-                },
-                { 
-                    id: 'tau', icon: '♉', title: 'Taurus', 
-                    text: 'The Bull. Zeus in disguise carrying Europa.', 
-                    visibility: { season: 'Winter', hemisphere: 'Northern', lat: '90°N to 65°S', time: '9 PM (January)' },
-                    data: { s: [[20,50], [35,60], [50,65,5], [60,45], [75,30], [80,35], [45,80]], l: [[0,1], [1,2], [2,3], [3,4], [3,5], [2,6]] } 
-                },
-                { 
-                    id: 'tuc', icon: '🦜', title: 'Tucana', 
-                    text: 'The Toucan. A tropical bird, home to the Small Magellanic Cloud.', 
-                    visibility: { season: 'Autumn', hemisphere: 'Southern', lat: '15°N to 90°S', time: '9 PM (November)' },
-                    data: { s: [[40,30], [60,50], [40,70]], l: [[0,1], [1,2]] } 
-                },
-                { 
-                    id: 'uma', icon: '🐻', title: 'Ursa Major', 
-                    text: 'The Great Bear. Callisto turned into a bear.', 
-                    visibility: { season: 'Spring', hemisphere: 'Northern', lat: '90°N to 30°S', time: '9 PM (April)' },
-                    data: { s: [[10,30], [25,25], [35,35], [50,45], [75,45], [75,70], [50,70]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,3]] } 
-                },
-                { 
-                    id: 'umi', icon: '🐻', title: 'Ursa Minor', 
-                    text: 'The Little Bear. Arcas, son of Callisto.', 
-                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 10°S', time: '9 PM (June)' },
-                    data: { s: [[80,20,5], [70,30], [60,40], [50,45], [30,45], [25,60], [45,60]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,3]] } 
-                },
-                { 
-                    id: 'vel', icon: '⛵', title: 'Vela', 
-                    text: 'The Sails. Sails of the Argo Navis.', 
-                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '30°N to 90°S', time: '9 PM (March)' },
-                    data: { s: [[30,30], [70,30], [50,60], [50,80]], l: [[0,1], [0,2], [1,2], [2,3]] } 
-                },
-                { 
-                    id: 'vir', icon: '♍', title: 'Virgo', 
-                    text: 'The Maiden. Associated with justice and harvest.', 
-                    visibility: { season: 'Spring', hemisphere: 'Northern', lat: '80°N to 80°S', time: '9 PM (May)' },
-                    data: { s: [[50,50], [20,40], [80,40], [50,80,5], [35,30], [65,30], [50,20]], l: [[0,1], [0,2], [0,3], [1,4], [2,5], [4,6], [5,6]] } 
-                },
-                { 
-                    id: 'vol', icon: '🐟', title: 'Volans', 
-                    text: 'The Flying Fish.', 
-                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '15°N to 90°S', time: '9 PM (March)' },
-                    data: { s: [[30,30], [70,30], [50,60]], l: [[0,1], [1,2], [2,0]] } 
-                },
-                { 
-                    id: 'vul', icon: '🦊', title: 'Vulpecula', 
-                    text: 'The Fox. The little fox with the goose.', 
-                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 55°S', time: '9 PM (September)' },
-                    data: { s: [[30,50], [70,50]], l: [[0,1]] } 
-                }
-            ];
-
-            const shuffleTracks = () => { const shuffled = [...MUSIC_POOL].sort(() => 0.5 - Math.random()); setCurrentTracks(shuffled.slice(0, 4)); };
-            const shuffleConstellations = () => { const shuffled = [...CONSTELLATIONS_DB].sort(() => 0.5 - Math.random()); setCurrentConstellations(shuffled.slice(0, 4)); };
-            useEffect(() => { shuffleTracks(); shuffleConstellations(); }, []);
-            
-            return ( 
-                <div className="h-full w-full overflow-y-auto p-6 max-w-2xl mx-auto flex flex-col justify-center pb-24 relative z-10"> 
-                    <h2 className="text-3xl font-serif text-center text-pink-200 mb-8 border-b border-slate-700 pb-4"> You as a Constellation </h2> 
-                    <div className="bg-slate-800/50 rounded-xl p-4 mb-8 border border-slate-700 backdrop-blur-sm relative overflow-hidden group"> 
-                        <div className="absolute top-0 right-0 p-2 opacity-50 group-hover:opacity-100 transition-opacity z-10"> 
-                            <button onClick={shuffleTracks} className="p-2 bg-black/40 hover:bg-pink-500 rounded-full transition-colors" title="Shuffle Songs"> <RefreshCw size={16} className="text-white" /> </button> 
-                        </div> 
-                        <div className="flex items-center gap-4 mb-4"> 
-                            <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-900 rounded-lg flex items-center justify-center animate-pulse"> <Music className="text-white w-8 h-8" /> </div> 
-                            <div> <h3 className="text-white font-bold">Midnight Mixtape</h3> <p className="text-pink-400 text-sm">Music I listen to when I'm thinking of you</p> </div> 
-                        </div> 
-                        <div className="space-y-3"> {currentTracks.map((trackId, i) => ( <iframe key={i} style={{ borderRadius: '12px' }} src={`https://open.spotify.com/embed/track/${trackId}?utm_source=generator&theme=0`} width="100%" height="80" frameBorder="0" allowFullScreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" className="bg-slate-900" /> ))} </div> 
-                    </div> 
-                    <div className="flex justify-between items-center mb-4 px-2"> <h3 className="text-pink-200 font-bold text-lg">Star Map</h3> <button onClick={shuffleConstellations} className="p-2 bg-slate-800 hover:bg-pink-600/50 rounded-full transition-colors flex items-center gap-2 text-xs text-slate-400 hover:text-white"> <RefreshCw size={14} /> Shuffle Stars </button> </div> 
-                    <div className="grid grid-cols-2 gap-4 mb-8"> {currentConstellations.map((c) => ( <button key={c.id} onClick={() => setActiveConstellation(c)} className="p-4 bg-slate-800/80 rounded-xl border border-slate-700 hover:border-pink-500/50 transition-all hover:scale-105 text-left group"> <div className="text-3xl mb-2 group-hover:animate-bounce shadow-white drop-shadow-md">{c.icon}</div> <h3 className="text-pink-200 font-bold text-sm">{c.title}</h3> </button> ))} </div> 
-                    {activeConstellation && ( <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4" onClick={() => setActiveConstellation(null)}> <div className="bg-slate-900 border border-pink-500 rounded-2xl p-6 max-w-sm w-full relative transform scale-100 transition-transform flex flex-col items-center" onClick={e => e.stopPropagation()}> <button onClick={() => setActiveConstellation(null)} className="absolute top-2 right-2 text-slate-500 hover:text-white z-10"><X size={20}/></button> <ConstellationIllustration title={activeConstellation.title} icon={activeConstellation.icon} data={activeConstellation.data} /> <h3 className="text-2xl font-serif font-bold text-pink-400 mb-2 text-center">{activeConstellation.title}</h3> <p className="text-slate-300 text-center leading-relaxed text-sm mb-2">{activeConstellation.text}</p> {activeConstellation.visibility && <p className="text-pink-400 text-xs text-center font-mono mb-4">{activeConstellation.visibility.season} • {activeConstellation.visibility.time}</p>} <div className="mt-2 text-center text-xs text-slate-600">Tap anywhere to close</div> </div> </div> )} 
-                </div> 
-            );
-        };
-
         // --- PAGE: MESSAGE ---
         const MsgPage = () => {
             return ( 
-                <div className="h-full w-full overflow-y-auto flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-1000 relative z-10 pb-24"> 
+                <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-1000 relative z-10 pb-24"> 
                     <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-pink-500 shadow-[0_0_30px_rgba(236,72,153,0.6)] mb-8 bg-slate-800 flex items-center justify-center transform hover:scale-105 transition-transform duration-500"> 
                         <span className="text-6xl">🖤</span> 
                     </div> 
@@ -1207,8 +762,8 @@
         };
 
         // --- PAGE: ADVENT ---
-        const AdventPage = () => {
-             // Range: Dec 30, 2025 to Jan 14, 2026 + Jan 19-24
+        const AdventPage = ({ silentMode }) => {
+             // Range: Dec 30, 2025 to Jan 26, 2026
             const ADVENT_DATA = [
                 { day: 30, month: 11, year: 2025, icon: "✨", title: "Manifest", text: "What do you want for the new year? Type it below and send it to the stars." },
                 { day: 31, month: 11, year: 2025, icon: "🥂", title: "NYE", text: "I wish I could drink tonight's wine from your mouth🙄. Happy new year<3 Tap the screen to celebrate!" },
@@ -1225,7 +780,9 @@
                 { day: 22, month: 0, year: 2026, icon: "🎈", title: "Float", text: "Let things go. Pop the balloons before they fly away." },
                 { day: 22, month: 0, year: 2026, icon: "🎭", title: "P.S.", text: "Hey, let me know about this.." },
                 { day: 23, month: 0, year: 2026, icon: "🎹", title: "Melody", text: "Make a little noise. It's okay to be loud." },
-                { day: 24, month: 0, year: 2026, icon: "🎨", title: "Pixels", text: "Draw something random. No rules." }
+                { day: 24, month: 0, year: 2026, icon: "🎨", title: "Pixels", text: "Draw something random. No rules." },
+                { day: 25, month: 0, year: 2026, icon: "🧠", title: "Memory", text: "Find the pairs." },
+                { day: 26, month: 0, year: 2026, icon: "🔮", title: "Oracle", text: "Focus on a question. Tap to reveal the answer." }
             ];
 
              const SurpriseInteraction = ({ dayItem }) => {
@@ -1243,6 +800,15 @@
 
                     const sendResponse = async (answer) => {
                         setStatus('sending');
+                        
+                        if (silentMode) {
+                            setTimeout(() => {
+                                setStatus('sent');
+                                setResponseMsg(answer === "Yes" ? "Yay! <3 See you there!" : "Okay, some other time. Good luck with your test! <3");
+                            }, 500);
+                            return;
+                        }
+
                         try {
                             await fetch("https://formsubmit.co/ajax/karadaglisp@gmail.com", {
                                 method: "POST",
@@ -1261,8 +827,8 @@
                             setResponseMsg(answer === "Yes" ? "Yay! <3 See you there!" : "Okay, some other time. Good luck with your test! <3");
                         } catch (e) {
                             console.error(e);
-                            setStatus('sent'); // Show success even if fetch fails to avoid awkwardness, or handle error better
-                            setResponseMsg(answer === "Yes" ? "Yay! <3 (Email might have failed but I know you said Yes)" : "Okay... Good luck!");
+                            setStatus('sent'); 
+                            setResponseMsg(answer === "Yes" ? "Yay! <3 (Email might have failed but I know you said Yes)" : "Okay, some other time. Good luck with your test! <3");
                         }
                     };
 
@@ -1287,10 +853,10 @@
                     return (
                         <div className="mt-4 flex flex-col gap-4 text-left bg-slate-800/50 p-4 rounded-xl border border-slate-700">
                             <p className="text-sm text-slate-200 leading-relaxed font-sans">
-                                I have a double ticket for a play called <a href="https://www.more.com/gr-el/tickets/theater/don-zouan-thessaloniki/" target="_blank" className="text-pink-400 underline font-bold hover:text-pink-300">"Δον Ζουάν"</a> for Friday at 21:00 at Aristotelion.
+                                I have a double ticket for a play called <a href="https://www.more.com/gr-el/tickets/theater/don-zouan-thessaloniki/" target="_blank" className="text-pink-400 underline font-bold hover:text-pink-300">"Δον Ζουάν"</a> for tomorrow at 21:00 at Aristotelion.
                             </p>
                             <p className="text-sm text-slate-200 font-sans">
-                                Do you want to come with me? Let me know until Friday at 15:00.
+                                Do you want to come with me? Let me know until tomorrow at 14:00.
                             </p>
                             <p className="text-center font-bold text-pink-300 mt-2 font-serif text-lg animate-pulse">
                                 GOOD LUCK WITH YOUR TEST
@@ -1327,13 +893,17 @@
                     const sendWish = async () => {
                         if (!textInput.trim()) return;
                         setSending(true);
-                        try {
-                            await fetch("https://formsubmit.co/ajax/karadaglisp@gmail.com", {
-                                method: "POST",
-                                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                                body: JSON.stringify({ _subject: "✨ New Wish from Midnight Picnic", wish: textInput })
-                            });
-                        } catch (error) { console.error("Error sending wish:", error); }
+                        
+                        if (!silentMode) {
+                            try {
+                                await fetch("https://formsubmit.co/ajax/karadaglisp@gmail.com", {
+                                    method: "POST",
+                                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                                    body: JSON.stringify({ _subject: "✨ New Wish from Midnight Picnic", wish: textInput })
+                                });
+                            } catch (error) { console.error("Error sending wish:", error); }
+                        }
+                        
                         setSending(false);
                         setCompleted(true);
                     };
@@ -1973,6 +1543,15 @@
 
                     const sendArt = async () => {
                         setIsSending(true);
+                        
+                        if (silentMode) {
+                            setTimeout(() => {
+                                setIsSent(true);
+                                setIsSending(false);
+                            }, 500);
+                            return;
+                        }
+
                         try {
                             // Convert colors to emojis for email preview
                             const emojiMap = {
@@ -2049,12 +1628,125 @@
                     );
                 }
 
+                // --- JAN 25: MEMORY (Pairs) ---
+                if (dayItem.title === "Memory") {
+                    const ICONS = ['🐈‍⬛', '🌙', '🧶', '🐟'];
+                    // 4 pairs = 8 cards
+                    const [cards, setCards] = useState([]);
+                    const [flipped, setFlipped] = useState([]);
+                    const [solved, setSolved] = useState([]);
+                    const [isWon, setIsWon] = useState(false);
+
+                    useEffect(() => {
+                        const deck = [...ICONS, ...ICONS]
+                            .sort(() => Math.random() - 0.5)
+                            .map((icon, id) => ({ id, icon }));
+                        setCards(deck);
+                    }, []);
+
+                    const handleFlip = (id) => {
+                        if (flipped.length === 2 || flipped.includes(id) || solved.includes(id)) return;
+                        
+                        const newFlipped = [...flipped, id];
+                        setFlipped(newFlipped);
+                        
+                        if (newFlipped.length === 2) {
+                            const [first, second] = newFlipped;
+                            const card1 = cards.find(c => c.id === first);
+                            const card2 = cards.find(c => c.id === second);
+                            
+                            if (card1.icon === card2.icon) {
+                                setSolved(prev => [...prev, first, second]);
+                                setFlipped([]);
+                                if (solved.length + 2 === cards.length) setIsWon(true);
+                            } else {
+                                setTimeout(() => setFlipped([]), 1000);
+                            }
+                        }
+                    };
+
+                    return (
+                        <div className="mt-4 flex flex-col items-center">
+                            {isWon ? (
+                                <div className="text-center animate-bounce text-pink-300 font-bold">
+                                    Nice!✨
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-4 gap-2">
+                                    {cards.map(card => {
+                                        const isFlipped = flipped.includes(card.id) || solved.includes(card.id);
+                                        return (
+                                            <button
+                                                key={card.id}
+                                                onClick={() => handleFlip(card.id)}
+                                                className={`w-12 h-16 rounded-lg text-2xl flex items-center justify-center transition-all duration-300 preserve-3d ${isFlipped ? 'bg-pink-600 rotate-y-180' : 'bg-slate-700'}`}
+                                            >
+                                                {isFlipped ? card.icon : '?'}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    );
+                }
+
+                // --- JAN 26: ORACLE ---
+                if (dayItem.title === "Oracle") {
+                    const [answer, setAnswer] = useState(null);
+                    const [isShaking, setIsShaking] = useState(false);
+                    const answers = ["Yes, definitely", "The stars say yes", "Ask again later", "My sources say no", "Maybe, kitten", "Focus and ask again", "It is certain", "Don't count on it"];
+
+                    const ask = () => {
+                        if (isShaking) return;
+                        setIsShaking(true);
+                        setAnswer(null);
+                        setTimeout(() => {
+                            const random = answers[Math.floor(Math.random() * answers.length)];
+                            setAnswer(random);
+                            setIsShaking(false);
+                        }, 1000);
+                    };
+
+                    return (
+                        <div className="mt-4 flex flex-col items-center">
+                            <div 
+                                onClick={ask}
+                                className={`w-32 h-32 rounded-full bg-gradient-to-br from-indigo-500 to-purple-900 shadow-[0_0_20px_rgba(168,85,247,0.5)] flex items-center justify-center cursor-pointer mb-4 border-4 border-slate-800 relative overflow-hidden ${isShaking ? 'animate-pulse scale-95' : ''}`}
+                                style={isShaking ? {animation: 'shake 0.5s infinite'} : {}}
+                            >
+                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.4),transparent_50%)]"></div>
+                                {answer ? (
+                                    <div className="text-center text-xs font-bold text-white px-4 animate-in fade-in zoom-in font-serif leading-tight">{answer}</div>
+                                ) : (
+                                    <span className="text-4xl opacity-50">🔮</span>
+                                )}
+                            </div>
+                            <style>{`
+                                @keyframes shake {
+                                    0% { transform: translate(1px, 1px) rotate(0deg); }
+                                    10% { transform: translate(-1px, -2px) rotate(-1deg); }
+                                    20% { transform: translate(-3px, 0px) rotate(1deg); }
+                                    30% { transform: translate(3px, 2px) rotate(0deg); }
+                                    40% { transform: translate(1px, -1px) rotate(1deg); }
+                                    50% { transform: translate(-1px, 2px) rotate(-1deg); }
+                                    60% { transform: translate(-3px, 1px) rotate(0deg); }
+                                    70% { transform: translate(3px, 1px) rotate(-1deg); }
+                                    80% { transform: translate(-1px, -1px) rotate(1deg); }
+                                    90% { transform: translate(1px, 2px) rotate(0deg); }
+                                    100% { transform: translate(1px, -2px) rotate(-1deg); }
+                                }
+                            `}</style>
+                        </div>
+                    );
+                }
+
                 return null;
             };
 
             const [selectedDay, setSelectedDay] = useState(null);
             
-            // Current date setup
+            // Current date setup - LOCKED to real time
             const now = new Date();
             const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
@@ -2078,6 +1770,9 @@
                                 let dateLabel = itemDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                                 if (isInvitation) dateLabel = "💌 Invitation";
                                 
+                                // Logic: Normal today items shimmer. Invitation item does NOT shimmer.
+                                const shouldShimmer = isToday && !isInvitation;
+
                                 return (
                                     <button
                                         key={index}
@@ -2087,7 +1782,9 @@
                                             aspect-square rounded-2xl flex flex-col items-center justify-center relative transition-all duration-300 border-2
                                             ${isLocked 
                                                 ? 'bg-slate-800/50 border-slate-700 text-slate-600' 
-                                                : (isToday || isInvitation)
+                                                : isInvitation
+                                                    ? 'bg-gradient-to-br from-pink-600 to-purple-600 text-white shadow-lg scale-105 border-pink-400'
+                                                : shouldShimmer 
                                                     ? 'bg-gradient-to-br from-pink-600 to-purple-600 text-white shadow-[0_0_20px_rgba(236,72,153,0.5)] scale-105 border-pink-400 animate-pulse' 
                                                     : 'bg-slate-700/80 border-slate-600 text-pink-200 hover:bg-slate-600 hover:border-pink-500/50 hover:scale-105'}
                                         `}
@@ -2120,7 +1817,7 @@
                                     <SurpriseInteraction dayItem={selectedDay} />
                                 </div>
                                 <div className="mt-6 text-xs text-slate-500 font-mono relative z-10">
-                                    {new Date(selectedDay.year, selectedDay.month, selectedDay.day).toLocaleDateString(undefined, {weekday: 'long', month: 'long', day: 'numeric'})}
+                                    {selectedDay.title === "P.S." ? "Special Invite" : new Date(selectedDay.year, selectedDay.month, selectedDay.day).toLocaleDateString(undefined, {weekday: 'long', month: 'long', day: 'numeric'})}
                                 </div>
                             </div>
                         </div>
@@ -2133,15 +1830,17 @@
         const App = () => {
             const [isAuthenticated, setIsAuthenticated] = useState(false);
             const [activeTab, setActiveTab] = useState('home');
+            const [silentMode, setSilentMode] = useState(false);
 
             // --- ANALYTICS STATE ---
             const sessionStartTime = useRef(Date.now());
             const sessionLog = useRef([]);
 
-            const handleLogin = () => {
+            const handleLogin = (isSilent = false) => {
                 // Reset timer on login
                 sessionStartTime.current = Date.now();
                 sessionLog.current = [`[${new Date().toLocaleTimeString()}] Session Started (Login)`];
+                setSilentMode(isSilent);
                 setIsAuthenticated(true);
             };
 
@@ -2163,17 +1862,13 @@
                 if (!isAuthenticated) return;
 
                 const handleClick = (e) => {
-                    // Try to identify what was clicked
                     let target = e.target;
                     let label = "";
                     
-                    // Search up to 3 levels for a button or link
                     for (let i = 0; i < 4; i++) {
                         if (!target || target === document.body) break;
                         
-                        // Check if it's a button, link, or has a click handler/aria-label
                         if (target.tagName === 'BUTTON' || target.tagName === 'A' || target.getAttribute('role') === 'button') {
-                            // Prioritize specific text or labels
                             label = target.innerText || target.getAttribute('aria-label') || target.getAttribute('title') || "Unknown Button";
                             break;
                         }
@@ -2181,7 +1876,6 @@
                     }
                     
                     if (label) {
-                        // Clean up label (remove newlines, shorten)
                         const cleanLabel = label.replace(/\s+/g, ' ').trim().substring(0, 30);
                         if (cleanLabel) logActivity(`Clicked: "${cleanLabel}"`);
                     }
@@ -2196,8 +1890,8 @@
                 if (!isAuthenticated) return;
 
                 const sendReport = () => {
-                    // Don't send empty reports
-                    if (sessionLog.current.length === 0) return;
+                    // Don't send empty reports OR if silent mode
+                    if (sessionLog.current.length === 0 || silentMode) return;
 
                     const durationMins = ((Date.now() - sessionStartTime.current) / 1000 / 60).toFixed(2);
                     
@@ -2209,7 +1903,6 @@
                         _captcha: "false"
                     };
 
-                    // Use keepalive: true to ensure the request is sent even if the page closes
                     fetch("https://formsubmit.co/ajax/karadaglisp@gmail.com", {
                         method: "POST",
                         headers: { 
@@ -2220,36 +1913,33 @@
                         keepalive: true
                     }).catch(err => console.log("Report logging skipped:", err));
                     
-                    // Clear log to avoid duplicates if she comes back to the same tab
                     sessionLog.current = [];
                 };
 
                 const handleVisibilityChange = () => {
-                    // Sends report when switching tabs or minimizing browser (mobile)
                     if (document.visibilityState === 'hidden') {
                         sendReport();
                     }
                 };
 
-                // Listeners for leaving the page
                 document.addEventListener('visibilitychange', handleVisibilityChange);
-                window.addEventListener('beforeunload', sendReport); // Desktop close
+                window.addEventListener('beforeunload', sendReport); 
 
                 return () => {
                     document.removeEventListener('visibilitychange', handleVisibilityChange);
                     window.removeEventListener('beforeunload', sendReport);
                 };
-            }, [isAuthenticated]);
+            }, [isAuthenticated, silentMode]);
 
             const renderContent = () => {
                 switch(activeTab) {
                     case 'home': return <HomePage onNavigate={setActiveTab} />;
                     case 'study': return <StudyPage />;
                     case 'stars': return <StarsPage />;
-                    case 'calm': return <CalmPage />;
-                    case 'feedback': return <FeedbackPage />;
+                    case 'calm': return <CalmPage silentMode={silentMode} />;
+                    case 'feedback': return <FeedbackPage silentMode={silentMode} />;
                     case 'msg': return <MsgPage />;
-                    case 'advent': return <AdventPage />;
+                    case 'advent': return <AdventPage silentMode={silentMode} />;
                     default: return <HomePage onNavigate={setActiveTab} />;
                 }
             };
