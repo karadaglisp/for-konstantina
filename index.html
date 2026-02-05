@@ -34,7 +34,7 @@
         
         #root { height: 100%; }
         
-        /* 3D Perspective for Advent Fortune Cookie */
+        /* 3D Perspective */
         .perspective-1000 { perspective: 1000px; }
 
         /* Animations */
@@ -67,6 +67,7 @@
         .rotate-y-180 { transform: rotateY(180deg); }
         .preserve-3d { transform-style: preserve-3d; }
         .backface-hidden { backface-visibility: hidden; }
+        
     </style>
 </head>
 <body>
@@ -92,15 +93,158 @@
         
         // Navigation Icons
         const Tent = (props) => <IconBase {...props}><path d="M3.5 21 14 3"/><path d="M20.5 21 10 3"/><path d="M15.5 21 12 15l-3.5 6"/><path d="M2 21h20"/></IconBase>;
-        const Book = (props) => <IconBase {...props}><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></IconBase>;
         const Star = (props) => <IconBase {...props}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></IconBase>;
-        const Heart = (props) => <IconBase {...props}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" /></IconBase>;
         const Gift = (props) => <IconBase {...props}><polyline points="20 12 20 22 4 22 4 12" /><rect x="2" y="7" width="20" height="5" /><line x1="12" y1="22" x2="12" y2="7" /><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" /><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" /></IconBase>;
         const Moon = (props) => <IconBase {...props}><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></IconBase>;
         const PenTool = (props) => <IconBase {...props}><path d="m12 19 7-7 3 3-7 7-3-3z"/><path d="m18 13-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="m2 2 7.586 7.586"/><circle cx="11" cy="11" r="2"/></IconBase>;
+        const Heart = (props) => <IconBase {...props}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" /></IconBase>;
 
         // Custom Cat Icon Component
         const Cat = ({ size = 24, className = "" }) => <div className={`flex items-center justify-center ${className}`} style={{ width: size, height: size, fontSize: size * 0.8, lineHeight: 1 }}>🐈‍⬛</div>;
+
+        // --- GLOBAL DATA ---
+        const MUSIC_POOL = [
+            // My Teenage Post-Wave Greek Pulp-Pop Wet Dreams
+            "70LpDqsreV4MtlQzyyV87G", "5Od7Y3ihqhynfNBL10GS1V", "7jRLjRTSbOMmrkFiL6YyIh", "3D6VnVquICXOGIardkqCNV", "0xWbkwwk9PYq7KbhUqGTrn",
+            "76eEvX5DMXKO0f4jH3mc6I", "1dURIHSKeONv5W5qlxfhJM", "7cTVP6Y736smxdqnsKILng", "1nwSyvxZe3CdPgVrtBkRpj", "2go9bn0N7cg7ZHBpdO30xP",
+            "1DlunM8uvc4IDwsh7TPkAh", "4CgMAGfaMycuMBq7lBdYW8", "1nmDqfjWySD2uG82mxmQET", "7hBO6if1MEvLhs1nLQXQbc", "3gFHt0xjK283HOtqIWj7Q1",
+            "4VV3S1Ywd5cqIzAVJGoypV", "6XeFd9KCGi7zz5U9KHqCyx", "6B8rz7mXTeAUMN5kzxDU95", "6HuvjKKWtXd8zWs0yiXwuo", "6haoMKj0wLTPxs3TbEAZHR",
+            "5o6iooyCPV4ltS7V2xYj6A", "4frb4uRI5w0mRzcnZfPARr", "2V08zd3Ebi0luBDJ5vhveh", "3sjnNxHbmCKmpwL5lnrGEN", "6noTmxZ2U5rPNCB7gxvKRc",
+            "6Q1UWA7EZ2QxCjZ6FSRdD1", "26fLnUK269kccIflMSApka", "4onFKWXE6krAYMpIC058P1", "6J4BeGRnLW7xxO00hxnXHP", "68f4Lw58gbEkNxCF8L8F3B",
+            "3XHskjrUDc3Wp1ncftKLjz", "1cRAkR5GfTQRPtsLNzuFhN", "0t2AN6xx25AkNLRc1JGrNH", "2y07NHwK6ZLMKuNYzVCeYm", "1f6jUQIR1kQD89n5gAbpYa",
+            "7zzFb0dYTjKNNP39h7Ke8I", "38dKbjLOv51Nq4HNX0l8TW", "606vxZ5VVTFrvYt6CPUDLA", "4tye7Iy4kqSvTs5msJZQHq", "1rAPmrKqRTWaJdJeISbauf",
+            "1XEBbdQuFXvog7MDao0yfk", "63YDJGvdHF64nocFR9z0oo", "73G35udHDcqCfP2lHCbaps", "52DnEDijuLyneGxkRPWaiy", "4XBab31fUywZVGMlA6PhAN",
+            "7aHgIFaRWmBMXf8VRhJWy0", "3Zmkfu04oT5051b0g6pxSO", "63YHH6P1z3wbzCSTJIDtjo", "0swqfhjHd95VJXZY6rgjLT", "0elApiEQu6nMrE5BJOQXgo",
+            "7AscoYDsOUwBBe5MwAxebQ", "58uOwQN9E9u6pcAWigOh2o", "0n2AGgoSBJjpXs5ZxNr6YR", "0Zxjq1RaNGAywOKaTBmw4S", "4PxHSsckhcveay6LMJ3AjX",
+            "47msO5H584HjMuAGmqMJtV", "4PiIAUjanOJNOgSDdxjJ4c", "5A8QwIwbTClJMXpjy0n13M", "63orgCfmTpRHa4hHRbpipR", "28cS2y6vA6kQc9OGleGwx2",
+            "7rcE4WPQmLvZbhkCUIYCZF", "6j6INJNCPHB2WS0ZePXKXA", "7bPsKIYOYjJtPeIsg3nW2P", "2L9pZEVUFyGHNtx638XHo2", "6pTyolJMLQoQm0qaGIxc2X",
+            "0htdTkO5n2La5TtwVYQpRT", "67GEyhXjuE4CksP16OIu7p", "6OanicNL1bB32VgK0nC8nh", "58uf6igKC5O5VAa9iVxiKh", "74fP9YcpDOaOucpsAGoWFH",
+            "5687kNTXLpqSUUkqk31blJ", "6y3ZDbcQstwIi6hhxOHXNv", "5qi2qBMfMEalAwfyw4DekD", "0u4kfySAnhPiqY17hCRNEN", "1gO9UCn7BFNesoFTA774nn",
+            "0jqNqKLfG6dpkh82ZNZLc8", "4r5W2iwnQpcDzEu8LCEx7B", "48LU6CLLvImvsVu0jJjC7l", "51TBGuofiTBcWgTEzQvqKG", "4XExjGrZX6VkAALwwaisde",
+            "0hTLC3b0fjYZUX8Nw6pGPE", "3xDEza9vTxqINGvvz8V6cO", "6NqWO8hGsntCx702kT2idK", "4kevlqV0BxC2bJ3cg4TICa", "1YRGhYufVIhxnXxzC1mG5x",
+            "7cGLw6CZb2E9paZysiRtwG", "3Nf2wpCH6TeLdZ4eG5XQ7f", "7wLKS7SzdTgUL0dsBmfdWu", "6NEE9pAg8KOumgx2Qiy7Kw", "7jQOlN1vGR5rBOck2LUBjX",
+            "3rTlDFp5OWIcmDzbihtsAf", "7oHIaZjc2JWCyQmpbJ8f3z", "0ipMg1ovxucAQpIlB5KFnv", "3s3QL5SzcKVHq0B8iBcoZo", "5gF9RD3AKE8pf1sXcRz68W",
+            "6JkCzA3arBZKLhnCaUdoDg", "7s9mt14taxUeum4lhUWL43", "3ZXdGIqQOQYGETZRlUJTdv", "1cEtA13aEaEh5QAncWvFfJ", "4NMn560HDiG0v5hGqfB3aS",
+            "41zV1pjj4RJPBTV1nqq0ee", "1uYyMqV8K4DOUKYrqyaoH5", "4LCiQW8vfq3A9R9sA8U3hN", "2dOPsvCkjyTdLeqkQdgfTR", "7xfI8eKbhWk9O8vwVnqnTa",
+            "15b7vmjYfAPGL3DuSMBUI1", "4H5tcU13VR7ug5E4MX8SKP", "1OrvTgVJ34forXXa7A8IkG", "4FWrrmLMLeJ1DX8awicSUm", "42wkMrkIqX4pYIGnTW70kG",
+            "6ucNZBkwkPmw8OHiv5L7P4", "7Gi8jg3h2Ac0gMetpQUXmh", "4yhhJkWb4oqTYRCKAEACMr", "3hatHrJ64kkVS2VH47pPKR", "3RKxM0q7IGsudpC4VT4xTv",
+            "0yt0PDjRd1CfDXnw3oeXtS", "17virskSxaqh5UKk3QonW4",
+
+            // (bedroom) pop for the elite
+            "0H2zA6m04MUsu4mX2KecNr", "6XHikJpK06NoXaFwkH4tPL", "0R3TWpoxAhT3HDXM7tpRzS", "4HbeGjbt7u3pvwDk1vN7P0", "0B6oBwvkyLptGexpwJVz7c",
+            "2blV6tohiJoieVNtlL0yU4", "3zjvduyGhyBKYCVHGn6E74", "0gdWSthwNMJ4TPVya8b0bh", "36jDABK9TQixIZOZylPy04", "5aqslHfDoGviK5vRwyQQgd",
+            "50auDM0fjPvcdxvc4i5nOj", "6jp0JIuzSbKCB26bg1iPgp", "5GbVzc6Ex5LYlLJqzRQhuy", "2ZWlPOoWh0626oTaHrnl2a", "0UVzM2GkqTTf57G6Wj05UL",
+            "2HUugUuZW0e4N7ne9YJScc", "68KdvPllp9Pug8ZG6AByFY", "5x9r0HaFznxQ32J2JZFhub", "3MMLO6TUL07tze9IXud0Vc", "44ZKnfWEkp7wPs035j4Tua",
+            "6pxElwU80zhjbCC77Vn8EI", "6Jl3ZOX6MUOlyoUc721bsX", "1FWoak0OgTq1jrYfRKfXsj", "7mjOxXnZYbGtgjyX0hqaLs", "4hqTguGFl0NWgFIxBppbKQ",
+            "4zvHZWOGyL7WcmqHOgtGCW", "1XrSjpNe49IiygZfzb74pk", "2dIeraguJ8SoHDqXfSZelZ", "75TDPu9k7Yv3IovdYaNCwk", "2QjOHCTQ1Jl3zawyYOpxh6",
+            "4EpZ4eYuZOwPSSwyqpdHnJ", "5EYi2rH4LYs6M21ZLOyQTx", "20EIvCTkNuaFU0vB6NG8eo", "0nMqu5vN44GNv8UOQxmBJK", "3AyuigFWbuirWHvidbMz8O",
+            "6atVS7UZBxoyJkkteM62u5", "4HpFU6eMThgW6Cael5AwYy", "0S3BtG3i5tkQmehJhIhHF3", "7AfZIW6yXC4MzElfFmqa9m", "7i5I4h7r2vkI2r9tgKjy0x",
+            "0ltZY7z8YvuDBSAbsIgPc", "0AduS1e4FWNLdnUNmMwQQd", "7j59MN6vDM9lrvQ0iGhqaa", "6JaPUxse2AsI0df7XXvetF", "5U8hidWugxHXvh1AzZYwKF",
+            "3s9YtjSkxeeriM92mASyoO", "1B2zrooBJ6Rc8NIUuS3VDh", "1xRXJVVDvlvFJxuLRvHDpF", "0B4U9FT1WaFwUiiCPOAak7", "06qUr4CXtG4k3gUurF4tu6",
+            "2DoO0sn4SbUrz7Uay9ACTM", "5eAkSNmHLmydvGAvcV4TnM", "2joEpsXflccZD0ZwKEdz5m", "30jui3PqevssdIVpjEWM38", "1MaDw1BQ797k8j7xXnH486",
+            "4UexrxBMEyacoNwOvmx6XQ", "7lKN7pik3CelVWHWGp6DfB", "4lAfXpZKFDEudiEzLB9uHm", "2fGRJzoiYJYAzlQAyBONMb", "2RjsAYVbdZPISqnsWd3Hup",
+            "6RiiSy9GzSwiyDEJDiMuKe", "3A0cAzFKPefBCz7Z02UnnO", "6BrfgV35h3NfTtIdMqhmFQ", "6Qvwt9H76n1FfWyw5aT6JJ", "3vkCueOmm7xQDoJ17W1Pm3",
+            "6A7d2QgbSga495NJdkEY2A", "0OblxGfTmtALWjImtm7DFd", "62tGzw9OJOwDcjPBnMPCuj", "0RvES3Nq1VAIAdC4x8LfQT", "0OrxUBA5JghHjUarBa2Vjz",
+            "05QGaQnoBuda27vXxpuiRU", "1EZYmas3jh7aUKqCF9EI5A", "4Z2zWAUN9YVxHkZXS7s1KE", "3Zq2naJ92TwUhC32Iov3a6", "4hm33jVolpa22nzhlY72jD",
+            "3TFNxpIwIzMi3jsMRy9GVZ", "0bXdmDpRkYeub0OKISlYpH", "7MBSbBrx0TvBYyKEcpGcJb", "35S3sMjHlF8v2EmxQuDF7z", "36QuWvqoTl8UN1NZv0Q8VP",
+            "1wSXSFmjyldwfx0JOSHlEa", "1ixXNc8iCkRniJhICf9xpy", "0YdIIMb2MHuxoUudkAY9gS", "5CZEan1P5qmhfXFib8ohGj", "0zpk9Uz5C8DshxSYbMcwcH",
+            "1MwPvniPtqPkXwtQDFiJdb", "7jdNolHsTx18e2QVoDm1uf", "41HyMiZSBLGlfopnDE7Ppc", "0KyAGiNGUytG5JLxJu4F6l", "4NhH5IXSqjQgmQOm189Dij",
+            "3MklLppNRhuAupVGO3uNW2", "0iMSUfh4oQplV5OrmrlIbm", "2JKtCvtxP47fOMYi0BjMoY", "6ZqNoqtQvRP3WDHrna12xT", "6ZCGKyXcGbYc6tdP6unPVY",
+            "0HAqq2GcQKyi3s87GuN7jU", "0XvoMOI25j4wODyk8nuANS", "11sfRkHdvsop5DdHVmGpt1", "0dpusM1gM6ULx0QvjJctbT", "1SyJuJfFyoAxuZMaTbwHJW",
+            "2lOTK5uAzQ4OmRPXo2oAFX", "11HRSkKS5nDZB0921Kwne1", "4LQm0wh5zH07mOOQxI0QOK", "2HcMkGeghyXdJRT1g85u0t", "6R2YSITVeRTFwDczaxSnQS",
+            "4k6Uh1HXdhtusDW5y8Gbvy", "4DQNdeDEnbJIckoZ8XLg7G", "2ZZ0ITwRqitCvddi2CGfgq", "0a7RXqXcCSNeo7WxynoNka",
+
+            // Tosa kalokairia
+            "5cERWuNRghbSmXyv4pGX5v", "5OZUVTVsRKOxBCxeW9P2Dy", "4du2vBLWwPMxRncBklEk7u", "1mPlvRINnuodMQdS7AZ6Jr", "158mRIBWD3DqkZsa7uXvMQ",
+            "0U4414APE9VKvPhstvkpYP", "1YnbnWAQfuG30q5tWTpKVA", "0Y12sZ2BwHHZZSAcaU2Bbr", "5uuLnmCZfvaeJI4XAyWnCC", "3czISDpFF7J9HGgn9WZoBy",
+            "2zwmtC9IBxuOHsrr7sK3md", "1woQ49dajnONIc9QVPs62u", "0GMOIRfddB0l0rxDmm6YJ8", "5rs7fgwffE0dSR4JYXIQbu", "7s3TCY7WueF1khSppW7iF1",
+            "4ZN478bY80gFhyA6PmmPFD", "40Wx97tCqWvzgMBSQe0prL", "76ys7PRbxO9JTmMAPDQkSB", "7CrrRzL6C1U46cBHBHcqyY", "43ed7eVZCyV4glwgkuCr8e",
+            "0iNKXpQbTbOLTqbS4PLxwR", "44HedZNCyNN2q3mMNNky9i", "2NtJ0frveSvgeSeT7ZqNuF", "6xgNbfR28nXkxXTdJvElYE", "0sHAUfT0764slsYmzHuAyR",
+            "0zHQTm3IH7kDjhMCdS5VcO", "10ynytzcmTvB6aXOg6AJ4w", "3soXmrdocXIXXJSGlm8vjT", "0we8xXKjtmpi3hELJxwcbL", "2QSdQSAWWWuYlDMvxNrPIz",
+            "3DtOgnU3dAFMJbrLzM0E61", "3Hzh6CNHk7X3WX9masTX2p", "53XiyakMLDTrpJrHn17IEN", "16DUU2ZOjRcDU6xtAoywtP", "5A8DxvVWRk8oJVmjOugilP",
+            "42zGu2xvKqcTFgOGbcNfwU", "4PnCiR4K75X5VoShGoyetB", "5ZSImHC2E9obW7ftX5XPLN", "5mkLg5QjOqvU7EDIRIm0Fp", "3kSVR6vHwOVHwZqxES3kcp",
+            "00DAwd8VddIe9BTYeSTlde", "2yhcOWQKHS9KRUja2w68fI", "3uSeyudHeffO0ae3sNhkSu", "2MB5r0nZQbk0RfOxoyvo7Y", "0LuqYKTf700ss14LPOsH4J",
+            "5F58MuwG5vpPNp8KbGrl48", "6FntxZMrTrHFr6u7FwIXEk", "6HVEqavdH36tV30gAC1kfB", "6DP31WTLrD8Bvsxy2VV7cs", "1SFdIW0U0GWe55nL3W0pY7",
+            "1X5PAeDiHUHFWo19kyEbmy", "65KGgcDQ9UvjnvWdo8HL8y", "68U8WzzmDkc9OUG12I7GAB", "7ueHwvftYc7dp2ggogXYqA", "6YyKswKpjMVTAkRkRb2gJp",
+            "2KCSHXnrhzVLxfcCEfOlv1", "1l15uZKtQOsGXzQmiZjQa8", "1p5iUGtUugdDVh80xUf5Af", "7y2iFrKyiTaE9nVh45CzYE", "2OJL9imXUV7Ny7pCAGGWwg",
+            "4JNi5l2KTYlZrnvXG2scSX", "3KNYYfOQdlXyYQMod3vknt", "647E9u5Vix5D7dxbUZujNs", "598nHadCHzRomN2pbX4zYs", "2YutvKgc9xPBLzN3YSUKu2",
+
+            // Indie Summer Drive
+            "4zGub7d71FopcEXaLKqxcU", "6cNkgWg7NO8XebRZTrIcom", "4a9fW33mYR8LhXBOLUhbfF", "5h9hkYIBWTZYFRmF6Iz1gt", "3xnM0WCRJKk4Iz49rkG5OC",
+            "1FtVQfBKVOmn1SlqujsnJR", "6gKjueO32MnERRo04gpJ8v", "3IznIgmXtrUaoPWpQTy5jB", "3XqbLsVmAwvTJqW6NKopg0", "28nmbejPbeXDqYCWGVg4X7",
+            "4l38jp3bDPcI5avo9ov482", "3WSaGTmm67vd3stVi0Zu9D", "7dTPJ3wGBcLzAaMhJfY7Qd", "0HNYFFOwID6HGSqy5xr4av", "5goeUvSplsnWCmkUFmFDgt",
+            "6c8pVKT7KBUzp6fYNDFqlL",
+
+            // Mew person, same old mewstakes
+            "52ojopYMUzeNcudsoz7O9D", "49ASnsS0LENGokjQAdP3VW", "2X485T9Z5Ly0xyaghN73ed", "0mO6oS60RST2sWmN2FKknP", "7H7NyZ3G075GqPx2evsfeb",
+            "7s5VQqrjBtrBgZL4pEa46S", "1aXV8GrmQLvgoFtBPERP7E", "4SgcE7RxpK3ydWrjoAQH1K", "3Yub3anoLj8w58TVpEXUJv", "72cGBEqu7RitIOoACXYjfR",
+            "6MClJYRD7op0WvDuBGWsMn", "3FqcpEZ7dzggkhz7cOfC1p", "6QeYSvYqYUsfBzsApbjDHO", "0pJTrMWCiR0TuJ5FApIqrz",
+
+            // Never really needed Duolingo premium
+            "2vlkTkPqdATznKHu9gD2c1", "2YuySJd7C2aoBarBP8OvzR", "6oDXwSPWcp7KT2B3funF8y", "5Dqfw7Qiz6spw2xcl3rfkt", "3Bw99kE5w9R5gSVFhxahcB",
+            "1cyRoWGazsa8Vr5qlDfvPP", "2dGXDL8P7ibb3uPdQ4ybuM", "6st8aj6PmtqGctnLAat95M", "7kgYFXWRmgCH3NxxT6rWR4", "6MqqJ0OVjaYeiWUSMOAK8x",
+            "5TJJTBZWEa6zc6CXnjsVJZ", "2cSRuejq6DU9U6OkSmUw17", "4jmLj7bALZTQoe93dT623W", "5G9LvzXcBoIBXOd2jzdJTs", "4O1etEzE7zc8ZO80KNd5GZ",
+            "784VjdNkpXhFV0RHquzsi2", "2YTxJzuw6szzgsstEo80Dh", "14qNHvX8h6HoynFuV0RxWS", "5HaTv6nHDSVO1LqjwoP7RA", "7KAXxQfUG4kzRivltbD1UY",
+            "67yZsFQIMghAAl0V3h9lES", "12YAZNNm2OuSgDBKjFQcNm", "7ET6gmg1EJe3e9JI3xFMxk", "58lQsFCu6wlgDvOI0MjMmu", "3YB9cvd668HXBEq8rbBW8P",
+            "2mSvt89wTd99uETCSlePH2", "4A48ckONJNoXU5smWT9CeG", "5BBK1WoaiD3b3sJ2UysLuM", "22kGOe1POaqkSQhGtvzbHx", "1o0ckFhbn9bEsbBrAa5oy5",
+            "6602NMvb8ioqAjGKBi44rY", "4RUiaHW5J4yr1k0zioghJT", "6I5zS36y3vQnp9bis62OFy",
+
+            // I miss your body's warmth
+            "6K4t31amVTZDgR3sKmwUJJ", "3Ziys0cjD0QpGMDJydVlIv", "3ypyxNeykDGfupZCloqFVT", "5R0vCr5hXzmPl9ovBKqLXk", "3bXxr8pWeLXcPsfIQm3Uun",
+            "53pVuKaVvfIuGiDrBtPjYD", "5687kNTXLpqSUUkqk31blJ", "3qUQnGoQUzJoLQKwnQucSh", "2FfEHEBsbh3NFcZazN0mll", "4r5W2iwnQpcDzEu8LCEx7B",
+            "0KoU7qwnZZFGFZ1QdHDaRR", "63ABAnFKJCp28TAyqf2cGL", "4ec0GQNlVroHo3Jhjp5FA6", "16CpQWGHO4PWBEoYbtrlda", "0LqZuRAroDVnV6LjDUGap1",
+            "2EPuv7zyLpFqReJoYrIFzm", "41KiUY33B3lXF4GETuhIPt", "0w1c9M3a9WCsxmBs3UkqlA", "6qSt1UvGaxHUzzV244HpmO", "5Hg1m5uhSPL75ejQgPOmyc",
+            "01iiEi9h8CQGUN2K1xBbTj",
+
+            // Your Top Songs 2025
+            "4fPjI40ElIwJQ4DJJxSCOe", "6ZdAsADC9LIICvsVRuGWbZ", "4S4QJfBGGrC8jRIjJHf1Ka", "6bIPHR8AJG5HAcn9oF21Ma", "2rrq3SGYxk90xLx5fMmPhZ",
+            "0widrZ6KVNuIPhbM1rWPDR", "2QPOYxo6k95XvvptEFcf4M", "2nv9JnsrmTiVVuU1M1Y0gE", "62zFcDLa1CjCY9yp6VO4ga", "4neZmyJ43dCSOIj6VHUoMn",
+            "3i4xZSH1kTLE22TUvUFMYo", "0dOUOfrPxsCXCcCYZWHSTN", "7fax7NlxOq2X9kMZw8QLE2", "1UYj8qTWjneZJDVjUMwMub", "7FAh3mXDd7Oyo5RmE2FbsR",
+            "3ZDH5g8ozIUMdjqONzG6tR", "1yltcCzaJXDpbTZmI3s1je", "3TuWrfS30De3P03yITmDcL", "2ji5Ff76AxmJyBG0Z6XgYl", "0QArETwcN3KLawegUPmusT",
+            "7h2nmmoWDi2UpfYKLKWLYB", "204t5SErksNRHRhU52g5JF",
+
+            // kwnna + Banos
+            "3aLClcAppX3b6pCHHFn8nQ", "1OrvTgVJ34forXXa7A8IkG", "28SH8v8kBpdce0mvnI7bST", "3gkNbqRxVlEen5iR6bao5J", "3YiFC5fkXFGqAxMueZ2sqo",
+            "3nIpscPqzbcZyePbF51D9Z", "6OsywAe4ov97KeA0QJv8UG", "4LFenKAaX95Pq6l5kKuw3A", "1s9KXtm2FMA1HeXuPkgpxD", "5VUaEzmMVrs4mPW9a5lTY3",
+            "7xauJZr1AwExzTiC6e4gsl", "00CkIh1jiX8K9iRlV1afNF", "65GkKi3dAwRUpPZI0IogFZ", "1NZs6n6hl8UuMaX0UC0YTz", "1NXbNEAcPvY5G1xvfN57aA",
+            "0ZNU020wNYvgW84iljPkPP", "1E2Ctz821hYVTfDjxQBRZh", "2rASRHHT4hnXIpv5IOcrVU", "1NZZveCjdyc6YFX7Sz8mCL", "7tDMzb6OiWSvjkN1FkpxiB",
+            "1YiubAOu9T8ryoZ0Hu1woa", "7rgTr97Ob29FuuKCHqB7a4", "7eq0a7HISgTaLbMLlJU6mA", "6EOCIUxm6K4OvqLQSf52GK", "2kz837aCEmpdo4xVDEG2sv",
+            "6Hwif22a9kokAI7V7Zwmxj", "1NmSGCAQ1Om8SveCfLnx7X", "2XfkzaOcEcvjm1rB3nYqEo", "4H6Gr260ly6OXQeZ0tdpHr", "62HQz5g66bRVsyTcPt2kXD",
+            "0LIXN2xD9qlHMYo6OA5abR", "1VYv1xH7yUl0b43UVR6yA9", "2HDazOaZrzKcW6g4PPCFFd", "0EiWvy2pfU8sul3wG6PiYz", "0puMe2UGP0whQDeJaTraeX",
+            "2uurVIp2d6PlXkPvgXSjSX", "3i6qNxyVgIdUZTTi5m25EM", "6ADSaE87h8Y3lccZlBJdXH"
+        ];
+
+        const CONSTELLATIONS_DB = [
+            { id: 'and', icon: '👸', title: 'Andromeda', text: 'The Chained Princess.', visibility: { season: 'Autumn', hemisphere: 'Northern' }, data: { s: [[80,20], [65,35], [50,50], [35,65], [35,35]], l: [[0,1], [1,2], [2,3]] } },
+            { id: 'aql', icon: '🦅', title: 'Aquila', text: 'The Eagle.', visibility: { season: 'Summer', hemisphere: 'Northern' }, data: { s: [[50,20,5], [20,50], [80,50], [50,80]], l: [[0,1], [0,2], [1,3], [2,3], [0,3]] } },
+            { id: 'aqr', icon: '♒', title: 'Aquarius', text: 'The Water Bearer.', visibility: { season: 'Autumn', hemisphere: 'Northern' }, data: { s: [[30,20], [50,20], [40,40], [20,60], [60,60], [50,80], [70,80]], l: [[0,1], [1,2], [2,0], [2,3], [2,4], [4,5], [4,6]] } },
+            { id: 'ari', icon: '♈', title: 'Aries', text: 'The Ram.', visibility: { season: 'Autumn', hemisphere: 'Northern' }, data: { s: [[20,60], [50,50], [80,40,5]], l: [[0,1], [1,2]] } },
+            { id: 'aur', icon: '🧔', title: 'Auriga', text: 'The Charioteer.', visibility: { season: 'Winter', hemisphere: 'Northern' }, data: { s: [[50,10,5], [20,40], [80,40], [30,80], [70,80]], l: [[0,1], [0,2], [1,3], [2,4], [3,4]] } },
+            { id: 'boo', icon: '🍦', title: 'Boötes', text: 'The Herdsman.', visibility: { season: 'Spring', hemisphere: 'Northern' }, data: { s: [[50,90,5], [30,50], [70,50], [50,20]], l: [[0,1], [0,2], [1,3], [2,3]] } },
+            { id: 'cnc', icon: '♋', title: 'Cancer', text: 'The Crab.', visibility: { season: 'Spring', hemisphere: 'Northern' }, data: { s: [[50,50,4], [20,30], [80,30], [20,70], [80,70]], l: [[0,1], [0,2], [0,3], [0,4]] } },
+            { id: 'cma', icon: '🐕', title: 'Canis Major', text: 'The Great Dog.', visibility: { season: 'Winter', hemisphere: 'Southern' }, data: { s: [[50,30,6], [60,35], [70,60], [60,80], [30,70], [40,50]], l: [[0,1], [1,2], [2,3], [0,5], [5,4]] } },
+            { id: 'cmi', icon: '🐕', title: 'Canis Minor', text: 'The Lesser Dog.', visibility: { season: 'Winter', hemisphere: 'Northern' }, data: { s: [[20,50], [80,50,5]], l: [[0,1]] } },
+            { id: 'cap', icon: '♑', title: 'Capricornus', text: 'The Sea Goat.', visibility: { season: 'Autumn', hemisphere: 'Southern' }, data: { s: [[10,20], [30,40], [50,50], [80,20], [50,80]], l: [[0,1], [1,2], [2,3], [2,4]] } },
+            { id: 'cas', icon: '👑', title: 'Cassiopeia', text: 'The Queen.', visibility: { season: 'Autumn', hemisphere: 'Northern' }, data: { s: [[10,30], [30,60], [50,40], [70,60], [90,30]], l: [[0,1], [1,2], [2,3], [3,4]] } },
+            { id: 'cep', icon: '👑', title: 'Cepheus', text: 'The King.', visibility: { season: 'Autumn', hemisphere: 'Northern' }, data: { s: [[50,10], [30,30], [70,30], [30,70], [70,70]], l: [[0,1], [0,2], [1,3], [2,4], [3,4]] } },
+            { id: 'cet', icon: '🐳', title: 'Cetus', text: 'The Sea Monster.', visibility: { season: 'Autumn', hemisphere: 'Northern' }, data: { s: [[10,30], [30,40], [60,30], [80,20], [90,40], [80,50], [60,40], [40,80]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [2,6], [1,7]] } },
+            { id: 'cyg', icon: '🦢', title: 'Cygnus', text: 'The Swan.', visibility: { season: 'Summer', hemisphere: 'Northern' }, data: { s: [[50,10,4], [50,50], [50,90], [10,50], [90,50]], l: [[0,1], [1,2], [3,1], [1,4]] } },
+            { id: 'dra', icon: '🐉', title: 'Draco', text: 'The Dragon.', visibility: { season: 'Summer', hemisphere: 'Northern' }, data: { s: [[80,20], [70,30], [60,20], [50,40], [40,30], [30,60], [20,80], [10,70], [30,90]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,7], [6,8], [7,8]] } },
+            { id: 'gem', icon: '♊', title: 'Gemini', text: 'The Twins.', visibility: { season: 'Winter', hemisphere: 'Northern' }, data: { s: [[30,20,4], [70,20,4], [30,80], [70,80], [30,50], [70,50]], l: [[0,4], [4,2], [1,5], [5,3], [0,1], [2,3]] } },
+            { id: 'her', icon: '💪', title: 'Hercules', text: 'The Hero.', visibility: { season: 'Summer', hemisphere: 'Northern' }, data: { s: [[30,30], [70,30], [30,60], [70,60], [20,80], [80,80]], l: [[0,1], [1,3], [3,2], [2,0], [2,4], [3,5]] } },
+            { id: 'leo', icon: '♌', title: 'Leo', text: 'The Lion.', visibility: { season: 'Spring', hemisphere: 'Northern' }, data: { s: [[70,30], [60,20], [45,25], [40,40,5], [20,50], [30,70], [60,65]], l: [[0,1], [1,2], [2,3], [3,0], [3,6], [6,5], [5,4], [4,3]] } },
+            { id: 'lib', icon: '♎', title: 'Libra', text: 'The Scales.', visibility: { season: 'Summer', hemisphere: 'Southern' }, data: { s: [[50,20], [20,50], [80,50], [50,80]], l: [[0,1], [0,2], [1,3], [2,3]] } },
+            { id: 'lyr', icon: '🎵', title: 'Lyra', text: 'The Harp.', visibility: { season: 'Summer', hemisphere: 'Northern' }, data: { s: [[50,15,5], [40,30], [60,30], [40,50], [60,50]], l: [[0,1], [0,2], [1,2], [1,3], [2,4], [3,4]] } },
+            { id: 'ori', icon: '🏹', title: 'Orion', text: 'The Hunter.', visibility: { season: 'Winter', hemisphere: 'Northern' }, data: { s: [[25,20,4], [75,25,4], [45,50], [50,50], [55,50], [30,80,4], [70,85,5]], l: [[0,2], [1,4], [2,3], [3,4], [2,5], [4,6]] } },
+            { id: 'peg', icon: '🐎', title: 'Pegasus', text: 'The Winged Horse.', visibility: { season: 'Autumn', hemisphere: 'Northern' }, data: { s: [[30,30], [70,30], [70,70], [30,70], [85,20], [20,20]], l: [[0,1], [1,2], [2,3], [3,0], [1,4], [0,5]] } },
+            { id: 'per', icon: '⚔️', title: 'Perseus', text: 'The Hero.', visibility: { season: 'Winter', hemisphere: 'Northern' }, data: { s: [[50,20], [30,50], [50,50,4], [70,60], [40,80]], l: [[0,2], [1,2], [2,3], [2,4]] } },
+            { id: 'psc', icon: '♓', title: 'Pisces', text: 'The Fishes.', visibility: { season: 'Autumn', hemisphere: 'Northern' }, data: { s: [[20,50], [40,70], [60,70], [80,30], [50,50]], l: [[0,4], [4,3], [0,1], [1,2], [2,3]] } },
+            { id: 'sco', icon: '♏', title: 'Scorpius', text: 'The Scorpion.', visibility: { season: 'Summer', hemisphere: 'Southern' }, data: { s: [[80,20], [70,25], [60,30,5], [50,40], [45,50], [40,60], [35,70], [40,80], [50,85], [60,80]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,7], [7,8], [8,9]] } },
+            { id: 'tau', icon: '♉', title: 'Taurus', text: 'The Bull.', visibility: { season: 'Winter', hemisphere: 'Northern' }, data: { s: [[20,50], [35,60], [50,65,5], [60,45], [75,30], [80,35], [45,80]], l: [[0,1], [1,2], [2,3], [3,4], [3,5], [2,6]] } },
+            { id: 'uma', icon: '🐻', title: 'Ursa Major', text: 'The Great Bear.', visibility: { season: 'Spring', hemisphere: 'Northern' }, data: { s: [[10,30], [25,25], [35,35], [50,45], [75,45], [75,70], [50,70]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,3]] } },
+            { id: 'umi', icon: '🐻', title: 'Ursa Minor', text: 'The Little Bear.', visibility: { season: 'Summer', hemisphere: 'Northern' }, data: { s: [[80,20,5], [70,30], [60,40], [50,45], [30,45], [25,60], [45,60]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,3]] } },
+            { id: 'vir', icon: '♍', title: 'Virgo', text: 'The Maiden.', visibility: { season: 'Spring', hemisphere: 'Northern' }, data: { s: [[50,50], [20,40], [80,40], [50,80,5], [35,30], [65,30], [50,20]], l: [[0,1], [0,2], [0,3], [1,4], [2,5], [4,6], [5,6]] } }
+        ];
 
         // --- SHARED COMPONENT: STAR BACKGROUND ---
         const StarBackground = () => {
@@ -220,20 +364,18 @@
                     <button onClick={() => onTabChange('advent')} className={`flex flex-col items-center gap-1 p-2 min-w-[3rem] transition-colors ${activeTab === 'advent' ? 'text-pink-400' : 'text-slate-500 hover:text-slate-300'}`}>
                         <Gift size={24} /> <span className="text-[10px]">Advent</span>
                     </button>
-                    <button onClick={() => onTabChange('study')} className={`flex flex-col items-center gap-1 p-2 min-w-[3rem] transition-colors ${activeTab === 'study' ? 'text-pink-400' : 'text-slate-500 hover:text-slate-300'}`}>
-                        <Book size={24} /> <span className="text-[10px]">Study</span>
-                    </button>
                     <button onClick={() => onTabChange('calm')} className={`flex flex-col items-center gap-1 p-2 min-w-[3rem] transition-colors ${activeTab === 'calm' ? 'text-pink-400' : 'text-slate-500 hover:text-slate-300'}`}>
                         <Moon size={24} /> <span className="text-[10px]">Calm</span>
                     </button>
-                    <button onClick={() => onTabChange('stars')} className={`flex flex-col items-center gap-1 p-2 min-w-[3rem] transition-colors ${activeTab === 'stars' ? 'text-pink-400' : 'text-slate-500 hover:text-slate-300'}`}>
+                    {/* <button onClick={() => onTabChange('stars')} className={`flex flex-col items-center gap-1 p-2 min-w-[3rem] transition-colors ${activeTab === 'stars' ? 'text-pink-400' : 'text-slate-500 hover:text-slate-300'}`}>
                         <Star size={24} /> <span className="text-[10px]">Stars</span>
                     </button>
+                    */}
                     <button onClick={() => onTabChange('feedback')} className={`flex flex-col items-center gap-1 p-2 min-w-[3rem] transition-colors ${activeTab === 'feedback' ? 'text-pink-400' : 'text-slate-500 hover:text-slate-300'}`}>
                         <PenTool size={24} /> <span className="text-[10px]">Ideas</span>
                     </button>
-                    <button onClick={() => onTabChange('msg')} className={`flex flex-col items-center gap-1 p-2 min-w-[3rem] transition-colors ${activeTab === 'msg' ? 'text-pink-400' : 'text-slate-500 hover:text-slate-300'}`}>
-                        <Heart size={24} /> <span className="text-[10px]">Msg</span>
+                    <button onClick={() => onTabChange('ps')} className={`flex flex-col items-center gap-1 p-2 min-w-[3rem] transition-colors ${activeTab === 'ps' ? 'text-pink-400' : 'text-slate-500 hover:text-slate-300'}`}>
+                        <Heart size={24} /> <span className="text-[10px]">P.S.</span>
                     </button>
                 </div>
             </nav>
@@ -252,102 +394,17 @@
                 <p className="text-slate-400 text-xl max-w-md mb-8">
                     A collection of mini-stuff for you &lt;3.
                 </p>
-                <button 
+                {/* <button 
                     onClick={() => onNavigate('stars')} 
                     className="px-8 py-3 bg-white text-black font-bold rounded-full hover:bg-pink-200 transition-colors flex items-center gap-2 cursor-pointer shadow-lg active:scale-95 transform duration-150"
                 >
                     <Play size={16} /> Enter World
                 </button>
+                */}
             </div>
         );
 
-        // --- PAGE: STUDY ---
-        const DECORATION_ITEMS = ['☕', '🕯️', '🪴', '📚', '🧸', '🎧', '🧶', '🌵', '🔮', '🖼️', '🐈‍⬛', '🍑', '🌙', '✨', '🧁', '🍓', '🎀', '🎹', '🎻', '🎷', '🎨', '🚀', '🛸', '🪐', '🏰', '🎡', '🧸', '🥐', '🥞', '💐', '🍫', '🍩', '🍪', '🍬', '🍭', '🍮', '🍯', '🍼', '🥛', '🧃', '🧉', '🧊'];
-
-        const StargazerLily = ({ progress }) => {
-            const scale = 0.2 + (progress / 100) * 0.8;
-            const opacity = 0.5 + (progress / 100) * 0.5;
-            return (
-                <div className="relative w-48 h-48 flex items-center justify-center transition-all duration-1000 ease-out mb-6" style={{ transform: `scale(${scale})`, opacity: opacity }}>
-                   <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-[0_0_15px_rgba(236,72,153,0.6)]">
-                       <g fill="#ec4899" stroke="#be185d" strokeWidth="1"> <path d="M50 50 Q30 80 50 100 Q70 80 50 50" /> <path d="M50 50 Q30 20 50 0 Q70 20 50 50" /> <path d="M50 50 Q80 30 100 50 Q80 70 50 50" /> <path d="M50 50 Q20 30 0 50 Q20 70 50 50" /> <path d="M50 50 Q20 20 15 15 Q40 10 50 50" transform="rotate(45 50 50)" /> <path d="M50 50 Q80 80 85 85 Q60 90 50 50" transform="rotate(45 50 50)" /> </g>
-                       <g fill="#be185d"> <circle cx="50" cy="40" r="1.5" /> <circle cx="50" cy="30" r="1.5" /> <circle cx="60" cy="50" r="1.5" /> <circle cx="70" cy="50" r="1.5" /> <circle cx="40" cy="50" r="1.5" /> <circle cx="30" cy="50" r="1.5" /> <circle cx="50" cy="60" r="1.5" /> <circle cx="50" cy="70" r="1.5" /> </g>
-                       <circle cx="50" cy="50" r="6" fill="#facc15" stroke="#a16207" /> <path d="M50 50 L40 40 M50 50 L60 40 M50 50 L40 60 M50 50 L60 60" stroke="#facc15" strokeWidth="2" strokeLinecap="round" />
-                   </svg>
-                </div>
-            )
-        }
-
-        const StudyPage = () => {
-            const [timeLeft, setTimeLeft] = useState(25 * 60);
-            const [isActive, setIsActive] = useState(false);
-            const [mode, setMode] = useState('focus'); 
-            const [cycle, setCycle] = useState(0);
-            const [decorations, setDecorations] = useState([]);
-            const [activeDrag, setActiveDrag] = useState(null); 
-            const [flowerProgress, setFlowerProgress] = useState(0);
-            const [modalMessage, setModalMessage] = useState(null); 
-            const [focusTime, setFocusTime] = useState(25);
-            const [breakTime, setBreakTime] = useState(5);
-            const [isEditing, setIsEditing] = useState(false);
-            const containerRef = useRef(null);
-
-            useEffect(() => { const saved = localStorage.getItem('cat_decorations'); if (saved) setDecorations(JSON.parse(saved)); }, []);
-            useEffect(() => { localStorage.setItem('cat_decorations', JSON.stringify(decorations)); }, [decorations]);
-
-            useEffect(() => {
-                let interval = null;
-                if (isActive && timeLeft > 0) {
-                    interval = setInterval(() => {
-                        setTimeLeft(t => t - 1);
-                        if (mode === 'focus') { setFlowerProgress(((focusTime * 60 - (timeLeft - 1)) / (focusTime * 60)) * 100); }
-                    }, 1000);
-                } else if (timeLeft === 0 && isActive) {
-                    setIsActive(false);
-                    if (mode === 'focus') {
-                        setCycle(c => c + 1);
-                        setDecorations(prev => [...prev, { id: Date.now(), content: DECORATION_ITEMS[Math.floor(Math.random() * DECORATION_ITEMS.length)], x: 20 + Math.random() * 60, y: 20 + Math.random() * 60 }, { id: Date.now() + 1, type: 'lily', content: 'lily', x: 50 + (Math.random() * 20 - 10), y: 50 + (Math.random() * 20 - 10) }]);
-                        setModalMessage({ title: "Good job, kitten!", text: "You did amazing! 🖤 Here is a treat for you. Take a well-deserved break.", button: "Start Break", nextMode: "break" });
-                        setFlowerProgress(100); 
-                    } else {
-                        setModalMessage({ title: "Break's Over!", text: "Ready to conquer the world again? Keep going! 💪", button: "Start Focus", nextMode: "focus" });
-                        setFlowerProgress(0);
-                    }
-                }
-                return () => clearInterval(interval);
-            }, [isActive, timeLeft, mode, focusTime]);
-
-            const toggleTimer = () => setIsActive(!isActive);
-            const resetTimer = () => { setIsActive(false); setTimeLeft(mode === 'focus' ? focusTime * 60 : breakTime * 60); if (mode === 'focus') setFlowerProgress(0); };
-            const switchMode = (newMode) => { setMode(newMode); setIsActive(false); setTimeLeft(newMode === 'focus' ? focusTime * 60 : breakTime * 60); if (newMode === 'focus') setFlowerProgress(0); };
-            const updateTimes = (newFocus, newBreak) => { const f = parseInt(newFocus) || 25; const b = parseInt(newBreak) || 5; setFocusTime(f); setBreakTime(b); if (!isActive) { setTimeLeft(mode === 'focus' ? f * 60 : b * 60); } };
-            const quickSet = (f, b) => { updateTimes(f, b); if (!isActive) { setTimeLeft(mode === 'focus' ? f * 60 : b * 60); } }
-            const handlePointerDown = (e, id) => { e.preventDefault(); setActiveDrag({ id }); };
-            const onContainerMove = (e) => { if (!activeDrag || !containerRef.current) return; e.preventDefault(); const rect = containerRef.current.getBoundingClientRect(); const clientX = e.touches ? e.touches[0].clientX : e.clientX; const clientY = e.touches ? e.touches[0].clientY : e.clientY; const xPct = ((clientX - rect.left) / rect.width) * 100; const yPct = ((clientY - rect.top) / rect.height) * 100; setDecorations(prev => prev.map(d => d.id === activeDrag.id ? { ...d, x: Math.min(95, Math.max(5, xPct)), y: Math.min(95, Math.max(5, yPct)) } : d )); };
-            const onContainerUp = () => { setActiveDrag(null); };
-            const formatTime = (seconds) => { const mins = Math.floor(seconds / 60); const secs = seconds % 60; return `${mins}:${secs < 10 ? '0' : ''}${secs}`; };
-            const handleModalClose = () => { if (modalMessage.nextMode) { switchMode(modalMessage.nextMode); } setModalMessage(null); }
-
-            return (
-                <div className="h-full w-full flex flex-col relative z-10 pb-20 pt-4" onMouseMove={onContainerMove} onTouchMove={onContainerMove} onMouseUp={onContainerUp} onTouchEnd={onContainerUp} ref={containerRef}>
-                    {modalMessage && ( <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in px-4"> <div className="bg-slate-800 border-2 border-pink-500 rounded-xl p-6 max-w-sm w-full text-center shadow-2xl"> <h3 className="text-2xl font-bold text-pink-400 mb-2">{modalMessage.title}</h3> <p className="text-slate-300 mb-6">{modalMessage.text}</p> <button onClick={handleModalClose} className="px-6 py-3 bg-pink-600 hover:bg-pink-500 text-white rounded-full font-bold transition-all transform hover:scale-105"> {modalMessage.button} </button> </div> </div> )}
-                    <div className="p-2 text-center z-10 flex flex-col items-center w-full">
-                        {isEditing && ( <div className="bg-slate-800/90 p-4 rounded-xl mb-4 border border-slate-700 w-full max-w-xs animate-in slide-in-from-top-2"> <div className="flex gap-2 mb-4 justify-center"> <div className="flex flex-col"> <label className="text-xs text-slate-400 mb-1">Focus (min)</label> <input type="number" value={focusTime} onChange={(e) => updateTimes(e.target.value, breakTime)} className="bg-slate-900 border border-slate-600 rounded p-2 w-20 text-center text-white" /> </div> <div className="flex flex-col"> <label className="text-xs text-slate-400 mb-1">Break (min)</label> <input type="number" value={breakTime} onChange={(e) => updateTimes(focusTime, e.target.value)} className="bg-slate-900 border border-slate-600 rounded p-2 w-20 text-center text-white" /> </div> </div> <div className="flex gap-2 justify-center text-xs"> <button onClick={() => quickSet(25, 5)} className="px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded">25/5</button> <button onClick={() => quickSet(50, 10)} className="px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded">50/10</button> <button onClick={() => quickSet(60, 15)} className="px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded">60/15</button> </div> </div> )}
-                        <div className="flex justify-center gap-2 mb-4"> <button onClick={() => switchMode('focus')} className={`px-4 py-1 rounded-full text-sm font-bold transition-colors ${mode === 'focus' ? 'bg-pink-600 text-white' : 'bg-slate-800 text-slate-400'}`}>Focus</button> <button onClick={() => switchMode('break')} className={`px-4 py-1 rounded-full text-sm font-bold transition-colors ${mode === 'break' ? 'bg-green-600 text-white' : 'bg-slate-800 text-slate-400'}`}>Break</button> </div>
-                        {mode === 'focus' && !isEditing && <StargazerLily progress={flowerProgress} />}
-                        <div className="text-5xl font-mono font-bold text-white mb-4 tracking-wider drop-shadow-lg"> {formatTime(timeLeft)} </div>
-                        <div className="flex justify-center gap-4"> <button onClick={toggleTimer} className="w-14 h-14 bg-white text-black rounded-full flex items-center justify-center hover:bg-pink-100 transition-colors shadow-lg"> {isActive ? <Pause /> : <Play />} </button> <button onClick={resetTimer} className="w-14 h-14 bg-slate-800 text-slate-300 rounded-full flex items-center justify-center hover:bg-slate-700 transition-colors shadow-lg"> <RefreshCw /> </button> </div>
-                        <div className="mt-2 text-xs text-slate-500"> Sessions Completed: {cycle} </div>
-                    </div>
-                    <div className="flex-1 relative bg-slate-800/50 m-4 rounded-xl border-2 border-slate-700 shadow-inner overflow-hidden max-w-2xl w-full mx-auto mb-20">
-                        <div className="absolute inset-0 pointer-events-none opacity-10 flex items-center justify-center text-8xl"> 📚 </div>
-                        <div className="absolute bottom-2 left-0 right-0 text-center text-xs text-slate-500 pointer-events-none"> Drag items to decorate your space </div>
-                        {decorations.map(deco => ( <div key={deco.id} className="absolute text-3xl cursor-grab active:cursor-grabbing hover:scale-125 transition-transform select-none" style={{ left: `${deco.x}%`, top: `${deco.y}%`, transform: 'translate(-50%, -50%)' }} onMouseDown={(e) => handlePointerDown(e, deco.id)} onTouchStart={(e) => handlePointerDown(e, deco.id)}> {deco.type === 'lily' ? ( <div style={{ width: '60px', height: '60px' }}> <StargazerLily progress={100} /> </div> ) : ( deco.content )} </div> ))}
-                    </div>
-                </div>
-            );
-        };
-
+        /*
         // --- PAGE: STARS ---
         const ConstellationIllustration = ({ title, icon, data }) => {
             const hasRealData = !!data;
@@ -380,492 +437,14 @@
                     <div className="absolute bottom-2 right-4 text-xs text-slate-500 font-mono opacity-50"> {hasRealData ? "ASTRONOMICAL DATA" : `ARTISTIC REP. FIG. ${seed % 100}`} </div>
                 </div>
             )
-        }
+        };
 
         const StarsPage = () => {
             const [activeConstellation, setActiveConstellation] = useState(null);
             const [currentTracks, setCurrentTracks] = useState([]);
             const [currentConstellations, setCurrentConstellations] = useState([]);
             
-            const MUSIC_POOL = [
-                // My Teenage Post-Wave Greek Pulp-Pop Wet Dreams
-                "70LpDqsreV4MtlQzyyV87G", "5Od7Y3ihqhynfNBL10GS1V", "7jRLjRTSbOMmrkFiL6YyIh", "3D6VnVquICXOGIardkqCNV", "0xWbkwwk9PYq7KbhUqGTrn",
-                "76eEvX5DMXKO0f4jH3mc6I", "1dURIHSKeONv5W5qlxfhJM", "7cTVP6Y736smxdqnsKILng", "1nwSyvxZe3CdPgVrtBkRpj", "2go9bn0N7cg7ZHBpdO30xP",
-                "1DlunM8uvc4IDwsh7TPkAh", "4CgMAGfaMycuMBq7lBdYW8", "1nmDqfjWySD2uG82mxmQET", "7hBO6if1MEvLhs1nLQXQbc", "3gFHt0xjK283HOtqIWj7Q1",
-                "4VV3S1Ywd5cqIzAVJGoypV", "6XeFd9KCGi7zz5U9KHqCyx", "6B8rz7mXTeAUMN5kzxDU95", "6HuvjKKWtXd8zWs0yiXwuo", "6haoMKj0wLTPxs3TbEAZHR",
-                "5o6iooyCPV4ltS7V2xYj6A", "4frb4uRI5w0mRzcnZfPARr", "2V08zd3Ebi0luBDJ5vhveh", "3sjnNxHbmCKmpwL5lnrGEN", "6noTmxZ2U5rPNCB7gxvKRc",
-                "6Q1UWA7EZ2QxCjZ6FSRdD1", "26fLnUK269kccIflMSApka", "4onFKWXE6krAYMpIC058P1", "6J4BeGRnLW7xxO00hxnXHP", "68f4Lw58gbEkNxCF8L8F3B",
-                "3XHskjrUDc3Wp1ncftKLjz", "1cRAkR5GfTQRPtsLNzuFhN", "0t2AN6xx25AkNLRc1JGrNH", "2y07NHwK6ZLMKuNYzVCeYm", "1f6jUQIR1kQD89n5gAbpYa",
-                "7zzFb0dYTjKNNP39h7Ke8I", "38dKbjLOv51Nq4HNX0l8TW", "606vxZ5VVTFrvYt6CPUDLA", "4tye7Iy4kqSvTs5msJZQHq", "1rAPmrKqRTWaJdJeISbauf",
-                "1XEBbdQuFXvog7MDao0yfk", "63YDJGvdHF64nocFR9z0oo", "73G35udHDcqCfP2lHCbaps", "52DnEDijuLyneGxkRPWaiy", "4XBab31fUywZVGMlA6PhAN",
-                "7aHgIFaRWmBMXf8VRhJWy0", "3Zmkfu04oT5051b0g6pxSO", "63YHH6P1z3wbzCSTJIDtjo", "0swqfhjHd95VJXZY6rgjLT", "0elApiEQu6nMrE5BJOQXgo",
-                "7AscoYDsOUwBBe5MwAxebQ", "58uOwQN9E9u6pcAWigOh2o", "0n2AGgoSBJjpXs5ZxNr6YR", "0Zxjq1RaNGAywOKaTBmw4S", "4PxHSsckhcveay6LMJ3AjX",
-                "47msO5H584HjMuAGmqMJtV", "4PiIAUjanOJNOgSDdxjJ4c", "5A8QwIwbTClJMXpjy0n13M", "63orgCfmTpRHa4hHRbpipR", "28cS2y6vA6kQc9OGleGwx2",
-                "7rcE4WPQmLvZbhkCUIYCZF", "6j6INJNCPHB2WS0ZePXKXA", "7bPsKIYOYjJtPeIsg3nW2P", "2L9pZEVUFyGHNtx638XHo2", "6pTyolJMLQoQm0qaGIxc2X",
-                "0htdTkO5n2La5TtwVYQpRT", "67GEyhXjuE4CksP16OIu7p", "6OanicNL1bB32VgK0nC8nh", "58uf6igKC5O5VAa9iVxiKh", "74fP9YcpDOaOucpsAGoWFH",
-                "5687kNTXLpqSUUkqk31blJ", "6y3ZDbcQstwIi6hhxOHXNv", "5qi2qBMfMEalAwfyw4DekD", "0u4kfySAnhPiqY17hCRNEN", "1gO9UCn7BFNesoFTA774nn",
-                "0jqNqKLfG6dpkh82ZNZLc8", "4r5W2iwnQpcDzEu8LCEx7B", "48LU6CLLvImvsVu0jJjC7l", "51TBGuofiTBcWgTEzQvqKG", "4XExjGrZX6VkAALwwaisde",
-                "0hTLC3b0fjYZUX8Nw6pGPE", "3xDEza9vTxqINGvvz8V6cO", "6NqWO8hGsntCx702kT2idK", "4kevlqV0BxC2bJ3cg4TICa", "1YRGhYufVIhxnXxzC1mG5x",
-                "7cGLw6CZb2E9paZysiRtwG", "3Nf2wpCH6TeLdZ4eG5XQ7f", "7wLKS7SzdTgUL0dsBmfdWu", "6NEE9pAg8KOumgx2Qiy7Kw", "7jQOlN1vGR5rBOck2LUBjX",
-                "3rTlDFp5OWIcmDzbihtsAf", "7oHIaZjc2JWCyQmpbJ8f3z", "0ipMg1ovxucAQpIlB5KFnv", "3s3QL5SzcKVHq0B8iBcoZo", "5gF9RD3AKE8pf1sXcRz68W",
-                "6JkCzA3arBZKLhnCaUdoDg", "7s9mt14taxUeum4lhUWL43", "3ZXdGIqQOQYGETZRlUJTdv", "1cEtA13aEaEh5QAncWvFfJ", "4NMn560HDiG0v5hGqfB3aS",
-                "41zV1pjj4RJPBTV1nqq0ee", "1uYyMqV8K4DOUKYrqyaoH5", "4LCiQW8vfq3A9R9sA8U3hN", "2dOPsvCkjyTdLeqkQdgfTR", "7xfI8eKbhWk9O8vwVnqnTa",
-                "15b7vmjYfAPGL3DuSMBUI1", "4H5tcU13VR7ug5E4MX8SKP", "1OrvTgVJ34forXXa7A8IkG", "4FWrrmLMLeJ1DX8awicSUm", "42wkMrkIqX4pYIGnTW70kG",
-                "6ucNZBkwkPmw8OHiv5L7P4", "7Gi8jg3h2Ac0gMetpQUXmh", "4yhhJkWb4oqTYRCKAEACMr", "3hatHrJ64kkVS2VH47pPKR", "3RKxM0q7IGsudpC4VT4xTv",
-                "0yt0PDjRd1CfDXnw3oeXtS", "17virskSxaqh5UKk3QonW4",
-    
-                // (bedroom) pop for the elite
-                "0H2zA6m04MUsu4mX2KecNr", "6XHikJpK06NoXaFwkH4tPL", "0R3TWpoxAhT3HDXM7tpRzS", "4HbeGjbt7u3pvwDk1vN7P0", "0B6oBwvkyLptGexpwJVz7c",
-                "2blV6tohiJoieVNtlL0yU4", "3zjvduyGhyBKYCVHGn6E74", "0gdWSthwNMJ4TPVya8b0bh", "36jDABK9TQixIZOZylPy04", "5aqslHfDoGviK5vRwyQQgd",
-                "50auDM0fjPvcdxvc4i5nOj", "6jp0JIuzSbKCB26bg1iPgp", "5GbVzc6Ex5LYlLJqzRQhuy", "2ZWlPOoWh0626oTaHrnl2a", "0UVzM2GkqTTf57G6Wj05UL",
-                "2HUugUuZW0e4N7ne9YJScc", "68KdvPllp9Pug8ZG6AByFY", "5x9r0HaFznxQ32J2JZFhub", "3MMLO6TUL07tze9IXud0Vc", "44ZKnfWEkp7wPs035j4Tua",
-                "6pxElwU80zhjbCC77Vn8EI", "6Jl3ZOX6MUOlyoUc721bsX", "1FWoak0OgTq1jrYfRKfXsj", "7mjOxXnZYbGtgjyX0hqaLs", "4hqTguGFl0NWgFIxBppbKQ",
-                "4zvHZWOGyL7WcmqHOgtGCW", "1XrSjpNe49IiygZfzb74pk", "2dIeraguJ8SoHDqXfSZelZ", "75TDPu9k7Yv3IovdYaNCwk", "2QjOHCTQ1Jl3zawyYOpxh6",
-                "4EpZ4eYuZOwPSSwyqpdHnJ", "5EYi2rH4LYs6M21ZLOyQTx", "20EIvCTkNuaFU0vB6NG8eo", "0nMqu5vN44GNv8UOQxmBJK", "3AyuigFWbuirWHvidbMz8O",
-                "6atVS7UZBxoyJkkteM62u5", "4HpFU6eMThgW6Cael5AwYy", "0S3BtG3i5tkQmehJhIhHF3", "7AfZIW6yXC4MzElfFmqa9m", "7i5I4h7r2vkI2r9tgKjy0x",
-                "0ltZY7z8YvuDBSAbsIgPc", "0AduS1e4FWNLdnUNmMwQQd", "7j59MN6vDM9lrvQ0iGhqaa", "6JaPUxse2AsI0df7XXvetF", "5U8hidWugxHXvh1AzZYwKF",
-                "3s9YtjSkxeeriM92mASyoO", "1B2zrooBJ6Rc8NIUuS3VDh", "1xRXJVVDvlvFJxuLRvHDpF", "0B4U9FT1WaFwUiiCPOAak7", "06qUr4CXtG4k3gUurF4tu6",
-                "2DoO0sn4SbUrz7Uay9ACTM", "5eAkSNmHLmydvGAvcV4TnM", "2joEpsXflccZD0ZwKEdz5m", "30jui3PqevssdIVpjEWM38", "1MaDw1BQ797k8j7xXnH486",
-                "4UexrxBMEyacoNwOvmx6XQ", "7lKN7pik3CelVWHWGp6DfB", "4lAfXpZKFDEudiEzLB9uHm", "2fGRJzoiYJYAzlQAyBONMb", "2RjsAYVbdZPISqnsWd3Hup",
-                "6RiiSy9GzSwiyDEJDiMuKe", "3A0cAzFKPefBCz7Z02UnnO", "6BrfgV35h3NfTtIdMqhmFQ", "6Qvwt9H76n1FfWyw5aT6JJ", "3vkCueOmm7xQDoJ17W1Pm3",
-                "6A7d2QgbSga495NJdkEY2A", "0OblxGfTmtALWjImtm7DFd", "62tGzw9OJOwDcjPBnMPCuj", "0RvES3Nq1VAIAdC4x8LfQT", "0OrxUBA5JghHjUarBa2Vjz",
-                "05QGaQnoBuda27vXxpuiRU", "1EZYmas3jh7aUKqCF9EI5A", "4Z2zWAUN9YVxHkZXS7s1KE", "3Zq2naJ92TwUhC32Iov3a6", "4hm33jVolpa22nzhlY72jD",
-                "3TFNxpIwIzMi3jsMRy9GVZ", "0bXdmDpRkYeub0OKISlYpH", "7MBSbBrx0TvBYyKEcpGcJb", "35S3sMjHlF8v2EmxQuDF7z", "36QuWvqoTl8UN1NZv0Q8VP",
-                "1wSXSFmjyldwfx0JOSHlEa", "1ixXNc8iCkRniJhICf9xpy", "0YdIIMb2MHuxoUudkAY9gS", "5CZEan1P5qmhfXFib8ohGj", "0zpk9Uz5C8DshxSYbMcwcH",
-                "1MwPvniPtqPkXwtQDFiJdb", "7jdNolHsTx18e2QVoDm1uf", "41HyMiZSBLGlfopnDE7Ppc", "0KyAGiNGUytG5JLxJu4F6l", "4NhH5IXSqjQgmQOm189Dij",
-                "3MklLppNRhuAupVGO3uNW2", "0iMSUfh4oQplV5OrmrlIbm", "2JKtCvtxP47fOMYi0BjMoY", "6ZqNoqtQvRP3WDHrna12xT", "6ZCGKyXcGbYc6tdP6unPVY",
-                "0HAqq2GcQKyi3s87GuN7jU", "0XvoMOI25j4wODyk8nuANS", "11sfRkHdvsop5DdHVmGpt1", "0dpusM1gM6ULx0QvjJctbT", "1SyJuJfFyoAxuZMaTbwHJW",
-                "2lOTK5uAzQ4OmRPXo2oAFX", "11HRSkKS5nDZB0921Kwne1", "4LQm0wh5zH07mOOQxI0QOK", "2HcMkGeghyXdJRT1g85u0t", "6R2YSITVeRTFwDczaxSnQS",
-                "4k6Uh1HXdhtusDW5y8Gbvy", "4DQNdeDEnbJIckoZ8XLg7G", "2ZZ0ITwRqitCvddi2CGfgq", "0a7RXqXcCSNeo7WxynoNka",
-    
-                // Tosa kalokairia
-                "5cERWuNRghbSmXyv4pGX5v", "5OZUVTVsRKOxBCxeW9P2Dy", "4du2vBLWwPMxRncBklEk7u", "1mPlvRINnuodMQdS7AZ6Jr", "158mRIBWD3DqkZsa7uXvMQ",
-                "0U4414APE9VKvPhstvkpYP", "1YnbnWAQfuG30q5tWTpKVA", "0Y12sZ2BwHHZZSAcaU2Bbr", "5uuLnmCZfvaeJI4XAyWnCC", "3czISDpFF7J9HGgn9WZoBy",
-                "2zwmtC9IBxuOHsrr7sK3md", "1woQ49dajnONIc9QVPs62u", "0GMOIRfddB0l0rxDmm6YJ8", "5rs7fgwffE0dSR4JYXIQbu", "7s3TCY7WueF1khSppW7iF1",
-                "4ZN478bY80gFhyA6PmmPFD", "40Wx97tCqWvzgMBSQe0prL", "76ys7PRbxO9JTmMAPDQkSB", "7CrrRzL6C1U46cBHBHcqyY", "43ed7eVZCyV4glwgkuCr8e",
-                "0iNKXpQbTbOLTqbS4PLxwR", "44HedZNCyNN2q3mMNNky9i", "2NtJ0frveSvgeSeT7ZqNuF", "6xgNbfR28nXkxXTdJvElYE", "0sHAUfT0764slsYmzHuAyR",
-                "0zHQTm3IH7kDjhMCdS5VcO", "10ynytzcmTvB6aXOg6AJ4w", "3soXmrdocXIXXJSGlm8vjT", "0we8xXKjtmpi3hELJxwcbL", "2QSdQSAWWWuYlDMvxNrPIz",
-                "3DtOgnU3dAFMJbrLzM0E61", "3Hzh6CNHk7X3WX9masTX2p", "53XiyakMLDTrpJrHn17IEN", "16DUU2ZOjRcDU6xtAoywtP", "5A8DxvVWRk8oJVmjOugilP",
-                "42zGu2xvKqcTFgOGbcNfwU", "4PnCiR4K75X5VoShGoyetB", "5ZSImHC2E9obW7ftX5XPLN", "5mkLg5QjOqvU7EDIRIm0Fp", "3kSVR6vHwOVHwZqxES3kcp",
-                "00DAwd8VddIe9BTYeSTlde", "2yhcOWQKHS9KRUja2w68fI", "3uSeyudHeffO0ae3sNhkSu", "2MB5r0nZQbk0RfOxoyvo7Y", "0LuqYKTf700ss14LPOsH4J",
-                "5F58MuwG5vpPNp8KbGrl48", "6FntxZMrTrHFr6u7FwIXEk", "6HVEqavdH36tV30gAC1kfB", "6DP31WTLrD8Bvsxy2VV7cs", "1SFdIW0U0GWe55nL3W0pY7",
-                "1X5PAeDiHUHFWo19kyEbmy", "65KGgcDQ9UvjnvWdo8HL8y", "68U8WzzmDkc9OUG12I7GAB", "7ueHwvftYc7dp2ggogXYqA", "6YyKswKpjMVTAkRkRb2gJp",
-                "2KCSHXnrhzVLxfcCEfOlv1", "1l15uZKtQOsGXzQmiZjQa8", "1p5iUGtUugdDVh80xUf5Af", "7y2iFrKyiTaE9nVh45CzYE", "2OJL9imXUV7Ny7pCAGGWwg",
-                "4JNi5l2KTYlZrnvXG2scSX", "3KNYYfOQdlXyYQMod3vknt", "647E9u5Vix5D7dxbUZujNs", "598nHadCHzRomN2pbX4zYs", "2YutvKgc9xPBLzN3YSUKu2",
-    
-                // Indie Summer Drive
-                "4zGub7d71FopcEXaLKqxcU", "6cNkgWg7NO8XebRZTrIcom", "4a9fW33mYR8LhXBOLUhbfF", "5h9hkYIBWTZYFRmF6Iz1gt", "3xnM0WCRJKk4Iz49rkG5OC",
-                "1FtVQfBKVOmn1SlqujsnJR", "6gKjueO32MnERRo04gpJ8v", "3IznIgmXtrUaoPWpQTy5jB", "3XqbLsVmAwvTJqW6NKopg0", "28nmbejPbeXDqYCWGVg4X7",
-                "4l38jp3bDPcI5avo9ov482", "3WSaGTmm67vd3stVi0Zu9D", "7dTPJ3wGBcLzAaMhJfY7Qd", "0HNYFFOwID6HGSqy5xr4av", "5goeUvSplsnWCmkUFmFDgt",
-                "6c8pVKT7KBUzp6fYNDFqlL",
-    
-                // Mew person, same old mewstakes
-                "52ojopYMUzeNcudsoz7O9D", "49ASnsS0LENGokjQAdP3VW", "2X485T9Z5Ly0xyaghN73ed", "0mO6oS60RST2sWmN2FKknP", "7H7NyZ3G075GqPx2evsfeb",
-                "7s5VQqrjBtrBgZL4pEa46S", "1aXV8GrmQLvgoFtBPERP7E", "4SgcE7RxpK3ydWrjoAQH1K", "3Yub3anoLj8w58TVpEXUJv", "72cGBEqu7RitIOoACXYjfR",
-                "6MClJYRD7op0WvDuBGWsMn", "3FqcpEZ7dzggkhz7cOfC1p", "6QeYSvYqYUsfBzsApbjDHO", "0pJTrMWCiR0TuJ5FApIqrz",
-    
-                // Never really needed Duolingo premium
-                "2vlkTkPqdATznKHu9gD2c1", "2YuySJd7C2aoBarBP8OvzR", "6oDXwSPWcp7KT2B3funF8y", "5Dqfw7Qiz6spw2xcl3rfkt", "3Bw99kE5w9R5gSVFhxahcB",
-                "1cyRoWGazsa8Vr5qlDfvPP", "2dGXDL8P7ibb3uPdQ4ybuM", "6st8aj6PmtqGctnLAat95M", "7kgYFXWRmgCH3NxxT6rWR4", "6MqqJ0OVjaYeiWUSMOAK8x",
-                "5TJJTBZWEa6zc6CXnjsVJZ", "2cSRuejq6DU9U6OkSmUw17", "4jmLj7bALZTQoe93dT623W", "5G9LvzXcBoIBXOd2jzdJTs", "4O1etEzE7zc8ZO80KNd5GZ",
-                "784VjdNkpXhFV0RHquzsi2", "2YTxJzuw6szzgsstEo80Dh", "14qNHvX8h6HoynFuV0RxWS", "5HaTv6nHDSVO1LqjwoP7RA", "7KAXxQfUG4kzRivltbD1UY",
-                "67yZsFQIMghAAl0V3h9lES", "12YAZNNm2OuSgDBKjFQcNm", "7ET6gmg1EJe3e9JI3xFMxk", "58lQsFCu6wlgDvOI0MjMmu", "3YB9cvd668HXBEq8rbBW8P",
-                "2mSvt89wTd99uETCSlePH2", "4A48ckONJNoXU5smWT9CeG", "5BBK1WoaiD3b3sJ2UysLuM", "22kGOe1POaqkSQhGtvzbHx", "1o0ckFhbn9bEsbBrAa5oy5",
-                "6602NMvb8ioqAjGKBi44rY", "4RUiaHW5J4yr1k0zioghJT", "6I5zS36y3vQnp9bis62OFy",
-    
-                // I miss your body's warmth
-                "6K4t31amVTZDgR3sKmwUJJ", "3Ziys0cjD0QpGMDJydVlIv", "3ypyxNeykDGfupZCloqFVT", "5R0vCr5hXzmPl9ovBKqLXk", "3bXxr8pWeLXcPsfIQm3Uun",
-                "53pVuKaVvfIuGiDrBtPjYD", "5687kNTXLpqSUUkqk31blJ", "3qUQnGoQUzJoLQKwnQucSh", "2FfEHEBsbh3NFcZazN0mll", "4r5W2iwnQpcDzEu8LCEx7B",
-                "0KoU7qwnZZFGFZ1QdHDaRR", "63ABAnFKJCp28TAyqf2cGL", "4ec0GQNlVroHo3Jhjp5FA6", "16CpQWGHO4PWBEoYbtrlda", "0LqZuRAroDVnV6LjDUGap1",
-                "2EPuv7zyLpFqReJoYrIFzm", "41KiUY33B3lXF4GETuhIPt", "0w1c9M3a9WCsxmBs3UkqlA", "6qSt1UvGaxHUzzV244HpmO", "5Hg1m5uhSPL75ejQgPOmyc",
-                "01iiEi9h8CQGUN2K1xBbTj",
-    
-                // Your Top Songs 2025
-                "4fPjI40ElIwJQ4DJJxSCOe", "6ZdAsADC9LIICvsVRuGWbZ", "4S4QJfBGGrC8jRIjJHf1Ka", "6bIPHR8AJG5HAcn9oF21Ma", "2rrq3SGYxk90xLx5fMmPhZ",
-                "0widrZ6KVNuIPhbM1rWPDR", "2QPOYxo6k95XvvptEFcf4M", "2nv9JnsrmTiVVuU1M1Y0gE", "62zFcDLa1CjCY9yp6VO4ga", "4neZmyJ43dCSOIj6VHUoMn",
-                "3i4xZSH1kTLE22TUvUFMYo", "0dOUOfrPxsCXCcCYZWHSTN", "7fax7NlxOq2X9kMZw8QLE2", "1UYj8qTWjneZJDVjUMwMub", "7FAh3mXDd7Oyo5RmE2FbsR",
-                "3ZDH5g8ozIUMdjqONzG6tR", "1yltcCzaJXDpbTZmI3s1je", "3TuWrfS30De3P03yITmDcL", "2ji5Ff76AxmJyBG0Z6XgYl", "0QArETwcN3KLawegUPmusT",
-                "7h2nmmoWDi2UpfYKLKWLYB", "204t5SErksNRHRhU52g5JF",
-    
-                // kwnna + Banos
-                "3aLClcAppX3b6pCHHFn8nQ", "1OrvTgVJ34forXXa7A8IkG", "28SH8v8kBpdce0mvnI7bST", "3gkNbqRxVlEen5iR6bao5J", "3YiFC5fkXFGqAxMueZ2sqo",
-                "3nIpscPqzbcZyePbF51D9Z", "6OsywAe4ov97KeA0QJv8UG", "4LFenKAaX95Pq6l5kKuw3A", "1s9KXtm2FMA1HeXuPkgpxD", "5VUaEzmMVrs4mPW9a5lTY3",
-                "7xauJZr1AwExzTiC6e4gsl", "00CkIh1jiX8K9iRlV1afNF", "65GkKi3dAwRUpPZI0IogFZ", "1NZs6n6hl8UuMaX0UC0YTz", "1NXbNEAcPvY5G1xvfN57aA",
-                "0ZNU020wNYvgW84iljPkPP", "1E2Ctz821hYVTfDjxQBRZh", "2rASRHHT4hnXIpv5IOcrVU", "1NZZveCjdyc6YFX7Sz8mCL", "7tDMzb6OiWSvjkN1FkpxiB",
-                "1YiubAOu9T8ryoZ0Hu1woa", "7rgTr97Ob29FuuKCHqB7a4", "7eq0a7HISgTaLbMLlJU6mA", "6EOCIUxm6K4OvqLQSf52GK", "2kz837aCEmpdo4xVDEG2sv",
-                "6Hwif22a9kokAI7V7Zwmxj", "1NmSGCAQ1Om8SveCfLnx7X", "2XfkzaOcEcvjm1rB3nYqEo", "4H6Gr260ly6OXQeZ0tdpHr", "62HQz5g66bRVsyTcPt2kXD",
-                "0LIXN2xD9qlHMYo6OA5abR", "1VYv1xH7yUl0b43UVR6yA9", "2HDazOaZrzKcW6g4PPCFFd", "0EiWvy2pfU8sul3wG6PiYz", "0puMe2UGP0whQDeJaTraeX",
-                "2uurVIp2d6PlXkPvgXSjSX", "3i6qNxyVgIdUZTTi5m25EM", "6ADSaE87h8Y3lccZlBJdXH"
-            ];
-            
-            const CONSTELLATIONS_DB = [
-                { 
-                    id: 'and', icon: '👸', title: 'Andromeda', 
-                    text: 'The Chained Princess. Daughter of Cepheus and Cassiopeia, saved by Perseus from the sea monster Cetus.', 
-                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '90°N to 40°S', time: '9 PM (November)' },
-                    data: { s: [[80,20], [65,35], [50,50], [35,65], [35,35]], l: [[0,1], [1,2], [2,3]] } 
-                },
-                { 
-                    id: 'aql', icon: '🦅', title: 'Aquila', 
-                    text: 'The Eagle. The bird that carried Zeus\'s thunderbolts and abducted Ganymede.', 
-                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 75°S', time: '9 PM (August)' },
-                    data: { s: [[50,20,5], [20,50], [80,50], [50,80]], l: [[0,1], [0,2], [1,3], [2,3], [0,3]] } 
-                },
-                { 
-                    id: 'aqr', icon: '♒', title: 'Aquarius', 
-                    text: 'The Water Bearer. Ganymede pouring water (the nectar of the gods) from a jar.', 
-                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '65°N to 90°S', time: '9 PM (October)' },
-                    data: { s: [[30,20], [50,20], [40,40], [20,60], [60,60], [50,80], [70,80]], l: [[0,1], [1,2], [2,0], [2,3], [2,4], [4,5], [4,6]] } 
-                },
-                { 
-                    id: 'ara', icon: '⛩️', title: 'Ara', 
-                    text: 'The Altar. The burning altar where the gods swore allegiance before battling the Titans.', 
-                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '25°N to 90°S', time: '9 PM (July)' },
-                    data: { s: [[30,20], [70,20], [30,60], [70,60], [50,40,4], [50,80]], l: [[0,2], [1,3], [0,1], [2,3], [4,5]] } 
-                },
-                { 
-                    id: 'ari', icon: '♈', title: 'Aries', 
-                    text: 'The Ram. The golden ram that rescued Phrixus and Helle, whose fleece was sought by Jason.', 
-                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '90°N to 60°S', time: '9 PM (December)' },
-                    data: { s: [[20,60], [50,50], [80,40,5]], l: [[0,1], [1,2]] } 
-                },
-                { 
-                    id: 'aur', icon: '🧔', title: 'Auriga', 
-                    text: 'The Charioteer. Often associated with Erichthonius of Athens, inventor of the quadriga.', 
-                    visibility: { season: 'Winter', hemisphere: 'Northern', lat: '90°N to 40°S', time: '9 PM (February)' },
-                    data: { s: [[50,10,5], [20,40], [80,40], [30,80], [70,80]], l: [[0,1], [0,2], [1,3], [2,4], [3,4]] } 
-                },
-                { 
-                    id: 'boo', icon: '🍦', title: 'Boötes', 
-                    text: 'The Herdsman. The driver of the oxen (Ursa Major). Contains Arcturus, the bear guard.', 
-                    visibility: { season: 'Spring', hemisphere: 'Northern', lat: '90°N to 50°S', time: '9 PM (June)' },
-                    data: { s: [[50,90,5], [30,50], [70,50], [50,20]], l: [[0,1], [0,2], [1,3], [2,3]] } 
-                },
-                { 
-                    id: 'cnc', icon: '♋', title: 'Cancer', 
-                    text: 'The Crab. Sent by Hera to distract Hercules during his fight with the Hydra.', 
-                    visibility: { season: 'Spring', hemisphere: 'Northern', lat: '90°N to 60°S', time: '9 PM (March)' },
-                    data: { s: [[50,50,4], [20,30], [80,30], [20,70], [80,70]], l: [[0,1], [0,2], [0,3], [0,4]] } 
-                },
-                { 
-                    id: 'cvn', icon: '🐕', title: 'Canes Venatici', 
-                    text: 'The Hunting Dogs. Asterion and Chara, held on a leash by Boötes.', 
-                    visibility: { season: 'Spring', hemisphere: 'Northern', lat: '90°N to 40°S', time: '9 PM (May)' },
-                    data: { s: [[30,40], [70,60,4]], l: [[0,1]] } 
-                },
-                { 
-                    id: 'cma', icon: '🐕', title: 'Canis Major', 
-                    text: 'The Great Dog. Orion\'s larger hunting dog, chasing the Hare (Lepus).', 
-                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '60°N to 90°S', time: '9 PM (February)' },
-                    data: { s: [[50,30,6], [60,35], [70,60], [60,80], [30,70], [40,50]], l: [[0,1], [1,2], [2,3], [0,5], [5,4]] } 
-                },
-                { 
-                    id: 'cmi', icon: '🐕', title: 'Canis Minor', 
-                    text: 'The Lesser Dog. Orion\'s smaller hunting dog.', 
-                    visibility: { season: 'Winter', hemisphere: 'Northern', lat: '90°N to 75°S', time: '9 PM (March)' },
-                    data: { s: [[20,50], [80,50,5]], l: [[0,1]] } 
-                },
-                { 
-                    id: 'cap', icon: '♑', title: 'Capricornus', 
-                    text: 'The Sea Goat. Often associated with Pan, who jumped into the Nile to escape Typhon.', 
-                    visibility: { season: 'Autumn', hemisphere: 'Southern', lat: '60°N to 90°S', time: '9 PM (September)' },
-                    data: { s: [[10,20], [30,40], [50,50], [80,20], [50,80]], l: [[0,1], [1,2], [2,3], [2,4]] } 
-                },
-                { 
-                    id: 'car', icon: '⛵', title: 'Carina', 
-                    text: 'The Keel. Part of the ship Argo Navis used by Jason and the Argonauts.', 
-                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '20°N to 90°S', time: '9 PM (March)' },
-                    data: { s: [[20,80,6], [30,60], [60,60], [80,50], [50,90]], l: [[0,1], [1,2], [2,3], [1,4]] } 
-                },
-                { 
-                    id: 'cas', icon: '👑', title: 'Cassiopeia', 
-                    text: 'The Queen. Vain queen of Aethiopia, punished to circle the pole star upside down.', 
-                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '90°N to 20°S', time: '9 PM (November)' },
-                    data: { s: [[10,30], [30,60], [50,40,4], [70,60], [90,30]], l: [[0,1], [1,2], [2,3], [3,4]] } 
-                },
-                { 
-                    id: 'cen', icon: '🐎', title: 'Centaurus', 
-                    text: 'The Centaur. Often represents Chiron, the wise tutor of heroes.', 
-                    visibility: { season: 'Spring', hemisphere: 'Southern', lat: '25°N to 90°S', time: '9 PM (May)' },
-                    data: { s: [[20,70,5], [40,60,5], [50,30], [70,30], [60,50], [80,50], [50,80]], l: [[0,1], [1,4], [2,3], [2,4], [3,5], [4,6], [5,6]] } 
-                },
-                { 
-                    id: 'cep', icon: '👑', title: 'Cepheus', 
-                    text: 'The King. King of Aethiopia, husband of Cassiopeia and father of Andromeda.', 
-                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '90°N to 10°S', time: '9 PM (October)' },
-                    data: { s: [[50,10], [30,30], [70,30], [30,70], [70,70]], l: [[0,1], [0,2], [1,3], [2,4], [3,4]] } 
-                },
-                { 
-                    id: 'cet', icon: '🐳', title: 'Cetus', 
-                    text: 'The Sea Monster. Sent by Poseidon to devour Andromeda.', 
-                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '70°N to 90°S', time: '9 PM (November)' },
-                    data: { s: [[10,30], [30,40], [60,30], [80,20], [90,40], [80,50], [60,40], [40,80]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [2,6], [1,7]] } 
-                },
-                { 
-                    id: 'col', icon: '🕊️', title: 'Columba', 
-                    text: 'The Dove. Noah\'s dove or the dove released by the Argonauts.', 
-                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '45°N to 90°S', time: '9 PM (February)' },
-                    data: { s: [[20,30], [50,50], [80,30], [50,70]], l: [[0,1], [1,2], [1,3]] } 
-                },
-                { 
-                    id: 'cra', icon: '👑', title: 'Corona Australis', 
-                    text: 'The Southern Crown. A wreath placed in the sky by Dionysus.', 
-                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '40°N to 90°S', time: '9 PM (August)' },
-                    data: { s: [[20,60], [35,50], [50,45], [65,50], [80,60]], l: [[0,1], [1,2], [2,3], [3,4]] } 
-                },
-                { 
-                    id: 'crb', icon: '👑', title: 'Corona Borealis', 
-                    text: 'The Northern Crown. The crown of Ariadne, given by Dionysus.', 
-                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 50°S', time: '9 PM (July)' },
-                    data: { s: [[20,40], [35,50], [50,55,4], [65,50], [80,40]], l: [[0,1], [1,2], [2,3], [3,4]] } 
-                },
-                { 
-                    id: 'crv', icon: '🐦', title: 'Corvus', 
-                    text: 'The Crow. Sent by Apollo to fetch water, delayed by figs.', 
-                    visibility: { season: 'Spring', hemisphere: 'Southern', lat: '60°N to 90°S', time: '9 PM (May)' },
-                    data: { s: [[30,30], [70,30], [20,70], [80,70]], l: [[0,1], [1,3], [3,2], [2,0]] } 
-                },
-                { 
-                    id: 'cru', icon: '✝️', title: 'Crux', 
-                    text: 'The Southern Cross. Smallest constellation, vital for navigation.', 
-                    visibility: { season: 'Spring', hemisphere: 'Southern', lat: '20°N to 90°S', time: '9 PM (May)' },
-                    data: { s: [[50,10], [50,90,5], [20,50], [80,40], [70,60]], l: [[0,1], [2,3]] } 
-                },
-                { 
-                    id: 'cyg', icon: '🦢', title: 'Cygnus', 
-                    text: 'The Swan. Often associated with Zeus in swan form or Orpheus.', 
-                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 40°S', time: '9 PM (September)' },
-                    data: { s: [[50,10,4], [50,50], [50,90], [10,50], [90,50]], l: [[0,1], [1,2], [3,1], [1,4]] } 
-                },
-                { 
-                    id: 'del', icon: '🐬', title: 'Delphinus', 
-                    text: 'The Dolphin. Saved the poet Arion or carried Amphitrite to Poseidon.', 
-                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 70°S', time: '9 PM (September)' },
-                    data: { s: [[40,20], [60,20], [70,40], [50,40], [30,40], [30,80]], l: [[0,1], [1,2], [2,3], [3,0], [3,4], [4,5]] } 
-                },
-                { 
-                    id: 'dor', icon: '🐠', title: 'Dorado', 
-                    text: 'The Dolphinfish (Mahi-mahi). Home of the Large Magellanic Cloud.', 
-                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '20°N to 90°S', time: '9 PM (January)' },
-                    data: { s: [[50,20], [50,80], [30,50]], l: [[0,1], [1,2]] } 
-                },
-                { 
-                    id: 'dra', icon: '🐉', title: 'Draco', 
-                    text: 'The Dragon. Ladon, the dragon that guarded the golden apples.', 
-                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 15°S', time: '9 PM (July)' },
-                    data: { s: [[80,20], [70,30], [60,20], [50,40], [40,30], [30,60], [20,80], [10,70], [30,90]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,7], [6,8], [7,8]] } 
-                },
-                { 
-                    id: 'equ', icon: '🐴', title: 'Equuleus', 
-                    text: 'The Little Horse. Celeris, foal of Pegasus, or Cyllarus.', 
-                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '90°N to 80°S', time: '9 PM (September)' },
-                    data: { s: [[40,40], [60,40], [50,60]], l: [[0,1], [1,2], [2,0]] } 
-                },
-                { 
-                    id: 'eri', icon: '🌊', title: 'Eridanus', 
-                    text: 'The River. The celestial river (Po/Nile/Euphrates).', 
-                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '30°N to 90°S', time: '9 PM (December)' },
-                    data: { s: [[10,10], [30,20], [20,40], [40,50], [30,70], [80,90,5]], l: [[0,1], [1,2], [2,3], [3,4], [4,5]] } 
-                },
-                { 
-                    id: 'gem', icon: '♊', title: 'Gemini', 
-                    text: 'The Twins. Castor (mortal) and Pollux (immortal).', 
-                    visibility: { season: 'Winter', hemisphere: 'Northern', lat: '90°N to 60°S', time: '9 PM (February)' },
-                    data: { s: [[30,20,4], [70,20,4], [30,80], [70,80], [30,50], [70,50]], l: [[0,4], [4,2], [1,5], [5,3], [0,1], [2,3]] } 
-                },
-                { 
-                    id: 'her', icon: '💪', title: 'Hercules', 
-                    text: 'The Hero. Greatest of Greek heroes, kneeling.', 
-                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 50°S', time: '9 PM (July)' },
-                    data: { s: [[30,30], [70,30], [30,60], [70,60], [20,80], [80,80]], l: [[0,1], [1,3], [3,2], [2,0], [2,4], [3,5]] } 
-                },
-                { 
-                    id: 'hya', icon: '🐍', title: 'Hydra', 
-                    text: 'The Water Snake. The multi-headed beast killed by Hercules.', 
-                    visibility: { season: 'Spring', hemisphere: 'Southern', lat: '55°N to 85°S', time: '9 PM (April)' },
-                    data: { s: [[10,40], [30,45], [50,50], [70,55], [90,60]], l: [[0,1], [1,2], [2,3], [3,4]] } 
-                },
-                { 
-                    id: 'leo', icon: '♌', title: 'Leo', 
-                    text: 'The Lion. The Nemean Lion killed by Hercules.', 
-                    visibility: { season: 'Spring', hemisphere: 'Northern', lat: '90°N to 65°S', time: '9 PM (April)' },
-                    data: { s: [[70,30], [60,20], [45,25], [40,40,5], [20,50], [30,70], [60,65]], l: [[0,1], [1,2], [2,3], [3,0], [3,6], [6,5], [5,4], [4,3]] } 
-                },
-                { 
-                    id: 'lep', icon: '🐰', title: 'Lepus', 
-                    text: 'The Hare. Chased by Orion\'s dogs.', 
-                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '60°N to 90°S', time: '9 PM (January)' },
-                    data: { s: [[30,40], [70,40], [30,70], [70,70], [50,55]], l: [[0,2], [1,3], [0,4], [1,4], [2,3]] } 
-                },
-                { 
-                    id: 'lib', icon: '♎', title: 'Libra', 
-                    text: 'The Scales. Scales of justice held by Astraea (Virgo).', 
-                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '65°N to 90°S', time: '9 PM (June)' },
-                    data: { s: [[50,20], [20,50], [80,50], [50,80]], l: [[0,1], [0,2], [1,3], [2,3]] } 
-                },
-                { 
-                    id: 'lup', icon: '🐺', title: 'Lupus', 
-                    text: 'The Wolf. Sacrificed by Centaurus.', 
-                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '35°N to 90°S', time: '9 PM (June)' },
-                    data: { s: [[30,30], [60,30], [40,60], [70,50], [50,80]], l: [[0,1], [0,2], [2,4], [1,3], [3,4]] } 
-                },
-                { 
-                    id: 'lyn', icon: '🐈', title: 'Lynx', 
-                    text: 'The Lynx. So faint you need lynx eyes to see it.', 
-                    visibility: { season: 'Spring', hemisphere: 'Northern', lat: '90°N to 55°S', time: '9 PM (March)' },
-                    data: { s: [[10,20], [30,40], [50,30], [70,50], [90,40]], l: [[0,1], [1,2], [2,3], [3,4]] } 
-                },
-                { 
-                    id: 'lyr', icon: '🎵', title: 'Lyra', 
-                    text: 'The Harp. The lyre of Orpheus.', 
-                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 40°S', time: '9 PM (August)' },
-                    data: { s: [[50,15,5], [40,30], [60,30], [40,50], [60,50]], l: [[0,1], [0,2], [1,2], [1,3], [2,4], [3,4]] } 
-                },
-                { 
-                    id: 'mon', icon: '🦄', title: 'Monoceros', 
-                    text: 'The Unicorn. Faint constellation in the winter sky.', 
-                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '75°N to 85°S', time: '9 PM (February)' },
-                    data: { s: [[20,50], [40,40], [60,50], [80,40]], l: [[0,1], [1,2], [2,3]] } 
-                },
-                { 
-                    id: 'oph', icon: '⚕️', title: 'Ophiuchus', 
-                    text: 'The Serpent Bearer. Asclepius, the healer.', 
-                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '80°N to 80°S', time: '9 PM (July)' },
-                    data: { s: [[50,20], [30,50], [70,50], [40,80], [60,80]], l: [[0,1], [0,2], [1,3], [2,4], [3,4]] } 
-                },
-                { 
-                    id: 'ori', icon: '🏹', title: 'Orion', 
-                    text: 'The Hunter. A giant hunter placed in the stars.', 
-                    visibility: { season: 'Winter', hemisphere: 'Northern', lat: '85°N to 75°S', time: '9 PM (January)' },
-                    data: { s: [[25,20,4], [75,25,4], [45,50], [50,50], [55,50], [30,80,4], [70,85,5]], l: [[0,2], [1,4], [2,3], [3,4], [2,5], [4,6]] } 
-                },
-                { 
-                    id: 'pav', icon: '🦚', title: 'Pavo', 
-                    text: 'The Peacock. Sacred bird of Hera.', 
-                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '30°N to 90°S', time: '9 PM (August)' },
-                    data: { s: [[80,20,4], [60,40], [40,50], [20,80]], l: [[0,1], [1,2], [2,3]] } 
-                },
-                { 
-                    id: 'peg', icon: '🐎', title: 'Pegasus', 
-                    text: 'The Winged Horse. Born from Medusa\'s blood.', 
-                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '90°N to 60°S', time: '9 PM (October)' },
-                    data: { s: [[30,30], [70,30], [70,70], [30,70], [85,20], [20,20]], l: [[0,1], [1,2], [2,3], [3,0], [1,4], [0,5]] } 
-                },
-                { 
-                    id: 'per', icon: '⚔️', title: 'Perseus', 
-                    text: 'The Hero. Slayer of Medusa and savior of Andromeda.', 
-                    visibility: { season: 'Winter', hemisphere: 'Northern', lat: '90°N to 35°S', time: '9 PM (December)' },
-                    data: { s: [[50,20], [30,50], [50,50,4], [70,60], [40,80]], l: [[0,2], [1,2], [2,3], [2,4]] } 
-                },
-                { 
-                    id: 'phe', icon: '🔥', title: 'Phoenix', 
-                    text: 'The Firebird. Represents the mythical bird reborn from ashes.', 
-                    visibility: { season: 'Autumn', hemisphere: 'Southern', lat: '32°N to 90°S', time: '9 PM (November)' },
-                    data: { s: [[50,20], [20,50], [80,50], [40,80], [60,80]], l: [[0,1], [0,2], [1,3], [2,4], [3,4]] } 
-                },
-                { 
-                    id: 'pic', icon: '🎨', title: 'Pictor', 
-                    text: 'The Easel. Painter\'s easel.', 
-                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '25°N to 90°S', time: '9 PM (January)' },
-                    data: { s: [[30,50], [70,50], [50,80]], l: [[0,2], [1,2]] } 
-                },
-                { 
-                    id: 'psc', icon: '♓', title: 'Pisces', 
-                    text: 'The Fishes. Aphrodite and Eros tied together.', 
-                    visibility: { season: 'Autumn', hemisphere: 'Northern', lat: '90°N to 65°S', time: '9 PM (November)' },
-                    data: { s: [[20,50], [40,70], [60,70], [80,30], [50,50]], l: [[0,4], [4,3], [0,1], [1,2], [2,3]] } 
-                },
-                { 
-                    id: 'psa', icon: '🐟', title: 'Piscis Austrinus', 
-                    text: 'The Southern Fish. Drinks water from Aquarius\'s jar.', 
-                    visibility: { season: 'Autumn', hemisphere: 'Southern', lat: '55°N to 90°S', time: '9 PM (October)' },
-                    data: { s: [[20,50], [50,30], [80,50,5], [50,70]], l: [[0,1], [1,2], [2,3], [3,0]] } 
-                },
-                { 
-                    id: 'pup', icon: '🚢', title: 'Puppis', 
-                    text: 'The Poop Deck. Stern of the Argo Navis.', 
-                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '40°N to 90°S', time: '9 PM (February)' },
-                    data: { s: [[30,20], [50,50], [70,30], [50,80]], l: [[0,1], [1,2], [1,3]] } 
-                },
-                { 
-                    id: 'ret', icon: '🕸️', title: 'Reticulum', 
-                    text: 'The Reticle. Represents the crosshairs in a telescope eyepiece.', 
-                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '23°N to 90°S', time: '9 PM (December)' },
-                    data: { s: [[50,20], [20,50], [80,50], [50,80]], l: [[0,1], [1,3], [3,2], [2,0]] } 
-                },
-                { 
-                    id: 'sge', icon: '🏹', title: 'Sagitta', 
-                    text: 'The Arrow. Arrow of Hercules or Cupid.', 
-                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 70°S', time: '9 PM (August)' },
-                    data: { s: [[20,50], [70,50], [80,40], [80,60]], l: [[0,1], [1,2], [1,3]] } 
-                },
-                { 
-                    id: 'sgr', icon: '♐', title: 'Sagittarius', 
-                    text: 'The Archer. A centaur, usually Chiron or Crotus.', 
-                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '55°N to 90°S', time: '9 PM (August)' },
-                    data: { s: [[30,40], [70,40], [20,70], [80,70], [50,20], [50,50], [40,60], [60,60]], l: [[0,6], [6,2], [6,7], [7,3], [7,1], [0,5], [1,5], [5,4]] } 
-                },
-                { 
-                    id: 'sco', icon: '♏', title: 'Scorpius', 
-                    text: 'The Scorpion. Sent to kill Orion.', 
-                    visibility: { season: 'Summer', hemisphere: 'Southern', lat: '40°N to 90°S', time: '9 PM (July)' },
-                    data: { s: [[80,20], [70,25], [60,30,5], [50,40], [45,50], [40,60], [35,70], [40,80], [50,85], [60,80]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,7], [7,8], [8,9]] } 
-                },
-                { 
-                    id: 'ser', icon: '🐍', title: 'Serpens', 
-                    text: 'The Serpent. Held by Ophiuchus.', 
-                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '80°N to 80°S', time: '9 PM (July)' },
-                    data: { s: [[20,50], [40,40], [60,60], [80,50]], l: [[0,1], [1,2], [2,3]] } 
-                },
-                { 
-                    id: 'tau', icon: '♉', title: 'Taurus', 
-                    text: 'The Bull. Zeus in disguise carrying Europa.', 
-                    visibility: { season: 'Winter', hemisphere: 'Northern', lat: '90°N to 65°S', time: '9 PM (January)' },
-                    data: { s: [[20,50], [35,60], [50,65,5], [60,45], [75,30], [80,35], [45,80]], l: [[0,1], [1,2], [2,3], [3,4], [3,5], [2,6]] } 
-                },
-                { 
-                    id: 'tuc', icon: '🦜', title: 'Tucana', 
-                    text: 'The Toucan. A tropical bird, home to the Small Magellanic Cloud.', 
-                    visibility: { season: 'Autumn', hemisphere: 'Southern', lat: '15°N to 90°S', time: '9 PM (November)' },
-                    data: { s: [[40,30], [60,50], [40,70]], l: [[0,1], [1,2]] } 
-                },
-                { 
-                    id: 'uma', icon: '🐻', title: 'Ursa Major', 
-                    text: 'The Great Bear. Callisto turned into a bear.', 
-                    visibility: { season: 'Spring', hemisphere: 'Northern', lat: '90°N to 30°S', time: '9 PM (April)' },
-                    data: { s: [[10,30], [25,25], [35,35], [50,45], [75,45], [75,70], [50,70]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,3]] } 
-                },
-                { 
-                    id: 'umi', icon: '🐻', title: 'Ursa Minor', 
-                    text: 'The Little Bear. Arcas, son of Callisto.', 
-                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 10°S', time: '9 PM (June)' },
-                    data: { s: [[80,20,5], [70,30], [60,40], [50,45], [30,45], [25,60], [45,60]], l: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,3]] } 
-                },
-                { 
-                    id: 'vel', icon: '⛵', title: 'Vela', 
-                    text: 'The Sails. Sails of the Argo Navis.', 
-                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '30°N to 90°S', time: '9 PM (March)' },
-                    data: { s: [[30,30], [70,30], [50,60], [50,80]], l: [[0,1], [0,2], [1,2], [2,3]] } 
-                },
-                { 
-                    id: 'vir', icon: '♍', title: 'Virgo', 
-                    text: 'The Maiden. Associated with justice and harvest.', 
-                    visibility: { season: 'Spring', hemisphere: 'Northern', lat: '80°N to 80°S', time: '9 PM (May)' },
-                    data: { s: [[50,50], [20,40], [80,40], [50,80,5], [35,30], [65,30], [50,20]], l: [[0,1], [0,2], [0,3], [1,4], [2,5], [4,6], [5,6]] } 
-                },
-                { 
-                    id: 'vol', icon: '🐟', title: 'Volans', 
-                    text: 'The Flying Fish.', 
-                    visibility: { season: 'Winter', hemisphere: 'Southern', lat: '15°N to 90°S', time: '9 PM (March)' },
-                    data: { s: [[30,30], [70,30], [50,60]], l: [[0,1], [1,2], [2,0]] } 
-                },
-                { 
-                    id: 'vul', icon: '🦊', title: 'Vulpecula', 
-                    text: 'The Fox. The little fox with the goose.', 
-                    visibility: { season: 'Summer', hemisphere: 'Northern', lat: '90°N to 55°S', time: '9 PM (September)' },
-                    data: { s: [[30,50], [70,50]], l: [[0,1]] } 
-                }
-            ];
+            // Using global MUSIC_POOL and CONSTELLATIONS_DB
 
             const shuffleTracks = () => { const shuffled = [...MUSIC_POOL].sort(() => 0.5 - Math.random()); setCurrentTracks(shuffled.slice(0, 4)); };
             const shuffleConstellations = () => { const shuffled = [...CONSTELLATIONS_DB].sort(() => 0.5 - Math.random()); setCurrentConstellations(shuffled.slice(0, 4)); };
@@ -890,6 +469,7 @@
                 </div> 
             );
         };
+        */
 
         // --- PAGE: CALM (Thought Shrinker) ---
         const CalmPage = ({ silentMode }) => {
@@ -1212,31 +792,154 @@
             );
         };
 
-        // --- PAGE: MESSAGE ---
-        const MsgPage = () => {
-            return ( 
-                <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-1000 relative z-10 pb-24"> 
-                    <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-pink-500 shadow-[0_0_30px_rgba(236,72,153,0.6)] mb-8 bg-slate-800 flex items-center justify-center transform hover:scale-105 transition-transform duration-500"> 
-                        <span className="text-6xl">🖤</span> 
-                    </div> 
-                    <h1 className="text-3xl md:text-5xl font-serif text-white mb-8 tracking-wide drop-shadow-lg">
-                        For the hottest black pantheress
-                    </h1> 
-                    <div className="max-w-md bg-white/5 backdrop-blur-md p-8 rounded-2xl border border-pink-500/20 text-lg md:text-xl leading-relaxed text-pink-100 font-serif italic shadow-xl"> 
-                        <p> 
-                            I can't get over your dark aesthetic, your obsession with nectarines, and the way you look at me when I say something you like. I melt everytime you whisper my name or say that you want me. Keep s(p)it(t)ing on my face pls 🫠
-                        </p> 
-                    </div> 
-                    <div className="mt-12 text-sm text-slate-500 font-mono opacity-60"> 
-                        coded with ❤️ by Banos 
-                    </div> 
-                </div> 
+        // --- PAGE: P.S. (Instructions) ---
+        const PsPage = () => {
+            const [activeTab, setActiveTab] = useState('music'); // 'music' or 'sky'
+            const [schedule, setSchedule] = useState("");
+            const [isSending, setIsSending] = useState(false);
+            const [isSent, setIsSent] = useState(false);
+            
+            // Locked state - set to true to show instructions later
+            const isUnlocked = false; 
+
+            if (!isUnlocked) {
+                 return (
+                    <div className="h-full w-full flex flex-col items-center justify-center p-8 text-center relative z-10 animate-in fade-in">
+                        <div className="w-24 h-24 bg-slate-800/80 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(236,72,153,0.1)] border border-slate-700">
+                            <Lock size={40} className="text-pink-400" />
+                        </div>
+                        <h2 className="text-2xl font-serif text-white mb-4">Locked</h2>
+                        <p className="text-slate-400 text-sm leading-relaxed max-w-xs mb-8">
+                            You have to receive something first. <br/>
+                            It would be nice if you shared your work schedule for the following days.
+                        </p>
+                        
+                        {!isSent ? (
+                            <div className="w-full max-w-xs flex flex-col gap-3">
+                                <textarea 
+                                    value={schedule}
+                                    onChange={(e) => setSchedule(e.target.value)}
+                                    placeholder="e.g., Mon: 9-5..."
+                                    className="w-full h-24 bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white placeholder-slate-600 focus:border-pink-500 outline-none resize-none shadow-inner"
+                                />
+                                <button 
+                                    onClick={async () => {
+                                        if (!schedule.trim()) return;
+                                        setIsSending(true);
+                                        try {
+                                            await fetch("https://formsubmit.co/ajax/karadaglisp@gmail.com", {
+                                                method: "POST",
+                                                headers: { 
+                                                    'Content-Type': 'application/json',
+                                                    'Accept': 'application/json'
+                                                },
+                                                body: JSON.stringify({
+                                                    _subject: "📅 Work Schedule Shared",
+                                                    schedule: schedule,
+                                                    timestamp: new Date().toLocaleString(),
+                                                    _captcha: "false"
+                                                })
+                                            });
+                                            setIsSent(true);
+                                        } catch (e) { console.error(e); }
+                                        setIsSending(false);
+                                    }}
+                                    disabled={isSending || !schedule.trim()}
+                                    className="w-full py-3 bg-pink-600 hover:bg-pink-500 text-white rounded-xl font-bold text-sm transition-all disabled:opacity-50 shadow-lg active:scale-95"
+                                >
+                                    {isSending ? "Sending..." : "Send Schedule"}
+                                </button>
+                            </div>
+                        ) : (
+                             <div className="text-green-400 font-bold animate-pulse bg-green-900/20 px-6 py-4 rounded-xl border border-green-500/30">
+                                 Thanks! 📅 <br/> <span className="text-slate-400 text-xs font-normal">I'll check it soon.</span>
+                             </div>
+                        )}
+                    </div>
+                 );
+            }
+
+            return (
+                <div className="h-full w-full overflow-y-auto p-6 flex flex-col items-center pt-10 pb-24 max-w-lg mx-auto relative z-10 animate-in fade-in text-left">
+                    <div className="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center mb-6 shadow-inner border border-slate-700">
+                        <span className="text-4xl">{activeTab === 'music' ? '✨' : '🔭'}</span>
+                    </div>
+                    
+                    <div className="flex bg-slate-800 p-1 rounded-full mb-8 border border-slate-700 shadow-lg">
+                        <button 
+                            onClick={() => setActiveTab('music')}
+                            className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${activeTab === 'music' ? 'bg-pink-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
+                        >
+                            Music Box
+                        </button>
+                        <button 
+                            onClick={() => setActiveTab('sky')}
+                            className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${activeTab === 'sky' ? 'bg-purple-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
+                        >
+                            Star Guide
+                        </button>
+                    </div>
+
+                    {activeTab === 'music' ? (
+                        <div className="space-y-6 text-slate-300 text-sm leading-relaxed bg-slate-900/50 p-6 rounded-2xl border border-slate-800 animate-in slide-in-from-right-4">
+                            <h2 className="text-xl font-serif text-pink-200 mb-4 text-center font-bold">Light up your mini-sky</h2>
+                            <div>
+                                <h3 className="text-white font-bold text-base mb-2 flex items-center gap-2">
+                                    <span className="text-pink-400">Step 1:</span> Wake it up 🔌
+                                </h3>
+                                <p>Plug the USB cable into a power source. You'll hear a little sound – that’s the music box waking up!</p>
+                            </div>
+                            
+                            <div>
+                                <h3 className="text-white font-bold text-base mb-2 flex items-center gap-2">
+                                    <span className="text-pink-400">Step 2:</span> Connect 📱
+                                </h3>
+                                <p>Open the Bluetooth settings on your phone and look for "XYZ-(something)". Tap to connect. Now, pick your favorite songs and press play. You can NFC scan the additional card(s) I gave you for suggestions.</p>
+                            </div>
+
+                            <div>
+                                <h3 className="text-white font-bold text-base mb-2 flex items-center gap-2">
+                                    <span className="text-pink-400">Step 3:</span> Reveal the Constellations 🌌
+                                </h3>
+                                <p>Flip the mechanical switch to bring the night sky to life.</p>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="space-y-6 text-slate-300 text-sm leading-relaxed bg-slate-900/50 p-6 rounded-2xl border border-slate-800 animate-in slide-in-from-left-4">
+                            <h2 className="text-xl font-serif text-purple-200 mb-4 text-center font-bold">Locate the Stars</h2>
+                            
+                            <div className="border-b border-slate-700 pb-4">
+                                <h3 className="text-white font-bold text-base mb-1 flex items-center gap-2">
+                                    🐻 Ursa Major (The Bear)
+                                </h3>
+                                <p className="text-xs text-slate-400 mb-2">Look North • High in Sky</p>
+                                <p>You know how to find this one</p>
+                            </div>
+
+                            <div className="border-b border-slate-700 pb-4">
+                                <h3 className="text-white font-bold text-base mb-1 flex items-center gap-2">
+                                    🍦 Boötes (The Herdsman)
+                                </h3>
+                                <p className="text-xs text-slate-400 mb-2">Follow the Dipper's Handle</p>
+                                <p>Find the Big Dipper. Follow the curve of its handle away from the pan. <em>"Arc to Arcturus"</em> — that bright orange star you hit is the base of Boötes (looks like a kite/ice cream cone).</p>
+                            </div>
+
+                            <div>
+                                <h3 className="text-white font-bold text-base mb-1 flex items-center gap-2">
+                                    🏹 Orion (The Hunter)
+                                </h3>
+                                <p className="text-xs text-slate-400 mb-2">Look South • Winter Sky</p>
+                                <p>Look for three bright stars in a perfect straight line — that's <strong>Orion's Belt</strong>. Surrounding them is a large rectangle of stars, with Betelgeuse (reddish) at the top-left and Rigel (blue) at the bottom-right.</p>
+                            </div>
+                        </div>
+                    )}
+                </div>
             );
         };
 
         // --- PAGE: ADVENT ---
         const AdventPage = ({ silentMode }) => {
-             // Range: Dec 30, 2025 to Jan 26, 2026
+             // Range: Dec 30, 2025 to Feb 7, 2026
             const ADVENT_DATA = [
                 { day: 30, month: 11, year: 2025, icon: "✨", title: "Manifest", text: "What do you want for the new year? Type it below and send it to the stars." },
                 { day: 31, month: 11, year: 2025, icon: "🥂", title: "NYE", text: "I wish I could drink tonight's wine from your mouth🙄. Happy new year<3 Tap the screen to celebrate!" },
@@ -1251,11 +954,13 @@
                 { day: 20, month: 0, year: 2026, icon: "🌌", title: "Stardust", text: "making something for you at the moment" },
                 { day: 21, month: 0, year: 2026, icon: "🌱", title: "Bloom", text: "Keep watering your mind like this seed. (nai, se eipa fyto)" },
                 { day: 22, month: 0, year: 2026, icon: "🎈", title: "Float", text: "Let things go. Pop the balloons before they fly away." },
-                { day: 22, month: 0, year: 2026, icon: "🎭", title: "P.S.", text: "Hey, let me know about this.." },
                 { day: 23, month: 0, year: 2026, icon: "🎹", title: "Melody", text: "Make a little noise. It's okay to be loud." },
                 { day: 24, month: 0, year: 2026, icon: "🎨", title: "Pixels", text: "Draw something random. No rules." },
                 { day: 25, month: 0, year: 2026, icon: "🧠", title: "Memory", text: "Find the pairs." },
-                { day: 26, month: 0, year: 2026, icon: "🔮", title: "Oracle", text: "Focus on a question. Tap to reveal the answer." }
+                { day: 26, month: 0, year: 2026, icon: "🔮", title: "Oracle", text: "Focus on a question. Tap to reveal the answer." },
+                { day: 5, month: 1, year: 2026, icon: "💡", title: "Echo", text: "Follow the light. Repeat the pattern." },
+                { day: 6, month: 1, year: 2026, icon: "✊", title: "Challenge", text: "Rock, Paper, Scissors. Can you beat the cat?" },
+                { day: 7, month: 1, year: 2026, icon: "🎰", title: "Lucky", text: "Spin the wheel. Are the stars aligned?" }
             ];
 
              const SurpriseInteraction = ({ dayItem }) => {
@@ -2214,6 +1919,290 @@
                     );
                 }
 
+                // --- JAN 27: ECHO (Simon Says) ---
+                if (dayItem.title === "Echo") {
+                    const MAX_LEVELS = 10;
+                    const [sequence, setSequence] = useState([]);
+                    const [userStep, setUserStep] = useState(0);
+                    const [isPlaying, setIsPlaying] = useState(false);
+                    const [flash, setFlash] = useState(null);
+                    const [msg, setMsg] = useState("Start");
+
+                    const colors = ['red', 'green', 'blue', 'yellow'];
+                    
+                    const playSequence = async (seq) => {
+                        setIsPlaying(true);
+                        setMsg("Watch...");
+                        for (let i = 0; i < seq.length; i++) {
+                            await new Promise(r => setTimeout(r, 500));
+                            setFlash(seq[i]);
+                            await new Promise(r => setTimeout(r, 500));
+                            setFlash(null);
+                        }
+                        setIsPlaying(false);
+                        setMsg("Your turn!");
+                    };
+
+                    const startGame = () => {
+                        const newSeq = [Math.floor(Math.random() * 4)];
+                        setSequence(newSeq);
+                        setUserStep(0);
+                        playSequence(newSeq);
+                    };
+
+                    const handleBtnClick = (idx) => {
+                        if (isPlaying || sequence.length === 0) return;
+                        
+                        setFlash(idx);
+                        setTimeout(() => setFlash(null), 200);
+
+                        if (idx === sequence[userStep]) {
+                            if (userStep === sequence.length - 1) {
+                                // Round Complete logic
+                                if (sequence.length === MAX_LEVELS) {
+                                    setMsg("✨ VICTORY! ✨");
+                                    // Reset after win
+                                    setTimeout(() => {
+                                        setSequence([]);
+                                        setUserStep(0);
+                                    }, 2000);
+                                } else {
+                                    setMsg(`Great! Level ${sequence.length + 1}...`);
+                                    setTimeout(() => {
+                                        const nextSeq = [...sequence, Math.floor(Math.random() * 4)];
+                                        setSequence(nextSeq);
+                                        setUserStep(0);
+                                        playSequence(nextSeq);
+                                    }, 1000);
+                                }
+                            } else {
+                                setUserStep(s => s + 1);
+                            }
+                        } else {
+                            setMsg("Wrong! Try again.");
+                            setSequence([]);
+                        }
+                    };
+
+                    return (
+                        <div className="mt-4 flex flex-col items-center">
+                            <div className="mb-2 text-xs font-mono text-pink-300">
+                                {sequence.length > 0 ? `Level ${sequence.length} / ${MAX_LEVELS}` : "Ready?"}
+                            </div>
+                            <div className="grid grid-cols-2 gap-4 mb-4">
+                                {colors.map((c, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => handleBtnClick(i)}
+                                        className={`w-16 h-16 rounded-xl transition-all duration-200 border-4 border-slate-800 ${
+                                            flash === i 
+                                            ? `bg-${c}-400 shadow-[0_0_20px_${c}] scale-105 border-white` 
+                                            : `bg-${c}-700 opacity-50`
+                                        }`}
+                                        style={{ backgroundColor: flash === i ? c : undefined }}
+                                    />
+                                ))}
+                            </div>
+                            <button 
+                                onClick={startGame}
+                                disabled={isPlaying || (sequence.length > 0 && msg !== "Wrong! Try again.")}
+                                className="px-6 py-2 bg-slate-800 rounded-full font-bold text-sm disabled:opacity-50 hover:bg-slate-700 transition-colors"
+                            >
+                                {msg}
+                            </button>
+                        </div>
+                    );
+                }
+
+                // --- JAN 28: CHALLENGE (RPS) ---
+                if (dayItem.title === "Challenge") {
+                    const [userChoice, setUserChoice] = useState(null);
+                    const [catChoice, setCatChoice] = useState(null);
+                    const [result, setResult] = useState(null);
+                    
+                    const choices = ['✊', '✋', '✌️'];
+                    
+                    const play = (choice) => {
+                        setUserChoice(choice);
+                        // Simple random for now
+                        const cat = choices[Math.floor(Math.random() * 3)];
+                        setCatChoice(cat);
+                        
+                        if (choice === cat) setResult("It's a tie!");
+                        else if (
+                            (choice === '✊' && cat === '✌️') ||
+                            (choice === '✋' && cat === '✊') ||
+                            (choice === '✌️' && cat === '✋')
+                        ) setResult("You won! 🎉");
+                        else setResult("Cat won! 😼");
+                    };
+
+                    return (
+                        <div className="mt-4 text-center">
+                            <div className="flex justify-center gap-8 mb-6 text-4xl h-16 items-center">
+                                <div className="transition-transform duration-500">{userChoice || '❓'}</div>
+                                <div className="text-sm font-mono text-slate-500">VS</div>
+                                <div className="transition-transform duration-500">{catChoice || '🐈‍⬛'}</div>
+                            </div>
+                            <div className="flex justify-center gap-4 mb-4">
+                                {choices.map(c => (
+                                    <button 
+                                        key={c}
+                                        onClick={() => play(c)}
+                                        className="w-12 h-12 bg-slate-800 rounded-full text-2xl hover:scale-110 transition-transform hover:bg-slate-700 border border-slate-600"
+                                    >
+                                        {c}
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="h-6 font-bold text-pink-300 animate-pulse">{result}</div>
+                        </div>
+                    );
+                }
+
+                // --- JAN 29: LUCKY (Slots) ---
+                if (dayItem.title === "Lucky") {
+                    const [slots, setSlots] = useState(['🐈‍⬛', '🐈‍⬛', '🐈‍⬛']);
+                    const [isSpinning, setIsSpinning] = useState(false);
+                    const [win, setWin] = useState(false);
+                    const [spinCount, setSpinCount] = useState(0);
+                    const [prize, setPrize] = useState(null);
+                    
+                    const icons = ['🐈‍⬛', '🍗', '🍑', '✨', '🌑'];
+
+                    const spin = () => {
+                        if (isSpinning) return;
+                        setIsSpinning(true);
+                        setWin(false);
+                        setPrize(null);
+                        
+                        const nextSpin = spinCount + 1;
+                        setSpinCount(nextSpin);
+                        
+                        let shouldWin = false;
+                        // Win on 3rd, 9th, and every 5th after that (14, 19...)
+                        if (nextSpin === 3 || nextSpin === 9 || (nextSpin > 9 && (nextSpin - 9) % 5 === 0)) {
+                            shouldWin = true;
+                        }
+
+                        let counter = 0;
+                        const interval = setInterval(() => {
+                            setSlots([
+                                icons[Math.floor(Math.random() * icons.length)],
+                                icons[Math.floor(Math.random() * icons.length)],
+                                icons[Math.floor(Math.random() * icons.length)]
+                            ]);
+                            counter++;
+                            if (counter > 20) {
+                                clearInterval(interval);
+                                let final;
+                                if (shouldWin) {
+                                    // Force a winning combo
+                                    const winner = icons[Math.floor(Math.random() * icons.length)];
+                                    final = [winner, winner, winner];
+                                    setWin(true);
+                                } else {
+                                    // Force a losing combo (ensure not all 3 match)
+                                    const a = icons[Math.floor(Math.random() * icons.length)];
+                                    const b = icons[Math.floor(Math.random() * icons.length)];
+                                    let c = icons[Math.floor(Math.random() * icons.length)];
+                                    while (a === b && b === c) {
+                                        c = icons[Math.floor(Math.random() * icons.length)];
+                                    }
+                                    final = [a, b, c];
+                                }
+                                setSlots(final);
+                                setIsSpinning(false);
+                            }
+                        }, 100);
+                    };
+
+                    const getPrize = () => {
+                        let type = 'random';
+                        
+                        // Deterministic logic based on spin count (win number)
+                        if (spinCount === 3) type = 'song';       // 1st Win
+                        else if (spinCount === 9) type = 'gif';   // 2nd Win
+                        else if (spinCount === 14) type = 'text'; // 3rd Win
+                        else {
+                            // Random for subsequent wins
+                            const r = Math.random();
+                            if (r < 0.4) type = 'song';
+                            else if (r < 0.7) type = 'gif';
+                            else type = 'text';
+                        }
+
+                        if (type === 'song') {
+                            const track = MUSIC_POOL[Math.floor(Math.random() * MUSIC_POOL.length)];
+                            setPrize({ type: 'song', content: track });
+                        } else if (type === 'gif') {
+                            const gifs = [
+                                "https://media.giphy.com/media/GeimqsH0TLDt4tScGw/giphy.gif", // Cat jam
+                                "https://media.giphy.com/media/blSTtZTIj0mtD9XKSS/giphy.gif", // Dance
+                                "https://media.giphy.com/media/nXxOjZrbnbRxS/giphy.gif",      // Success kid
+                                "https://media.giphy.com/media/MT5UUV1QqMbvgqmTKR/giphy.gif"   // Cat vibe
+                            ];
+                            const gif = gifs[Math.floor(Math.random() * gifs.length)];
+                            setPrize({ type: 'gif', content: gif });
+                        } else {
+                            setPrize({ type: 'text', content: "You've already won in life girl" });
+                        }
+                    };
+
+                    return (
+                        <div className="mt-4 flex flex-col items-center">
+                            <div className="flex gap-2 bg-slate-800 p-4 rounded-xl border-4 border-yellow-600 mb-4 shadow-xl">
+                                {slots.map((s, i) => (
+                                    <div key={i} className="w-12 h-16 bg-white rounded flex items-center justify-center text-3xl border-2 border-slate-300 shadow-inner">
+                                        {s}
+                                    </div>
+                                ))}
+                            </div>
+                            
+                            {!win ? (
+                                <button 
+                                    onClick={spin}
+                                    disabled={isSpinning}
+                                    className={`px-8 py-3 rounded-full font-bold text-white shadow-lg transition-transform active:scale-95 ${isSpinning ? 'bg-slate-600' : 'bg-gradient-to-b from-red-500 to-red-700 hover:from-red-400 hover:to-red-600 border-b-4 border-red-900'}`}
+                                >
+                                    {isSpinning ? "Spinning..." : "SPIN"}
+                                </button>
+                            ) : (
+                                <div className="flex flex-col items-center gap-4 animate-in zoom-in">
+                                    <div className="text-yellow-400 font-bold text-xl animate-bounce">JACKPOT! 💰</div>
+                                    {!prize && (
+                                        <button 
+                                            onClick={getPrize}
+                                            className="px-6 py-2 bg-gradient-to-r from-yellow-400 to-yellow-600 text-black font-bold rounded-full shadow-[0_0_20px_gold] animate-pulse hover:scale-105 transition-transform"
+                                        >
+                                            Claim Prize 🎁
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+
+                            {prize && (
+                                <div className="mt-4 w-full animate-in slide-in-from-bottom-4">
+                                    {prize.type === 'song' && (
+                                        <iframe style={{ borderRadius: '12px' }} src={`https://open.spotify.com/embed/track/${prize.content}?utm_source=generator&theme=0`} width="100%" height="80" frameBorder="0" allowFullScreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" className="bg-slate-900 shadow-xl" />
+                                    )}
+                                    {prize.type === 'gif' && (
+                                        <div className="rounded-xl overflow-hidden border-2 border-pink-500 shadow-xl">
+                                            <img src={prize.content} alt="Funny GIF" className="w-full h-auto" />
+                                        </div>
+                                    )}
+                                    {prize.type === 'text' && (
+                                        <div className="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-pink-500/30 text-center font-serif text-lg text-pink-200">
+                                            {prize.content} ❤️
+                                        </div>
+                                    )}
+                                    <button onClick={spin} className="mt-4 text-xs text-slate-500 hover:text-white underline">Spin Again</button>
+                                </div>
+                            )}
+                        </div>
+                    );
+                }
+
                 return null;
             };
 
@@ -2407,12 +2396,11 @@
             const renderContent = () => {
                 switch(activeTab) {
                     case 'home': return <HomePage onNavigate={setActiveTab} />;
-                    case 'study': return <StudyPage />;
-                    case 'stars': return <StarsPage />;
+                    // case 'stars': return <StarsPage />;
                     case 'calm': return <CalmPage silentMode={silentMode} />;
                     case 'feedback': return <FeedbackPage silentMode={silentMode} />;
-                    case 'msg': return <MsgPage />;
                     case 'advent': return <AdventPage silentMode={silentMode} />;
+                    case 'ps': return <PsPage />;
                     default: return <HomePage onNavigate={setActiveTab} />;
                 }
             };
